@@ -36,6 +36,42 @@ public class weekone {
        int x;
        System.out.println("-----------------");
 
+       String str1 = "Hello World";
+       String str2 = "Hello World";
+       String str3 = str1;
+       int s1 = str1.compareTo(str2);
+       int s2 = str1.compareTo(str3);
+       boolean s3 = (str1 == str2);
+       boolean s4 = (str1 == str3);
+
+       System.out.printf("s1: %d, s2: %d, s3: %b, s4: %b", s1, s2, s3, s4);
+
+
+       System.out.println("-----------------");
+
+       double[][] balances = new double[20][10];
+       System.out.println("2D array's length: " + balances.length);
+
+       for (int j = 0; j < balances.length; j++){
+           balances[j][0] = 10000 + 1000 * j;
+       }
+
+       for (int j = 0; j <balances.length; j++){
+           for (int i = 1; i < 10; i++){
+               balances[j][i] = balances[j][0] * Math.pow(1.3, i);
+           }
+       }
+
+       for (int j = 0; j <balances.length; j++){
+           for (int i = 0; i < 10; i++){
+               System.out.printf("Balance[%d][%d]: %.2f  ", j, i, balances[j][i]);
+           }
+           System.out.println();
+       }
+
+
+       System.out.println("-----------------");
+
        Random ranint = new Random();
        int[] arr = new int[50];
        for (int i = 0; i < arr.length; i++){
@@ -46,13 +82,16 @@ public class weekone {
            System.out.println(i + ": " + arr[i]);
        }
 
-
-
        System.out.println("-----------------");
-       for (int i = 0; i < 100; i++){
-           if (isPrime(i) == true){
-               System.out.println(i + " is a Prime.");
+       int[] primearr = new int[100];
+       int cnt = 0;
+       int value = 0;
+       while (cnt < 100){
+           if (isPrime(value) == true){
+               System.out.println(value + " is a Prime.");
+               primearr[cnt++] = value;
            }
+           value++;
        }
 
        System.out.println("-----------------");
