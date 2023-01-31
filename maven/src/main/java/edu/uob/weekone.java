@@ -1,5 +1,6 @@
 package edu.uob;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class weekone {
@@ -16,8 +17,46 @@ public class weekone {
        return res;
    }
 
+   public static boolean isPrime(int num){
+       if (num <= 2){
+           return false;
+       }
+
+       for (int i = 2; i <= Math.sqrt(num); i++){
+           if (num % i == 0){
+               return false;
+           }
+       }
+
+       return true;
+   }
+
    public static void main(String[] args){
        Scanner in = new Scanner(System.in);
+       int x;
+       System.out.println("-----------------");
+
+       Random ranint = new Random();
+       int[] arr = new int[50];
+       for (int i = 0; i < arr.length; i++){
+           arr[i] = ranint.nextInt(100);
+       }
+
+       for (int i = 0; i < arr.length; i++){
+           System.out.println(i + ": " + arr[i]);
+       }
+
+
+
+       System.out.println("-----------------");
+       for (int i = 0; i < 100; i++){
+           if (isPrime(i) == true){
+               System.out.println(i + " is a Prime.");
+           }
+       }
+
+       System.out.println("-----------------");
+
        System.out.println("Input a number and its nums of digits is: ");
        int num = in.nextInt();
        int res = numofdigits(num);
@@ -54,7 +93,7 @@ public class weekone {
            System.out.println("10 / 3 <= 3");
        }
 
-       int x = 10 / 3;
+       x = 10 / 3;
        double y = (10 / 3);
        System.out.println("x: " + x + ", y: " + y);
 
