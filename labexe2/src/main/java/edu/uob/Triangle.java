@@ -8,19 +8,23 @@ public class Triangle extends TwoDimensionalShape{
   private int b;
   private int c;
 
+  public TriangleVariant getVariant(){
+    return this.type;
+  }
+
   public TriangleVariant typecheck() {
-    if (a == b && b == c) {
-      return TriangleVariant.EQUILATERAL;
+    if (a <= 0 || b <= 0 || c <= 0 ) {
+      return TriangleVariant.ILLEGAL;
+    }else if (a == b && b == c){
+      return  TriangleVariant.EQUILATERAL;
+    }else if (a + b == c || a + c == b || b + c == a){
+      return  TriangleVariant.FLAT;
     }else if (a == b || b == c || a == c ){
       return TriangleVariant.ISOSCELES;
     }else if (isPythagoras()){
        return TriangleVariant.RIGHT;
-    }else if (a + b == c || a + c == b || b + c == a){
-       return  TriangleVariant.FLAT;
     }else if (a + b < c || a + c < b || b + c < a){
        return TriangleVariant.IMPOSSIBLE;
-    }else if (a == 0 || b == 0 || c ==0){
-       return  TriangleVariant.ILLEGAL;
     }else{
        return TriangleVariant.SCALENE;
     }
@@ -60,8 +64,6 @@ public class Triangle extends TwoDimensionalShape{
   public int calculatePerimeterLength() {
     return a + b + c;
   }
-
-
 
   public boolean isPythagoras(){
     int max = a > b? a: b;
