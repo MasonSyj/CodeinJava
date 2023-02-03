@@ -14,15 +14,14 @@ class TwoDimensionalShape extends Shapes{
 
   @Override
   public String toString(){
-    return "This is a " + col + " ";
+    return "This is a " + this.col + " ";
   }
 
   protected void setCol(Colour c){
-    col = c;
+    this.col = c;
   }
 
   public Colour getCol(){
-    System.out.println(col);
-    return col;
+    return this.col;
   }
 }
