@@ -16,4 +16,13 @@ class TwoDimensionalShape extends Shapes{
   public String toString(){
     return "This is a " + col + " ";
   }
+
+  protected void setCol(Colour c){
+    col = c;
+  }
+
+  public Colour getCol(){
+    System.out.println(col);
+    return col;
+  }
 }

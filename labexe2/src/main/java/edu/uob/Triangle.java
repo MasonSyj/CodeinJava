@@ -13,7 +13,7 @@ public class Triangle extends TwoDimensionalShape{
       return TriangleVariant.EQUILATERAL;
     }else if (a == b || b == c || a == c ){
       return TriangleVariant.ISOSCELES;
-    }else if (Pythagoras()){
+    }else if (isPythagoras()){
        return TriangleVariant.RIGHT;
     }else if (a + b == c || a + c == b || b + c == a){
        return  TriangleVariant.FLAT;
@@ -46,7 +46,7 @@ public class Triangle extends TwoDimensionalShape{
       res.replace("Y", String.valueOf(b));
       res.replace("Z", String.valueOf(c));
 */
-    return super.toString() + "Triangle with sides of length" + a + ", " + b + ", " + c;
+    return super.toString() + "Triangle with sides of length " + a + ", " + b + ", " + c;
   }
 
 
@@ -61,16 +61,9 @@ public class Triangle extends TwoDimensionalShape{
     return a + b + c;
   }
 
-  public void setCol(Colour c){
-    col = c;
-  }
 
-  public Colour getCol(){
-    System.out.println(col);
-    return col;
-  }
 
-  public boolean Pythagoras(){
+  public boolean isPythagoras(){
     int max = a > b? a: b;
     max = max> c?max:c;
     int short1, short2;

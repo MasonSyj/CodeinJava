@@ -23,12 +23,5 @@ class Rectangle extends TwoDimensionalShape {
     return super.toString() + "Rectangle of dimensions " + width + " x " + height;
   }
 
-  public void setCol(Colour c){
-    col = c;
-  }
 
-  public Colour getCol(){
-    System.out.println(col);
-    return col;
-  }
 }

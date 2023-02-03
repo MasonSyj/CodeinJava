@@ -21,12 +21,4 @@ class Circle extends TwoDimensionalShape {
     return super.toString() + "Circle with radius " + radius;
   }
 
-  public void setCol(Colour c){
-    col = c;
-  }
-
-  public Colour getCol(){
-    System.out.println(col);
-    return col;
-  }
 }
