@@ -15,12 +15,12 @@ class Rectangle extends TwoDimensionalShape {
   }
 
   @Override
-  public int calculatePerimeterLength() {
+  public long calculatePerimeterLength() {
     return 2 * (width + height);
   }
 
   public String toString() {
-    return super.toString() + "Rectangle of dimensions " + width + " x " + height;
+    return super.toDefualtString() + "Rectangle of dimensions " + width + " x " + height;
   }
 
 

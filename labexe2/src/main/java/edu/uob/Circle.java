@@ -12,13 +12,13 @@ class Circle extends TwoDimensionalShape {
     return (int) Math.round(Math.PI * radius * radius);
   }
   @Override
-  public int calculatePerimeterLength() {
+  public long calculatePerimeterLength() {
     return (int) Math.round(Math.PI * radius * 2.0);
   }
 
   @Override
   public String toString() {
-    return super.toString() + "Circle with radius " + radius;
+    return super.toDefualtString() + "Circle with radius " + radius;
   }
 
 }

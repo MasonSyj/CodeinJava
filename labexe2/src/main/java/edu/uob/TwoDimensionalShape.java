@@ -1,19 +1,15 @@
 package edu.uob;
 
-class TwoDimensionalShape extends Shapes{
+abstract class TwoDimensionalShape extends Shapes{
 
   protected Colour col;
 
-  public double calculateArea(){
-    return 0;
-  }
+  abstract public double calculateArea();
 
-  public int calculatePerimeterLength(){
-    return 0;
-  }
+  abstract public long calculatePerimeterLength();
 
-  @Override
-  public String toString(){
+
+  public String toDefualtString(){
     return "This is a " + this.col + " ";
   }
 

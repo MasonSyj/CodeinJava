@@ -4,9 +4,9 @@ import java.util.Timer;
 
 public class Triangle extends TwoDimensionalShape{
   private TriangleVariant type;
-  private int a;
-  private int b;
-  private int c;
+  private long a;
+  private long b;
+  private long c;
 
   public TriangleVariant getVariant(){
     return this.type;
@@ -21,7 +21,8 @@ public class Triangle extends TwoDimensionalShape{
       return  TriangleVariant.FLAT;
     }else if (a == b || b == c || a == c ){
       return TriangleVariant.ISOSCELES;
-    }else if (isPythagoras()){
+    }else if (a * a + b * b == c * c || a * a + c * c == b * b  || b * b + c * c == a * a){
+//    }else if (isPythagoras()){
        return TriangleVariant.RIGHT;
     }else if (a + b < c || a + c < b || b + c < a){
        return TriangleVariant.IMPOSSIBLE;
@@ -37,8 +38,8 @@ public class Triangle extends TwoDimensionalShape{
     this.type = typecheck();
   }
 
-  public int getLongestSide(){
-    int max = a > b? a: b;
+  public long getLongestSide(){
+    long max = a > b? a: b;
     return max > c? max: c;
   }
 
@@ -50,7 +51,7 @@ public class Triangle extends TwoDimensionalShape{
       res.replace("Y", String.valueOf(b));
       res.replace("Z", String.valueOf(c));
 */
-    return super.toString() + "Triangle with sides of length " + a + ", " + b + ", " + c;
+    return super.toDefualtString() + "Triangle with sides of length " + a + ", " + b + ", " + c;
   }
 
 
@@ -61,29 +62,8 @@ public class Triangle extends TwoDimensionalShape{
   }
 
   @Override
-  public int calculatePerimeterLength() {
+  public long calculatePerimeterLength() {
     return a + b + c;
   }
 
-  public boolean isPythagoras(){
-    int max = a > b? a: b;
-    max = max> c?max:c;
-    int short1, short2;
-    if (c == max){
-      short1 = a;
-      short2 = b;
-    }else if (b == max){
-      short1 = a;
-      short2 = c;
-    }else {
-      short1 = b;
-      short2 = c;
-    }
-
-    if (short1 * short1 + short2 * short2 == max * max){
-      return true;
-    }else{
-      return false;
-    }
-  }
 }
