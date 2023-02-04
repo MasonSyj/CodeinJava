@@ -19,7 +19,7 @@ class Rectangle extends TwoDimensionalShape {
     return 2 * (width + height);
   }
 
-  public String toString() {
+  public String toDefualtString() {
     return super.toDefualtString() + "Rectangle of dimensions " + width + " x " + height;
   }
 
