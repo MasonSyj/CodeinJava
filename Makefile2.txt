@@ -1,0 +1,14 @@
+State = State.java
+Direction = Direction.java
+Grid = Grid.java Direction.java
+Entity = Entity.java State.java Grid.java Direction.java
+Wall = Wall.java $(Entity)
+Space = Space.java $(Entity)
+Star = Star.java $(Entity)
+Player = Player.java $(Entity)
+Level = Level.java Wall.java Space.java Star.java Player.java $(Entity)
+Maze = Maze.java $(Level)
+
+%: %.java
+	javac $($@)
+	java -ea $@

@@ -1,0 +1,1 @@
+class Wall extends Entity { }
