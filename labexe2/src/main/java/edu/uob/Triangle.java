@@ -22,7 +22,6 @@ public class Triangle extends TwoDimensionalShape{
     }else if (a == b || b == c || a == c ){
       return TriangleVariant.ISOSCELES;
     }else if (a * a + b * b == c * c || a * a + c * c == b * b  || b * b + c * c == a * a){
-//    }else if (isPythagoras()){
        return TriangleVariant.RIGHT;
     }else if (a + b < c || a + c < b || b + c < a){
        return TriangleVariant.IMPOSSIBLE;
@@ -39,18 +38,11 @@ public class Triangle extends TwoDimensionalShape{
   }
 
   public long getLongestSide(){
-    long max = a > b? a: b;
-    return max > c? max: c;
+    long max = Math.max(a, b);
+    return Math.max(max, c);
   }
 
-  @Override
-  public String toString(){
-/*
-      String res = "This is a Triangle with sides of length X, Y, Z";
-      res.replace("X", String.valueOf(a));
-      res.replace("Y", String.valueOf(b));
-      res.replace("Z", String.valueOf(c));
-*/
+  public String toDefualtString(){
     return super.toDefualtString() + "Triangle with sides of length " + a + ", " + b + ", " + c;
   }
 

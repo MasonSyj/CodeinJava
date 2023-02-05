@@ -16,8 +16,7 @@ class Circle extends TwoDimensionalShape {
     return (int) Math.round(Math.PI * radius * 2.0);
   }
 
-  @Override
-  public String toString() {
+  public String toDefualtString() {
     return super.toDefualtString() + "Circle with radius " + radius;
   }
 
