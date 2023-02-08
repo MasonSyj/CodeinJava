@@ -2,7 +2,7 @@ package edu.uob;
 
 import java.util.Timer;
 
-public class Triangle extends TwoDimensionalShape{
+public class Triangle extends TwoDimensionalShape implements MultiVariantShape{
   private TriangleVariant type;
   private long a;
   private long b;
