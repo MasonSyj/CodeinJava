@@ -33,9 +33,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>19.0.2.1</version>
+        </dependency>
+
     </dependencies>
-
-
 
     <build>
         <plugins>
@@ -73,7 +77,14 @@
                 </configuration>
             </plugin>
 
-
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>HelloFX</mainClass>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

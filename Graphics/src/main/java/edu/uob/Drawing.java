@@ -1,5 +1,3 @@
-package edu.uob;
-
 /* Display a drawing of a seesaw. */
 
 import javafx.application.*;
