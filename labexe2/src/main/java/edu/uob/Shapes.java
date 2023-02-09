@@ -62,6 +62,8 @@ public class Shapes {
       }else {
         arr[i] = new Rectangle(7, 8);
       }
+      System.out.println(arr[i].toDefualtString());
+
     }
 
     int tricnt = 0;
