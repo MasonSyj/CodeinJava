@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c2940d70-5577-45eb-a8a6-e16bd74a12a3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../Clock/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/Clock.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/out/production/Clock/Clock.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/out/production/Clock/Counter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/out/production/Clock/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/src/Clock.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/src/Counter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/Clock.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/out/production/Clock/Clock.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/out/production/Clock/Counter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/out/production/Clock/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/src/Clock.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/src/Counter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Clock2/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/Shapes.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/out/production/Shapes/Circus.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/out/production/Shapes/Shape.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/out/production/Shapes/ShapeType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/out/production/Shapes/Square.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/out/production/Shapes/Triangle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Circus.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Circus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Shape.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Shape.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/ShapeType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Square.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Square.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Triangle.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Shapesselfprac/src/Triangle.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/.mvn/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/src/main/java/edu/uob/weekone.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/src/test/java/edu/uob/.keep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../datastructprac/src/test/java/edu/uob/test.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../enumsselfprac/EnumTest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../enumsselfprac/EnumTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../enumsselfprac/Size.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../enumsselfprac/Test$Size.class" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2LY6yJ8sfcesZB5rgMwkdSj328B" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/tj22981/CodeinJava/pro/MammalsArraysAndPolymorphism",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c2940d70-5577-45eb-a8a6-e16bd74a12a3" name="Changes" comment="" />
+      <created>1676035922928</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1676035922928</updated>
+      <workItem from="1676035924313" duration="569000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
