@@ -3,7 +3,7 @@ package edu.uob;
 import javax.swing.*;
 import java.awt.*;
 
-public class Main {
+public class JFramesMethondExample {
     public static void main(String[] args){
         JFrame window1 = new JFrame("window 1");
         JFrame window2 = new JFrame("window 2");
