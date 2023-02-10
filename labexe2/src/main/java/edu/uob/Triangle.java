@@ -18,6 +18,10 @@ public class Triangle extends TwoDimensionalShape implements MultiVariantShape{
     return this.type;
   }
 
+  public static int getPopulation(){
+    return cnt;
+  }
+
 
   public TriangleVariant typecheck() {
     if (a <= 0 || b <= 0 || c <= 0 ) {

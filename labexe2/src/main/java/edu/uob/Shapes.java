@@ -84,7 +84,7 @@ public class Shapes {
     example = (Triangle)example;
     System.out.println(((Triangle) example).getVariant());*/
 
-    System.out.println(Triangle.cnt);
+    System.out.println(Triangle.getPopulation());
 
 
   }

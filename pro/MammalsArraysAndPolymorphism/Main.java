@@ -46,7 +46,6 @@ public class Main {
             one.eat();
             if (one instanceof Dog){
                 System.out.println("*******************");
-                //one.sit();
                 ((Dog) one).sit();
                 System.out.println("*******************");
             }
