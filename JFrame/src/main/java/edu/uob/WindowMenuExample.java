@@ -19,16 +19,22 @@ public class WindowMenuExample {
         JMenu editm = new JMenu("Edit");
         bar.add(filem);
         bar.add(editm);
-        JMenuItem save = new JMenuItem("save", arrow);
+        JMenuItem save = new JMenuItem("save");
+        JMenuItem open = new JMenuItem("open");
+        JMenuItem recent = new JMenuItem("recent");
+        JMenuItem paste = new JMenuItem("paste");
+        JMenuItem delete = new JMenuItem("delete");
+/*      JMenuItem save = new JMenuItem("save", arrow);
         JMenuItem open = new JMenuItem("open", call);
         JMenuItem copy = new JMenuItem("recent", cross);
         JMenuItem paste = new JMenuItem("paste", download);
         JMenuItem delete = new JMenuItem("delete", tick);
+*/
         filem.add(save);
         filem.add(open);
-        open.add(copy);
+        filem.add(recent);
         editm.add(paste);
-        paste.add(delete);
+        editm.add(delete);
 
 
         JFrame window = new JFrame();
@@ -43,6 +49,8 @@ public class WindowMenuExample {
         window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         window.setResizable(true);
+
+        window.setTitle("Hello World");
 
         window.setVisible(true);
 
