@@ -8,9 +8,16 @@ public class Triangle extends TwoDimensionalShape implements MultiVariantShape{
   private long b;
   private long c;
 
+  public static int cnt = 0;
+
+  public static void increment(){
+    cnt++;
+  }
+
   public TriangleVariant getVariant(){
     return this.type;
   }
+
 
   public TriangleVariant typecheck() {
     if (a <= 0 || b <= 0 || c <= 0 ) {
@@ -35,6 +42,7 @@ public class Triangle extends TwoDimensionalShape implements MultiVariantShape{
     this.b = b;
     this.c = c;
     this.type = typecheck();
+    increment();
   }
 
   public long getLongestSide(){

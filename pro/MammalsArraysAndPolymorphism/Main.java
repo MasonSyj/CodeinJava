@@ -26,6 +26,7 @@ public class Main {
 
         for(Mammal one: mms){
             one.makeNoise();
+
         }
 
         System.out.println("---------------Separate Line-----------------------");
@@ -43,6 +44,12 @@ public class Main {
         }
         for(Pet one: pets){
             one.eat();
+            if (one instanceof Dog){
+                System.out.println("*******************");
+                //one.sit();
+                ((Dog) one).sit();
+                System.out.println("*******************");
+            }
         }
     }
 }

@@ -75,14 +75,16 @@ public class Shapes {
 
     System.out.println("100 shapes hold: " + tricnt + " Triangles");
 
-    example = new Triangle(3, 4, 5);
+/*    example = new Triangle(3, 4, 5);
     example = (Triangle)example;
     System.out.println(((Triangle) example).getVariant());
 
 
     example = new Rectangle(4, 6);
     example = (Triangle)example;
-    System.out.println(((Triangle) example).getVariant());
+    System.out.println(((Triangle) example).getVariant());*/
+
+    System.out.println(Triangle.cnt);
 
 
   }
