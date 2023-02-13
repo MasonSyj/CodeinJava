@@ -1,4 +1,5 @@
 import java.sql.SQLOutput;
+import java.util.LinkedList;
 
 class MyLinkedList {
 
@@ -36,12 +37,14 @@ class MyLinkedList {
 	}
 
 	public void addAtIndex(int index, int val) {
-		if (index < 0 || index > size){
+		if (index < 0 || index > this.size){
 			return;
 		}
 
-		if (this.size == 0 && index == 0){
+		if (index == 0){
+			ListNode temp = this.head;
 			this.head = new ListNode(val);
+			head.next = temp;
 			this.increment();
 			return;
 		}
@@ -49,7 +52,7 @@ class MyLinkedList {
 		ListNode temp = this.head;
 		ListNode newnode = new ListNode(val);
 
-		for (int i = 0; i < index; i++){
+		for (int i = 0; i < index - 1; i++){
 			temp = temp.next;
 		}
 
@@ -106,42 +109,7 @@ class MyLinkedList {
 		this.size--;
 	}
 
-	public static void main(String[] agrs){
-		MyLinkedList list = new MyLinkedList();
-		list.addAtIndex(0, 3);
-		list.addAtIndex(0, 4);
-		list.addAtIndex(0, 5);
-		list.addAtIndex(1, 10);
-		list.addAtIndex(2, 7);
 
-		System.out.println(list.toDefaultString());
-
-		list.addAtTail(8);
-		list.addAtTail(9);
-
-		System.out.println(list.toDefaultString());
-
-		list.deleteAtIndex(0);
-		list.deleteAtIndex(0);
-
-		System.out.println(list.toDefaultString());
-
-		System.out.println(list.get(0));
-		System.out.println(list.get(1));
-		System.out.println(list.get(2));
-
-		MyLinkedList list2 = new MyLinkedList();
-		list2.addAtHead(1);
-		list2.addAtTail(3);
-		list2.addAtIndex(1, 2);
-		System.out.println(list2.toDefaultString());
-		System.out.println(list2.get(1));
-		list2.deleteAtIndex(1);
-		System.out.println(list2.get(1));
-		System.out.println(list2.toDefaultString());
-
-
-	}
 }
 
 /**
