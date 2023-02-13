@@ -35,6 +35,7 @@ public class Field {
             this.points += tempf.points;
         }
         this.board[ypac][xpac] = temp;
+        ((Pacman)this.board[ypac][xpac]).eat();
     }
 
     public Field(int row, int col){
@@ -48,9 +49,10 @@ public class Field {
         this.numFoods = 0;
         for (int j = 0; j < this.row; j++){
             for (int i = 0; i < this.col; i++){
-                if (rand.nextInt(10) < 7){
+                int randnum = rand.nextInt(20);
+                if (randnum < 12){
                     this.board[j][i] = new Cell();
-                }else if (rand.nextInt(10) < 9){
+                }else if (randnum < 17){
                     this.board[j][i] = new Marble();
                     this.numFoods++;
                 }else{

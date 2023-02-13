@@ -1,3 +1,5 @@
+import java.awt.*;
+
 public class Cell implements Draw{
     boolean isexist;
 
@@ -9,10 +11,12 @@ public class Cell implements Draw{
         this.isexist = isexist;
     }
 
-    @Override
-    public void draw() {
-        System.out.print("_");
+
+    public void draw(Graphics g, int x, int y, int size) {
+        g.setColor(new Color(0, 0, 0, 0));//(int)((20-getAge())/20.0*255)));
+        g.fillRect(x, y, size, size);
     }
+
 
     public void toDefaultString(){
         if (this.isexist == true){
