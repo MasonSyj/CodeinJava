@@ -19,7 +19,7 @@ public abstract class Animal {
 	
 	public void reborn() { alive = true;}
 	
-	public boolean isAlive(){ return alive;}
+	public boolean isAlive(){ return this.alive;}
 	
 	protected int getAge(){
 		return age;

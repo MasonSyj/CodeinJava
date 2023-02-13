@@ -1,4 +1,4 @@
-package Cellss;
+package foxandrabbit;
 
 import javax.swing.text.*;
 import javax.swing.*;
