@@ -2,7 +2,7 @@ package edu.uob;
 
 public class OXOModel {
 
-    private OXOPlayer[][] cells;
+    protected OXOPlayer[][] cells;
     private OXOPlayer[] players;
     private int currentPlayerNumber;
     private OXOPlayer winner;
