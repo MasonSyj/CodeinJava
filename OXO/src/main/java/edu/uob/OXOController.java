@@ -1,5 +1,7 @@
 package edu.uob;
 
+import edu.uob.OXOMoveException.*;
+
 public class OXOController {
     OXOModel gameModel;
 
@@ -11,8 +13,26 @@ public class OXOController {
     }
 
     public void handleIncomingCommand(String command) throws OXOMoveException {
+
+            int len = command.length();
+            if (len != 2){
+                throw new InvalidIdentifierLengthException(len);
+            }
         int currentRow = Character.toLowerCase(command.charAt(0)) - 'a';
         int currentCol = command.charAt(1) - '1';
+
+            if (!Character.isLowerCase(command.charAt(0))){
+                throw new InvalidIdentifierCharacterException(OXOMoveException.RowOrColumn.ROW, Character.toLowerCase(command.charAt(0)));
+            }else if (!Character.isDigit(command.charAt(1))) {
+                throw new InvalidIdentifierCharacterException(OXOMoveException.RowOrColumn.COLUMN, command.charAt(1));
+            }else if (currentRow < 0 || currentRow >= gameModel.getNumberOfRows()){
+                throw new OutsideCellRangeException(OXOMoveException.RowOrColumn.ROW, currentRow);
+            }else if (currentCol < 0 || currentCol >= gameModel.getNumberOfColumns()){
+                throw new OutsideCellRangeException(OXOMoveException.RowOrColumn.COLUMN, currentCol);
+            }else if (gameModel.getCellOwner(currentRow, currentCol) != null){
+                throw new CellAlreadyTakenException(currentRow, currentCol);
+            }
+
         System.out.println(currentRow + " " + currentCol);
         if (gameModel.getCellOwner(currentRow, currentCol) == null){
             gameModel.setCellOwner(currentRow, currentCol,gameModel.getPlayerByNumber(gameModel.getCurrentPlayerNumber()));
@@ -38,9 +58,11 @@ public class OXOController {
     }
     public void increaseWinThreshold() {
         gameModel.setWinThreshold(gameModel.getWinThreshold() + 1);
+        System.out.println("new Threshold: " + gameModel.getWinThreshold());
     }
     public void decreaseWinThreshold() {
         gameModel.setWinThreshold(gameModel.getWinThreshold() - 1);
+        System.out.println("new Threshold: " + gameModel.getWinThreshold());
     }
     public void reset() {}
 

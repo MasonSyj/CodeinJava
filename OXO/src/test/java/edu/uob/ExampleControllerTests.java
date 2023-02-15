@@ -20,6 +20,10 @@ class ExampleControllerTests {
     model.addPlayer(new OXOPlayer('X'));
     model.addPlayer(new OXOPlayer('O'));
     controller = new OXOController(model);
+
+    controller.addRow();
+    controller.addColumn();
+    controller.increaseWinThreshold();
   }
 
   // This next method is a utility function that can be used by any of the test methods to _safely_ send a command to the controller
@@ -37,9 +41,22 @@ class ExampleControllerTests {
     OXOPlayer firstMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
     // Make a move
     sendCommandToController("a1");
+
     // Check that A1 (cell [0,0] on the board) is now "owned" by the first player
     String failedTestComment = "Cell a1 wasn't claimed by the first player";
     assertEquals(firstMovingPlayer, controller.gameModel.getCellOwner(0, 0), failedTestComment);
+
+    OXOPlayer seconcMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
+    sendCommandToController("b2");
+    String failedTestCommentSecond = "Cell b2 wasn't claimed by the second player";
+    assertEquals(seconcMovingPlayer, controller.gameModel.getCellOwner(1, 1), failedTestComment);
+
+    OXOPlayer thirdMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
+    sendCommandToController("c3");
+    String failedTestCommentThird = "Cell c3 wasn't claimed by the second player";
+    assertEquals(thirdMovingPlayer, controller.gameModel.getCellOwner(2, 2), failedTestComment);
+
+
   }
 
   // Test out basic win detection
@@ -53,6 +70,9 @@ class ExampleControllerTests {
     sendCommandToController("a2"); // First player
     sendCommandToController("b2"); // Second player
     sendCommandToController("a3"); // First player
+    sendCommandToController("b3"); // First player
+    sendCommandToController("a4"); // First player
+
 
     // a1, a2, a3 should be a win for the first player (since players alternate between moves)
     // Let's check to see whether the first moving player is indeed the winner
