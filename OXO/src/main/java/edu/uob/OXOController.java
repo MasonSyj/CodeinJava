@@ -64,6 +64,21 @@ public class OXOController {
         gameModel.setWinThreshold(gameModel.getWinThreshold() - 1);
         System.out.println("new Threshold: " + gameModel.getWinThreshold());
     }
+
+    public void increasePlayer(){
+        Character letter = 'A';
+        for (int i = 0; i < gameModel.getNumberOfPlayers(); i++){
+            if (gameModel.getPlayerByNumber(gameModel.getCurrentPlayerNumber()).getPlayingLetter() == letter){
+                letter++;
+                i = -1;
+            }
+        }
+        gameModel.addPlayer(new OXOPlayer(letter));
+    }
+
+    public void decreasePlayer(){
+
+    }
     public void reset() {}
 
     public void winDectHorizontal(int currentRow, int currentCol){

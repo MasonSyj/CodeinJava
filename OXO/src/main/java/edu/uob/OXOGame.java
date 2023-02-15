@@ -37,6 +37,7 @@ public class OXOGame extends Frame implements WindowListener, ActionListener, Mo
         OXOModel model = new OXOModel(3, 3, 3);
         model.addPlayer(new OXOPlayer('X'));
         model.addPlayer(new OXOPlayer('O'));
+        model.addPlayer(new OXOPlayer('A'));
         controller = new OXOController(model);
         inputBox = new TextField("");
         inputBox.addActionListener(this);
@@ -103,6 +104,8 @@ public class OXOGame extends Frame implements WindowListener, ActionListener, Mo
         if (event.getKeyChar() == '-') controller.decreaseWinThreshold();
         view.repaint();
     }
+
+
 
     public void mouseClicked(MouseEvent event) {}
     public void mouseEntered(MouseEvent event) {}

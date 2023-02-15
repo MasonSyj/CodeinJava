@@ -6,7 +6,7 @@ import java.util.List;
 public class OXOModel {
 
     private List<List<OXOPlayer>> cells;
-    private OXOPlayer[] players;
+    private List<OXOPlayer> players;
     private int currentPlayerNumber;
     private OXOPlayer winner;
     private boolean gameDrawn;
@@ -22,24 +22,20 @@ public class OXOModel {
             }
 
         }
-        players = new OXOPlayer[2];
+        players = new ArrayList<OXOPlayer>(2);
+
     }
 
     public int getNumberOfPlayers() {
-        return players.length;
+        return players.size();
     }
 
     public void addPlayer(OXOPlayer player) {
-        for (int i = 0; i < players.length; i++) {
-            if (players[i] == null) {
-                players[i] = player;
-                return;
-            }
-        }
+        players.add(player);
     }
 
     public OXOPlayer getPlayerByNumber(int number) {
-        return players[number];
+        return players.get(number);
     }
 
     public OXOPlayer getWinner() {
