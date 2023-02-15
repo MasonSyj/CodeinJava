@@ -20,48 +20,17 @@ public class OXOController {
         }
     }
     public void addRow() {
-        OXOPlayer[][] newcells = new OXOPlayer[gameModel.getNumberOfRows() + 1][gameModel.getNumberOfColumns()];
-//        OXOModel newmodel = new OXOModel(gameModel.getNumberOfRows() + 1, gameModel.getNumberOfColumns(), 3);
-        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
-            for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
-//                newmodel.setCellOwner(j, i, gameModel.getCellOwner(j, i));
-                newcells[j][i] = gameModel.getCellOwner(j, i);
-            }
-        }
-        gameModel.cells = newcells;
+        gameModel.setCellOwner(gameModel.getNumberOfRows() + 1, gameModel.getNumberOfColumns(), null);
     }
     public void removeRow() {
-        OXOPlayer[][] newcells = new OXOPlayer[gameModel.getNumberOfRows() - 1][gameModel.getNumberOfColumns()];
-//        OXOModel newmodel = new OXOModel(gameModel.getNumberOfRows() + 1, gameModel.getNumberOfColumns(), 3);
-        for (int j = 0; j < gameModel.getNumberOfRows() - 1; j++){
-            for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
-//                newmodel.setCellOwner(j, i, gameModel.getCellOwner(j, i));
-                newcells[j][i] = gameModel.getCellOwner(j, i);
-            }
-        }
-        gameModel.cells = newcells;
+        gameModel.setCellOwner(-1, gameModel.getNumberOfColumns(), null);
     }
     public void addColumn() {
-        OXOPlayer[][] newcells = new OXOPlayer[gameModel.getNumberOfRows()][gameModel.getNumberOfColumns() + 1];
-//        OXOModel newmodel = new OXOModel(gameModel.getNumberOfRows() + 1, gameModel.getNumberOfColumns(), 3);
-        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
-            for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
-//                newmodel.setCellOwner(j, i, gameModel.getCellOwner(j, i));
-                newcells[j][i] = gameModel.getCellOwner(j, i);
-            }
-        }
-        gameModel.cells = newcells;
+        gameModel.setCellOwner(gameModel.getNumberOfRows(), gameModel.getNumberOfColumns() + 1, null);
     }
     public void removeColumn() {
-        OXOPlayer[][] newcells = new OXOPlayer[gameModel.getNumberOfRows()][gameModel.getNumberOfColumns() - 1];
-//        OXOModel newmodel = new OXOModel(gameModel.getNumberOfRows() + 1, gameModel.getNumberOfColumns(), 3);
-        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
-            for (int i = 0; i < gameModel.getNumberOfColumns() - 1; i++){
-//                newmodel.setCellOwner(j, i, gameModel.getCellOwner(j, i));
-                newcells[j][i] = gameModel.getCellOwner(j, i);
-            }
-        }
-        gameModel.cells = newcells;
+        gameModel.setCellOwner(gameModel.getNumberOfRows() , -1, null);
+
     }
     public void increaseWinThreshold() {}
     public void decreaseWinThreshold() {}

@@ -1,8 +1,11 @@
 package edu.uob;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OXOModel {
 
-    protected OXOPlayer[][] cells;
+    private List<List<OXOPlayer>> cells;
     private OXOPlayer[] players;
     private int currentPlayerNumber;
     private OXOPlayer winner;
@@ -11,7 +14,14 @@ public class OXOModel {
 
     public OXOModel(int numberOfRows, int numberOfColumns, int winThresh) {
         winThreshold = winThresh;
-        cells = new OXOPlayer[numberOfRows][numberOfColumns];
+        cells = new ArrayList<List<OXOPlayer>>(numberOfRows);
+        for (int j = 0; j < numberOfRows; j++) {
+            cells.add(new ArrayList<>(numberOfColumns));
+            for (int i = 0; i < numberOfColumns; i++){
+                cells.get(j).add(null);
+            }
+
+        }
         players = new OXOPlayer[2];
     }
 
@@ -49,19 +59,47 @@ public class OXOModel {
     }
 
     public int getNumberOfRows() {
-        return cells.length;
+        return cells.size();
     }
 
     public int getNumberOfColumns() {
-        return cells[0].length;
+        return cells.get(0).size();
     }
 
     public OXOPlayer getCellOwner(int rowNumber, int colNumber) {
-        return cells[rowNumber][colNumber];
+        return cells.get(rowNumber).get(colNumber);
     }
 
     public void setCellOwner(int rowNumber, int colNumber, OXOPlayer player) {
-        cells[rowNumber][colNumber] = player;
+        if (cells.size() < rowNumber){
+            List<OXOPlayer> temp = new ArrayList<OXOPlayer>(colNumber);
+            for (int i = 0; i < colNumber; i++){
+                temp.add(null);
+            }
+            cells.add(temp);
+            return;
+        }
+
+        if (rowNumber == -1){
+            cells.remove(cells.size() - 1);
+            return;
+        }
+
+        if (colNumber == -1){
+            for (int j = 0 ; j < cells.size(); j++){
+                cells.get(j).remove(cells.get(j).size() - 1);
+            }
+            return;
+        }
+
+        if (cells.get(0).size() < colNumber){
+            for (int j = 0; j < cells.size(); j++){
+                cells.get(j).add(null);
+            }
+            return;
+        }
+
+        cells.get(rowNumber).set(colNumber,player);
     }
 
     public void setWinThreshold(int winThresh) {
