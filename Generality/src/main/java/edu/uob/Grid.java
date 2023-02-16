@@ -6,31 +6,28 @@ dependency on the Entity class. */
 import java.lang.Object.*;
 
 class Grid<Entity> {
+
     private Entity[][] cells;
 
-    @SuppressWarnings("unchecked")
-    Grid(int w, int h) {
+    Grid(int w, int h){
         cells = (Entity[][]) new Object[w][h];
     }
 
-    // Get the entity at a particular position.
-    Entity get(int x, int y) {
-        return cells[x][y];
+    Entity get(int w, int h){
+        return cells[w][h];
     }
 
-    void set(int x, int y, Entity e) {
-        cells[x][y] = e;
+    void set(int w, int h, Entity newentity){
+        cells[w][h] = newentity;
     }
 
-//    Entity next(int x, int y, Direction d) {
-//        return get(x + d.dx(), y + d.dy());
-//    }
+    public Entity[] newArray(int n){
+        return (Entity[]) new Object[n];
+    }
+
+
 
     public static void main(String[] args) {
-        Grid<String> g = new Grid<>(3, 3);
-        String e = "e";
-        g.set(2, 2, e);
-        assert(g.get(2, 2) == e);
-        System.out.println("Grid class OK");
+
     }
 }

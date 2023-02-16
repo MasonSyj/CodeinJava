@@ -1,11 +1,9 @@
 package edu.uob;
 
-import java.util.*;
-
-public class Pair<K>{
+public class SingleGen<K>{
     private K king;
 
-    public Pair(K king){
+    public SingleGen(K king){
         this.king = king;
     }
 
@@ -18,7 +16,9 @@ public class Pair<K>{
     }
 
     public static void main(String[] args){
-        Pair<Integer> pair1 = new Pair<Integer>(20);
+        SingleGen<Integer> pair1 = new SingleGen<Integer>(20);
+        System.out.println(pair1.getKing());
+
         pair1.setKing(5);
         System.out.println(pair1.getKing());
     }
