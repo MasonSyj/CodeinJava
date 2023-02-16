@@ -19,6 +19,7 @@ class ExampleControllerTests {
     model = new OXOModel(3, 3, 3);
     model.addPlayer(new OXOPlayer('X'));
     model.addPlayer(new OXOPlayer('O'));
+    model.addPlayer(new OXOPlayer('A'));
     controller = new OXOController(model);
 
     controller.addRow();
