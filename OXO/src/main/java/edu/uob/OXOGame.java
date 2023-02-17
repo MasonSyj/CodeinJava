@@ -105,8 +105,6 @@ public class OXOGame extends Frame implements WindowListener, ActionListener, Mo
         view.repaint();
     }
 
-
-
     public void mouseClicked(MouseEvent event) {}
     public void mouseEntered(MouseEvent event) {}
     public void mouseExited(MouseEvent event) {}
