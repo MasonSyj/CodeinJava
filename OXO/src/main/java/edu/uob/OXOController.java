@@ -2,6 +2,10 @@ package edu.uob;
 
 import edu.uob.OXOMoveException.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 public class OXOController {
     OXOModel gameModel;
 
@@ -39,10 +43,16 @@ public class OXOController {
         //should this stuff be part of the OXOModel?
         if (gameModel.getCellOwner(currentRow, currentCol) == null){
             gameModel.setCellOwner(currentRow, currentCol,gameModel.getPlayerByNumber(gameModel.getCurrentPlayerNumber()));
-            winDectHorizontal(currentRow, currentCol);
-            winDectVertical(currentRow, currentCol);
-            winDectdiagonal1(currentRow, currentCol);
-            winDectdiagonal2(currentRow, currentCol);
+
+            winDect(currentRow, currentCol);
+
+//            HorizontalVertical(currentRow, currentCol);
+//            Diagonal(currentRow, currentCol);
+
+//            winDectHorizontal(currentRow, currentCol);
+//            winDectVertical(currentRow, currentCol);
+//            winDectdiagonal1(currentRow, currentCol);
+//            winDectdiagonal2(currentRow, currentCol);
             gameModel.setCurrentPlayerNumber((gameModel.getCurrentPlayerNumber() + 1) % gameModel.getNumberOfPlayers());
         }
     }
@@ -86,83 +96,145 @@ public class OXOController {
         gameModel.reset();
     }
 
-    public void winDectHorizontal(int currentRow, int currentCol){
+    public boolean winDect(ArrayList<OXOPlayer> list, int curPlayerIndex) {
         int left, right;
-        left = right = currentCol;
-        OXOPlayer cur = gameModel.getCellOwner(currentRow, currentCol);
-
-        while (left >= 0 && gameModel.getCellOwner(currentRow, left) == cur){
+        left = right = curPlayerIndex;
+        System.out.println("size " + list.size());
+        while (left >= 0 && list.get(left) == list.get(curPlayerIndex)) {
             left--;
         }
 
-        while (right < gameModel.getNumberOfColumns() && gameModel.getCellOwner(currentRow, right) == cur){
+        while (right < list.size() && list.get(right) == list.get(curPlayerIndex)) {
             right++;
         }
 
         if (right - left - 1 == gameModel.getWinThreshold()){
-            gameModel.setWinner(cur);
+            gameModel.setWinner(list.get(curPlayerIndex));
+            return true;
+        }else{
+            return false;
         }
     }
 
-    public void winDectVertical(int currentRow, int currentCol){
-        int up, down;
-        up = down = currentCol;
-        OXOPlayer cur = gameModel.getCellOwner(currentRow, currentCol);
-
-        while (up >= 0 && gameModel.getCellOwner(up, currentCol) == cur){
-            up--;
+    public void HorizontalVertical(int currentRow, int currentCol){
+        ArrayList<OXOPlayer> list = new ArrayList<OXOPlayer>();
+        for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
+            list.add(gameModel.getCellOwner(currentRow, i));
         }
 
-        while (down < gameModel.getNumberOfColumns() && gameModel.getCellOwner(down, currentCol) == cur){
-            down++;
+        if (winDect(list, currentCol)){
+            return;
         }
 
-        if (down - up - 1 == gameModel.getWinThreshold()){
-            gameModel.setWinner(cur);
+        ArrayList<OXOPlayer> list2 = new ArrayList<OXOPlayer>();
+
+        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
+            list2.add(gameModel.getCellOwner(j, currentCol));
         }
+
+        winDect(list2, currentCol);
     }
 
-    public void winDectdiagonal1(int currentRow, int currentCol){
+    public void Diagonal(int currentRow, int currentCol){
         int x1, x2, y1, y2;
         y1 = y2 = currentRow;
         x1 = x2 = currentCol;
         OXOPlayer cur = gameModel.getCellOwner(currentRow, currentCol);
 
-        while (y1 >= 0 && x1 >= 0 && gameModel.getCellOwner(y1, x1) == cur){
-            y1--;
-            x1--;
+        for (int loop = 1; loop > -2; loop = loop - 2) {
+            while (y1 >= 0 && x1 >= 0 && x1 < gameModel.getNumberOfColumns() && gameModel.getCellOwner(y1, x1) == cur){
+                y1--;
+                x1 += loop;
+            }
+
+
+            while (y2 < gameModel.getNumberOfRows() && x2 >= 0 && x2 < gameModel.getNumberOfColumns() && gameModel.getCellOwner(y2, x2) == cur){
+                y2++;
+                x2 += loop;
+            }
+
+            if (y2 - y1 - 1 == gameModel.getWinThreshold()){
+                gameModel.setWinner(cur);
+            }
+
+            y1 = y2 = currentRow;
+            x1 = x2 = currentCol;
         }
 
 
-        while (y2 < gameModel.getNumberOfRows() && x2 < gameModel.getNumberOfColumns() && gameModel.getCellOwner(y2, x2) == cur){
-            y2++;
-            x2++;
-        }
+    }
 
-        if (y2 - y1 - 1 == gameModel.getWinThreshold()){
-            gameModel.setWinner(cur);
+    public void winDect(int currentRow, int currentCol){
+        int[] dY = {0, 1, 1, 1};
+        int[] dX = {1, 0, 1, -1};
+
+        for (int loop = 0; loop < 4; loop++){
+            int left = 0, right = 0, y = currentRow, x = currentCol;
+
+            for (; y >= 0 && y < gameModel.getNumberOfRows() && x >= 0 && x < gameModel.getNumberOfColumns(); y = y + dY[loop], x = x + dX[loop]){
+                if (gameModel.getCellOwner(y, x) == gameModel.getCellOwner(currentRow, currentCol)){
+                    right++;
+                }
+            }
+            y = currentRow;
+            x = currentCol;
+
+            for (; y >= 0 && y < gameModel.getNumberOfRows() && x >= 0 && x < gameModel.getNumberOfColumns(); y = y - dY[loop], x = x - dX[loop]){
+                if (gameModel.getCellOwner(y, x) == gameModel.getCellOwner(currentRow, currentCol)){
+                    right++;
+                }
+            }
+
+            if (right - left - 1 == gameModel.getWinThreshold()){
+                gameModel.setWinner(gameModel.getCellOwner(currentRow, currentCol));
+                return;
+            }
         }
     }
 
-    public void winDectdiagonal2(int currentRow, int currentCol){
-        int x1, x2, y1, y2;
-        y1 = y2 = currentRow;
-        x1 = x2 = currentCol;
-        OXOPlayer cur = gameModel.getCellOwner(currentRow, currentCol);
-
-        while (y1 >= 0 && x1 < gameModel.getNumberOfColumns() && gameModel.getCellOwner(y1, x1) == cur){
-            y1--;
-            x1++;
-        }
-
-
-        while (y2 < gameModel.getNumberOfRows() && x2 >= 0 && gameModel.getCellOwner(y2, x2) == cur){
-            y2++;
-            x2--;
-        }
-
-        if (y2 - y1 - 1 == gameModel.getWinThreshold()){
-            gameModel.setWinner(cur);
-        }
-    }
 }
+
+//    public void winDectdiagonal1(int currentRow, int currentCol){
+//        int x1, x2, y1, y2;
+//        y1 = y2 = currentRow;
+//        x1 = x2 = currentCol;
+//        OXOPlayer cur = gameModel.getCellOwner(currentRow, currentCol);
+//
+//        while (y1 >= 0 && x1 >= 0 && gameModel.getCellOwner(y1, x1) == cur){
+//            y1--;
+//            x1--;
+//        }
+//
+//
+//        while (y2 < gameModel.getNumberOfRows() && x2 < gameModel.getNumberOfColumns() && gameModel.getCellOwner(y2, x2) == cur){
+//            y2++;
+//            x2++;
+//        }
+//
+//        if (y2 - y1 - 1 == gameModel.getWinThreshold()){
+//            gameModel.setWinner(cur);
+//        }
+//    }
+//
+//    public void winDectdiagonal2(int currentRow, int currentCol){
+//        int x1, x2, y1, y2;
+//        y1 = y2 = currentRow;
+//        x1 = x2 = currentCol;
+//        OXOPlayer cur = gameModel.getCellOwner(currentRow, currentCol);
+//
+//        while (y1 >= 0 && x1 < gameModel.getNumberOfColumns() && gameModel.getCellOwner(y1, x1) == cur){
+//            y1--;
+//            x1++;
+//        }
+//
+//
+//        while (y2 < gameModel.getNumberOfRows() && x2 >= 0 && gameModel.getCellOwner(y2, x2) == cur){
+//            y2++;
+//            x2--;
+//        }
+//
+//        if (y2 - y1 - 1 == gameModel.getWinThreshold()){
+//            gameModel.setWinner(cur);
+//        }
+
+
