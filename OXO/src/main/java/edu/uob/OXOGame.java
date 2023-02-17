@@ -78,7 +78,7 @@ public class OXOGame extends Frame implements WindowListener, ActionListener, Mo
             else if (event.getModifiersEx() == MouseEvent.BUTTON3_DOWN_MASK) controller.removeRow();
             else controller.addRow();
         }
-        if (event.getY() < 70) {
+        if (event.getY() < 35) {
             if (event.isPopupTrigger()) controller.removeColumn();
             else if (event.getModifiersEx() == MouseEvent.BUTTON3_DOWN_MASK) controller.removeColumn();
             else controller.addColumn();

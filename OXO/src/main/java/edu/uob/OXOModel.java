@@ -67,34 +67,6 @@ public class OXOModel {
     }
 
     public void setCellOwner(int rowNumber, int colNumber, OXOPlayer player) {
-        if (cells.size() < rowNumber){
-            List<OXOPlayer> temp = new ArrayList<OXOPlayer>(colNumber);
-            for (int i = 0; i < colNumber; i++){
-                temp.add(null);
-            }
-            cells.add(temp);
-            return;
-        }
-
-        if (rowNumber == -1){
-            cells.remove(cells.size() - 1);
-            return;
-        }
-
-        if (colNumber == -1){
-            for (int j = 0 ; j < cells.size(); j++){
-                cells.get(j).remove(cells.get(j).size() - 1);
-            }
-            return;
-        }
-
-        if (cells.get(0).size() < colNumber){
-            for (int j = 0; j < cells.size(); j++){
-                cells.get(j).add(null);
-            }
-            return;
-        }
-
         cells.get(rowNumber).set(colNumber,player);
     }
 
@@ -114,4 +86,31 @@ public class OXOModel {
         return gameDrawn;
     }
 
+    public void addRow() {
+        List<OXOPlayer> temp = new ArrayList<OXOPlayer>();
+        for (int i = 0; i < getNumberOfColumns(); i++){
+            temp.add(null);
+        }
+        cells.add(temp);
+    }
+
+    public void removeRow() {
+        System.out.println("current row is" + getNumberOfRows() + " it will be deducted");
+        if (getNumberOfRows() == 0){
+            return;
+        }
+        cells.remove(getNumberOfRows() - 1);
+    }
+
+    public void addColumn() {
+        for (int j = 0; j < cells.size(); j++){
+            cells.get(j).add(null);
+        }
+    }
+
+    public void removeColumn() {
+        for (int j = 0 ; j < cells.size(); j++){
+            cells.get(j).remove(cells.get(j).size() - 1);
+        }
+    }
 }

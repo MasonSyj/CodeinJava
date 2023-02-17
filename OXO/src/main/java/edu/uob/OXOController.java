@@ -44,16 +44,16 @@ public class OXOController {
         }
     }
     public void addRow() {
-        gameModel.setCellOwner(gameModel.getNumberOfRows() + 1, gameModel.getNumberOfColumns(), null);
+        gameModel.addRow();
     }
     public void removeRow() {
-        gameModel.setCellOwner(-1, gameModel.getNumberOfColumns(), null);
+        gameModel.removeRow();
     }
     public void addColumn() {
-        gameModel.setCellOwner(gameModel.getNumberOfRows(), gameModel.getNumberOfColumns() + 1, null);
+        gameModel.addColumn();
     }
     public void removeColumn() {
-        gameModel.setCellOwner(gameModel.getNumberOfRows() , -1, null);
+        gameModel.removeColumn();
 
     }
     public void increaseWinThreshold() {
