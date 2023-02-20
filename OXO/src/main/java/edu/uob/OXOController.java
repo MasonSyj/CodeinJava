@@ -37,14 +37,31 @@ public class OXOController {
         }else if (gameModel.getCellOwner(currentRow, currentCol) != null){
             throw new CellAlreadyTakenException(currentRow, currentCol);
         }
+<<<<<<< HEAD
 
         System.out.println(currentRow + " " + currentCol);
 
+=======
+        // delete before submitting.
+        System.out.println(currentRow + " " + currentCol);
+
+        //should this stuff be part of the OXOModel?
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
         if (gameModel.getCellOwner(currentRow, currentCol) == null){
             gameModel.setCellOwner(currentRow, currentCol,gameModel.getPlayerByNumber(gameModel.getCurrentPlayerNumber()));
 
             winDect(currentRow, currentCol);
 
+<<<<<<< HEAD
+=======
+//            HorizontalVertical(currentRow, currentCol);
+//            Diagonal(currentRow, currentCol);
+
+//            winDectHorizontal(currentRow, currentCol);
+//            winDectVertical(currentRow, currentCol);
+//            winDectdiagonal1(currentRow, currentCol);
+//            winDectdiagonal2(currentRow, currentCol);
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
             gameModel.setCurrentPlayerNumber((gameModel.getCurrentPlayerNumber() + 1) % gameModel.getNumberOfPlayers());
         }
 

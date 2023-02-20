@@ -25,7 +25,10 @@ public class OXOModel {
         players = new ArrayList<OXOPlayer>(2);
 
         winThreshold = winThresh;
+<<<<<<< HEAD
         rounds = 0;
+=======
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
     }
 
     public int getRounds(){return this.rounds;}
@@ -92,9 +95,12 @@ public class OXOModel {
     }
 
     public void addRow() {
+<<<<<<< HEAD
         if(cells.size() == 9){
             return;
         }
+=======
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
         List<OXOPlayer> temp = new ArrayList<OXOPlayer>();
         for (int i = 0; i < getNumberOfColumns(); i++){
             temp.add(null);
@@ -103,26 +109,37 @@ public class OXOModel {
     }
 
     public void removeRow() {
+<<<<<<< HEAD
         if (getNumberOfRows() == 1){
+=======
+        System.out.println("current row is" + getNumberOfRows() + " it will be deducted");
+        if (getNumberOfRows() == 0){
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
             return;
         }
         cells.remove(getNumberOfRows() - 1);
     }
 
     public void addColumn() {
+<<<<<<< HEAD
         if(cells.get(0).size() == 9){
             return;
         }
 
+=======
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
         for (int j = 0; j < cells.size(); j++){
             cells.get(j).add(null);
         }
     }
 
     public void removeColumn() {
+<<<<<<< HEAD
         if (cells.get(0).size() == 1){
             return;
         }
+=======
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
         for (int j = 0 ; j < cells.size(); j++){
             cells.get(j).remove(cells.get(j).size() - 1);
         }
@@ -134,8 +151,12 @@ public class OXOModel {
                 setCellOwner(j, i, null);
             }
         }
+<<<<<<< HEAD
         setCurrentPlayerNumber(0);
         setWinner(null);
         this.gameDrawn = false;
+=======
+        setCurrentPlayerNumber(getNumberOfPlayers() + 1);
+>>>>>>> b2137a824b647285daf3676805df6342647895d4
     }
 }
