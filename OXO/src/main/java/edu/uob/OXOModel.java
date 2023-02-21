@@ -25,13 +25,14 @@ public class OXOModel {
         players = new ArrayList<OXOPlayer>(2);
 
         winThreshold = winThresh;
-<<<<<<< HEAD
+
         rounds = 0;
-=======
->>>>>>> b2137a824b647285daf3676805df6342647895d4
+
     }
 
-    public int getRounds(){return this.rounds;}
+    public int getRounds(){
+        return this.rounds;
+    }
 
     public int getNumberOfPlayers() {
         return players.size();
@@ -74,6 +75,9 @@ public class OXOModel {
     }
 
     public void setCellOwner(int rowNumber, int colNumber, OXOPlayer player) {
+        if (winner != null){
+            return;
+        }
         cells.get(rowNumber).set(colNumber,player);
         rounds++;
     }
@@ -95,12 +99,10 @@ public class OXOModel {
     }
 
     public void addRow() {
-<<<<<<< HEAD
-        if(cells.size() == 9){
+        if(getNumberOfRows() == 9){
             return;
         }
-=======
->>>>>>> b2137a824b647285daf3676805df6342647895d4
+
         List<OXOPlayer> temp = new ArrayList<OXOPlayer>();
         for (int i = 0; i < getNumberOfColumns(); i++){
             temp.add(null);
@@ -109,54 +111,63 @@ public class OXOModel {
     }
 
     public void removeRow() {
-<<<<<<< HEAD
+
         if (getNumberOfRows() == 1){
-=======
-        System.out.println("current row is" + getNumberOfRows() + " it will be deducted");
-        if (getNumberOfRows() == 0){
->>>>>>> b2137a824b647285daf3676805df6342647895d4
             return;
         }
+
+        for (int i = 0; i < getNumberOfColumns(); i++){
+            if (cells.get(getNumberOfRows() - 1).get(i) != null){
+                return;
+            }
+        }
+
+        System.out.println("current row is" + getNumberOfRows() + " it will be deducted");
+
         cells.remove(getNumberOfRows() - 1);
     }
 
     public void addColumn() {
-<<<<<<< HEAD
-        if(cells.get(0).size() == 9){
+
+        if(getNumberOfColumns() == 9){
             return;
         }
 
-=======
->>>>>>> b2137a824b647285daf3676805df6342647895d4
-        for (int j = 0; j < cells.size(); j++){
+        for (int j = 0; j < getNumberOfRows(); j++){
             cells.get(j).add(null);
         }
     }
 
     public void removeColumn() {
-<<<<<<< HEAD
-        if (cells.get(0).size() == 1){
+
+        if (getNumberOfColumns() == 1){
             return;
         }
-=======
->>>>>>> b2137a824b647285daf3676805df6342647895d4
-        for (int j = 0 ; j < cells.size(); j++){
+
+        for (int j = 0 ; j < getNumberOfRows(); j++){
+            if (cells.get(j).get(getNumberOfColumns() - 1) != null){
+                return;
+            }
+        }
+
+        for (int j = 0 ; j < getNumberOfRows(); j++){
             cells.get(j).remove(cells.get(j).size() - 1);
         }
     }
 
     public void reset(){
-        for (int j = 0; j < cells.size(); j++){
-            for (int i = 0; i < cells.get(0).size(); i++){
-                setCellOwner(j, i, null);
-            }
-        }
-<<<<<<< HEAD
         setCurrentPlayerNumber(0);
         setWinner(null);
         this.gameDrawn = false;
-=======
-        setCurrentPlayerNumber(getNumberOfPlayers() + 1);
->>>>>>> b2137a824b647285daf3676805df6342647895d4
+
+
+        for (int j = 0; j < getNumberOfRows(); j++){
+            for (int i = 0; i < getNumberOfColumns(); i++){
+                setCellOwner(j, i, null);
+            }
+        }
+
+
+
     }
 }
