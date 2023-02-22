@@ -2,15 +2,9 @@ package edu.uob;
 
 import edu.uob.OXOMoveException.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 public class OXOController {
     OXOModel gameModel;
-
-    int currentRow;
-    int currentCol;
 
     public OXOController(OXOModel model) {
         gameModel = model;
@@ -38,9 +32,6 @@ public class OXOController {
             throw new CellAlreadyTakenException(currentRow, currentCol);
         }
 
-        // delete before submitting.
-        System.out.println(currentRow + " " + currentCol);
-
         if (gameModel.getCellOwner(currentRow, currentCol) == null){
             gameModel.setCellOwner(currentRow, currentCol,gameModel.getPlayerByNumber(gameModel.getCurrentPlayerNumber()));
 
@@ -65,24 +56,51 @@ public class OXOController {
     }
 
     public void addRow() {
+
+        if(gameModel.getNumberOfRows() == 9){
+            return;
+        }
+
         gameModel.addRow();
     }
     public void removeRow() {
+        if (gameModel.getNumberOfRows() == 1){
+            return;
+        }
+
+        for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
+            if (gameModel.getCellOwner(gameModel.getNumberOfRows() - 1, i) != null){
+                return;
+            }
+        }
+
         gameModel.removeRow();
     }
     public void addColumn() {
+        if(gameModel.getNumberOfColumns() == 9){
+            return;
+        }
+
         gameModel.addColumn();
     }
     public void removeColumn() {
+        for (int j = 0 ; j < gameModel.getNumberOfRows(); j++){
+            if (gameModel.getCellOwner(j, gameModel.getNumberOfColumns() - 1)!= null){
+                return;
+            }
+        }
+
+        if (gameModel.getNumberOfColumns() == 1){
+            return;
+        }
+
         gameModel.removeColumn();
 
     }
     public void increaseWinThreshold() {
-
         gameModel.setWinThreshold(gameModel.getWinThreshold() + 1);
-        System.out.println("new Threshold: " + gameModel.getWinThreshold());
-
     }
+
     public void decreaseWinThreshold() {
         if (gameModel.getWinThreshold() == 3){
             return;
@@ -96,25 +114,23 @@ public class OXOController {
             }
         }
 
-
         gameModel.setWinThreshold(gameModel.getWinThreshold() - 1);
-        System.out.println("new Threshold: " + gameModel.getWinThreshold());
     }
-
 
     public void reset() {
         gameModel.reset();
     }
 
-
     public void winDect(int currentRow, int currentCol){
         int[] dY = {0, 1, 1, 1};
         int[] dX = {1, 0, 1, -1};
+        int row = gameModel.getNumberOfRows();
+        int col = gameModel.getNumberOfColumns();
 
         for (int loop = 0; loop < 4; loop++){
             int left = 0, right = 0, y = currentRow, x = currentCol;
 
-            for (; y >= 0 && y < gameModel.getNumberOfRows() && x >= 0 && x < gameModel.getNumberOfColumns(); y = y + dY[loop], x = x + dX[loop]){
+            for (; y >= 0 && y < row && x >= 0 && x < col; y = y + dY[loop], x = x + dX[loop]){
                 if (gameModel.getCellOwner(y, x) == gameModel.getCellOwner(currentRow, currentCol)){
                     right++;
                 }
@@ -122,7 +138,7 @@ public class OXOController {
             y = currentRow;
             x = currentCol;
 
-            for (; y >= 0 && y < gameModel.getNumberOfRows() && x >= 0 && x < gameModel.getNumberOfColumns(); y = y - dY[loop], x = x - dX[loop]){
+            for (; y >= 0 && y < row && x >= 0 && x < col; y = y - dY[loop], x = x - dX[loop]){
                 if (gameModel.getCellOwner(y, x) == gameModel.getCellOwner(currentRow, currentCol)){
                     right++;
                 }
@@ -134,5 +150,4 @@ public class OXOController {
             }
         }
     }
-
 }

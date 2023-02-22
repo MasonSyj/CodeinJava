@@ -31,7 +31,7 @@ class ExampleControllerTests {
 
   // Test simple move taking and cell claiming functionality
   @Test
-  void testBasicMoveTaking() throws OXOMoveException {
+  void testBasicMoveTaking(){
     // Find out which player is going to make the first move
     OXOPlayer firstMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
     // Make a move
@@ -44,19 +44,19 @@ class ExampleControllerTests {
     OXOPlayer seconcMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
     sendCommandToController("b2");
     String failedTestCommentSecond = "Cell b2 wasn't claimed by the second player";
-    assertEquals(seconcMovingPlayer, controller.gameModel.getCellOwner(1, 1), failedTestComment);
+    assertEquals(seconcMovingPlayer, controller.gameModel.getCellOwner(1, 1), failedTestCommentSecond);
 
     OXOPlayer thirdMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
     sendCommandToController("c3");
     String failedTestCommentThird = "Cell c3 wasn't claimed by the second player";
-    assertEquals(thirdMovingPlayer, controller.gameModel.getCellOwner(2, 2), failedTestComment);
+    assertEquals(thirdMovingPlayer, controller.gameModel.getCellOwner(2, 2), failedTestCommentThird);
 
 
   }
 
   // Test out basic win detection
   @Test
-  void testBasicWin() throws OXOMoveException {
+  void testBasicWin(){
     // Find out which player is going to make the first move (they should be the eventual winner)
     OXOPlayer firstMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
     // Make a bunch of moves for the two players
@@ -74,7 +74,7 @@ class ExampleControllerTests {
   }
 
   @Test
-  void testWinHoriztontal() throws OXOMoveException {
+  void testWinHoriztontal(){
     // Find out which player is going to make the first move (they should be the eventual winner)
     OXOPlayer firstMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
 
@@ -113,7 +113,7 @@ class ExampleControllerTests {
   }
 
   @Test
-  void testWinVertical() throws OXOMoveException {
+  void testWinVertical(){
     // Find out which player is going to make the first move (they should be the eventual winner)
     OXOPlayer firstMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
 
@@ -152,7 +152,7 @@ class ExampleControllerTests {
   }
 
   @Test
-  void testWinDiagonal() throws OXOMoveException {
+  void testWinDiagonal(){
     // Find out which player is going to make the first move (they should be the eventual winner)
     OXOPlayer firstMovingPlayer = model.getPlayerByNumber(model.getCurrentPlayerNumber());
 
@@ -211,7 +211,7 @@ class ExampleControllerTests {
   }
 
   @Test
-  void testWinDrawn() throws OXOMoveException {
+  void testWinDrawn(){
     controller.addRow();
     controller.addRow();
     controller.addRow();
@@ -277,12 +277,12 @@ class ExampleControllerTests {
     sendCommandToController("e3");
 
     String failedTestComment = "Should be Drawn by now, but it isn't.";
-    assertEquals(true, model.isGameDrawn(), failedTestComment);
+    assertTrue(model.isGameDrawn(), failedTestComment);
 
   }
 
   @Test
-  void testAddRemove() throws OXOMoveException {
+  void testAddRemove(){
     String failTestComment0 = "Should be only one row, but it isn't";
     controller.removeRow();
     controller.removeRow();
@@ -356,7 +356,7 @@ class ExampleControllerTests {
   }
 
   @Test
-  void testIncreasePlayer() throws OXOMoveException{
+  void testIncreasePlayer(){
     model.addPlayer(new OXOPlayer('A'));
     model.addPlayer(new OXOPlayer('B'));
     model.addPlayer(new OXOPlayer('C'));
@@ -387,7 +387,7 @@ class ExampleControllerTests {
   }
 
   @Test
-  void testIncreDreacaseWinthreshold() throws OXOMoveException{
+  void testIncreDreacaseWinthreshold(){
 
     controller.increaseWinThreshold();
     controller.increaseWinThreshold();
@@ -411,7 +411,7 @@ class ExampleControllerTests {
 
   // Example of how to test for the throwing of exceptions
   @Test
-  void testInvalidIdentifierException() throws OXOMoveException {
+  void testInvalidIdentifierException(){
     // Check that the controller throws a suitable exception when it gets an invalid command
     String failedTestComment = "Controller failed to throw an InvalidIdentifierLengthException for command";
     // The next lins is a bit ugly, but it is the easiest way to test exceptions (soz)
@@ -439,9 +439,8 @@ class ExampleControllerTests {
 
   }
 
-
   @Test
-  void testRemoveLeads2Drawn() throws OXOMoveException {
+  void testRemoveLeads2Drawn(){
     controller.increaseWinThreshold();
     controller.increaseWinThreshold();
 
@@ -451,9 +450,9 @@ class ExampleControllerTests {
     sendCommandToController("b2");
     sendCommandToController("a3");
     sendCommandToController("b3");
-    assertEquals(false, model.isGameDrawn());
+    assertFalse(model.isGameDrawn(), "Game isn't Drawn, still spaces in last row to fill in");
     model.removeRow();
-    assertEquals(true,model.isGameDrawn());
+    assertTrue(model.isGameDrawn(), "Game should be Drawn cuz no spaces left");
 
     model.reset();
 
@@ -465,9 +464,9 @@ class ExampleControllerTests {
     sendCommandToController("b2");
     sendCommandToController("c1");
     sendCommandToController("c2");
-    assertEquals(false, model.isGameDrawn());
+    assertFalse(model.isGameDrawn(), "Game isn't Drawn, still spaces in last column to fill in");
     model.removeColumn();
-    assertEquals(true,model.isGameDrawn());
+    assertTrue(model.isGameDrawn(), "Game should be Drawn cuz no spaces left");
 
   }
 

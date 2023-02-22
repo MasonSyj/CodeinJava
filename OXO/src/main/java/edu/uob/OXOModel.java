@@ -14,18 +14,16 @@ public class OXOModel {
 
 
     public OXOModel(int numberOfRows, int numberOfColumns, int winThresh) {
-        cells = new ArrayList<List<OXOPlayer>>(numberOfRows);
+        cells = new ArrayList<>(numberOfRows);
         for (int j = 0; j < numberOfRows; j++) {
             cells.add(new ArrayList<>(numberOfColumns));
             for (int i = 0; i < numberOfColumns; i++){
                 cells.get(j).add(null);
             }
         }
-        players = new ArrayList<OXOPlayer>(2);
 
+        players = new ArrayList<>(2);
         winThreshold = winThresh;
-
-
     }
 
 
@@ -34,7 +32,7 @@ public class OXOModel {
     }
 
     public void addPlayer(OXOPlayer player) {
-        if(getWinner() == null && isGameDrawn() == false){
+        if (getWinner() == null && isGameDrawn() == false){
             players.add(player);
         }
     }
@@ -95,11 +93,7 @@ public class OXOModel {
     }
 
     public void addRow() {
-        if(getNumberOfRows() == 9){
-            return;
-        }
-
-        List<OXOPlayer> temp = new ArrayList<OXOPlayer>();
+        List<OXOPlayer> temp = new ArrayList<>();
         for (int i = 0; i < getNumberOfColumns(); i++){
             temp.add(null);
         }
@@ -107,20 +101,7 @@ public class OXOModel {
     }
 
     public void removeRow() {
-
-        if (getNumberOfRows() == 1){
-            return;
-        }
-
-        for (int i = 0; i < getNumberOfColumns(); i++){
-            if (cells.get(getNumberOfRows() - 1).get(i) != null){
-                return;
-            }
-        }
-
         cells.remove(getNumberOfRows() - 1);
-
-        System.out.println("current row is" + getNumberOfRows() + " it will be deducted");
 
         for (int j = 0; j < getNumberOfRows(); j++){
             for (int i = 0; i < getNumberOfColumns(); i++){
@@ -129,36 +110,16 @@ public class OXOModel {
                 }
             }
         }
-
         setGameDrawn();
-
     }
 
     public void addColumn() {
-
-        if(getNumberOfColumns() == 9){
-            return;
-        }
-
         for (int j = 0; j < getNumberOfRows(); j++){
             cells.get(j).add(null);
         }
-
-
     }
 
     public void removeColumn() {
-
-        if (getNumberOfColumns() == 1){
-            return;
-        }
-
-        for (int j = 0 ; j < getNumberOfRows(); j++){
-            if (cells.get(j).get(getNumberOfColumns() - 1) != null){
-                return;
-            }
-        }
-
         for (int j = 0 ; j < getNumberOfRows(); j++){
             cells.get(j).remove(cells.get(j).size() - 1);
         }
@@ -172,7 +133,6 @@ public class OXOModel {
         }
 
         setGameDrawn();
-
     }
 
     public void reset(){
