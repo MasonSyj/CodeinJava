@@ -167,7 +167,7 @@ public class OXOModel {
             }
         }
 
-
+        rounds = 0;
 
     }
 }

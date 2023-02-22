@@ -52,6 +52,7 @@ public class OXOController {
         if (gameModel.getRounds() == gameModel.getNumberOfRows() * gameModel.getNumberOfColumns()){
             gameModel.setGameDrawn();
         }
+        System.out.println("Rounds:" + gameModel.getRounds());
     }
 
     public void addRow() {
