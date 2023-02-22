@@ -97,6 +97,7 @@ public class OXOModel {
         for (int i = 0; i < getNumberOfColumns(); i++){
             temp.add(null);
         }
+        gameDrawn = false;
         cells.add(temp);
     }
 
@@ -117,6 +118,7 @@ public class OXOModel {
         for (int j = 0; j < getNumberOfRows(); j++){
             cells.get(j).add(null);
         }
+        gameDrawn = false;
     }
 
     public void removeColumn() {
