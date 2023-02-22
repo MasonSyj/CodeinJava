@@ -26,8 +26,8 @@ public class OXOController {
         int currentRow = Character.toLowerCase(command.charAt(0)) - 'a';
         int currentCol = command.charAt(1) - '1';
 
-        if (!Character.isLowerCase(command.charAt(0))){
-            throw new InvalidIdentifierCharacterException(OXOMoveException.RowOrColumn.ROW, Character.toLowerCase(command.charAt(0)));
+        if (!Character.isLetter(command.charAt(0))){
+            throw new InvalidIdentifierCharacterException(OXOMoveException.RowOrColumn.ROW, command.charAt(0));
         }else if (!Character.isDigit(command.charAt(1))) {
             throw new InvalidIdentifierCharacterException(OXOMoveException.RowOrColumn.COLUMN, command.charAt(1));
         }else if (currentRow < 0 || currentRow >= gameModel.getNumberOfRows()){
@@ -46,13 +46,22 @@ public class OXOController {
 
             winDect(currentRow, currentCol);
 
+            if(gameModel.getWinner() != null){
+                return;
+            }
+
             gameModel.setCurrentPlayerNumber((gameModel.getCurrentPlayerNumber() + 1) % gameModel.getNumberOfPlayers());
         }
 
-        if (gameModel.getRounds() == gameModel.getNumberOfRows() * gameModel.getNumberOfColumns()){
-            gameModel.setGameDrawn();
+        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
+            for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
+                if (gameModel.getCellOwner(j, i) == null){
+                    return;
+                }
+            }
         }
-        System.out.println("Rounds:" + gameModel.getRounds());
+        gameModel.setGameDrawn();
+
     }
 
     public void addRow() {
@@ -75,24 +84,22 @@ public class OXOController {
 
     }
     public void decreaseWinThreshold() {
-        if (gameModel.getWinThreshold() == 3 || gameModel.getRounds() > 0){
+        if (gameModel.getWinThreshold() == 3){
             return;
         }
+
+        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
+            for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
+                if (gameModel.getCellOwner(j, i) != null){
+                    return;
+                }
+            }
+        }
+
+
         gameModel.setWinThreshold(gameModel.getWinThreshold() - 1);
         System.out.println("new Threshold: " + gameModel.getWinThreshold());
     }
-
-    public void increasePlayer(){
-        Character letter = 'A';
-        for (int i = 0; i < gameModel.getNumberOfPlayers(); i++){
-            if (gameModel.getPlayerByNumber(i).getPlayingLetter() == letter){
-                letter++;
-                i = -1;
-            }
-        }
-        gameModel.addPlayer(new OXOPlayer(letter));
-    }
-
 
 
     public void reset() {

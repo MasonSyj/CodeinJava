@@ -12,7 +12,6 @@ public class OXOModel {
     private boolean gameDrawn;
     private int winThreshold;
 
-    private int rounds;
 
     public OXOModel(int numberOfRows, int numberOfColumns, int winThresh) {
         cells = new ArrayList<List<OXOPlayer>>(numberOfRows);
@@ -26,20 +25,18 @@ public class OXOModel {
 
         winThreshold = winThresh;
 
-        rounds = 0;
 
     }
 
-    public int getRounds(){
-        return this.rounds;
-    }
 
     public int getNumberOfPlayers() {
         return players.size();
     }
 
     public void addPlayer(OXOPlayer player) {
-        players.add(player);
+        if(getWinner() == null && isGameDrawn() == false){
+            players.add(player);
+        }
     }
 
     public OXOPlayer getPlayerByNumber(int number) {
@@ -79,7 +76,6 @@ public class OXOModel {
             return;
         }
         cells.get(rowNumber).set(colNumber,player);
-        rounds++;
     }
 
     public void setWinThreshold(int winThresh) {
@@ -122,9 +118,20 @@ public class OXOModel {
             }
         }
 
+        cells.remove(getNumberOfRows() - 1);
+
         System.out.println("current row is" + getNumberOfRows() + " it will be deducted");
 
-        cells.remove(getNumberOfRows() - 1);
+        for (int j = 0; j < getNumberOfRows(); j++){
+            for (int i = 0; i < getNumberOfColumns(); i++){
+                if (cells.get(j).get(i) == null){
+                    return;
+                }
+            }
+        }
+
+        setGameDrawn();
+
     }
 
     public void addColumn() {
@@ -136,6 +143,8 @@ public class OXOModel {
         for (int j = 0; j < getNumberOfRows(); j++){
             cells.get(j).add(null);
         }
+
+
     }
 
     public void removeColumn() {
@@ -153,6 +162,17 @@ public class OXOModel {
         for (int j = 0 ; j < getNumberOfRows(); j++){
             cells.get(j).remove(cells.get(j).size() - 1);
         }
+
+        for (int j = 0; j < getNumberOfRows(); j++){
+            for (int i = 0; i < getNumberOfColumns(); i++){
+                if (cells.get(j).get(i) == null){
+                    return;
+                }
+            }
+        }
+
+        setGameDrawn();
+
     }
 
     public void reset(){
@@ -166,8 +186,5 @@ public class OXOModel {
                 setCellOwner(j, i, null);
             }
         }
-
-        rounds = 0;
-
     }
 }

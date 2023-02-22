@@ -4,7 +4,6 @@ import edu.uob.OXOMoveException.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -358,11 +357,27 @@ class ExampleControllerTests {
 
   @Test
   void testIncreasePlayer() throws OXOMoveException{
-    controller.increasePlayer();
-    controller.increasePlayer();
-    controller.increasePlayer();
+    model.addPlayer(new OXOPlayer('A'));
+    model.addPlayer(new OXOPlayer('B'));
+    model.addPlayer(new OXOPlayer('C'));
     String failedTestComment = "Should have 5 players, but it isn't";
     assertEquals(5, model.getNumberOfPlayers(), failedTestComment);
+
+    sendCommandToController("a1");
+    sendCommandToController("b2");
+
+    String correctPlayer = "should be the currentPlayer but it isn't";
+    OXOPlayer temp = model.getPlayerByNumber(model.getCurrentPlayerNumber());
+    sendCommandToController("c3");
+    assertEquals(temp, model.getCellOwner(2, 2), "c3" + correctPlayer);
+
+    temp = model.getPlayerByNumber(model.getCurrentPlayerNumber());
+    sendCommandToController("a2");
+    assertEquals(temp, model.getCellOwner(0, 1), "a2" + correctPlayer);
+
+    temp = model.getPlayerByNumber(model.getCurrentPlayerNumber());
+    sendCommandToController("b3");
+    assertEquals(temp, model.getCellOwner(1, 2), "b3" + correctPlayer);
 
     String failedTestComment1 = "Should have 6 players, but it isn't";
     model.addPlayer(new OXOPlayer('D'));
@@ -423,4 +438,37 @@ class ExampleControllerTests {
     assertThrows(InvalidIdentifierCharacterException.class, ()-> sendCommandToController(ninth), failedTestComment + ninth);
 
   }
+
+
+  @Test
+  void testRemoveLeads2Drawn() throws OXOMoveException {
+    controller.increaseWinThreshold();
+    controller.increaseWinThreshold();
+
+    sendCommandToController("a1");
+    sendCommandToController("b1");
+    sendCommandToController("a2");
+    sendCommandToController("b2");
+    sendCommandToController("a3");
+    sendCommandToController("b3");
+    assertEquals(false, model.isGameDrawn());
+    model.removeRow();
+    assertEquals(true,model.isGameDrawn());
+
+    model.reset();
+
+    model.addRow();
+
+    sendCommandToController("a1");
+    sendCommandToController("a2");
+    sendCommandToController("b1");
+    sendCommandToController("b2");
+    sendCommandToController("c1");
+    sendCommandToController("c2");
+    assertEquals(false, model.isGameDrawn());
+    model.removeColumn();
+    assertEquals(true,model.isGameDrawn());
+
+  }
+
 }
