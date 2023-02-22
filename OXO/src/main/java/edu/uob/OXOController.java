@@ -56,7 +56,6 @@ public class OXOController {
     }
 
     public void addRow() {
-
         if(gameModel.getNumberOfRows() == 9){
             return;
         }
@@ -73,6 +72,18 @@ public class OXOController {
                 return;
             }
         }
+        boolean existnull = false;
+        for (int j = 0; j < gameModel.getNumberOfRows() - 1; j++){
+            for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
+                if (gameModel.getCellOwner(j, i) == null){
+                    existnull = true;
+                }
+            }
+        }
+        if (existnull == false){
+            return;
+        }
+
 
         gameModel.removeRow();
     }
@@ -90,6 +101,18 @@ public class OXOController {
             }
         }
 
+        boolean existnull = false;
+        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
+            for (int i = 0; i < gameModel.getNumberOfColumns() - 1; i++){
+                if (gameModel.getCellOwner(j, i) == null){
+                    existnull = true;
+                }
+            }
+        }
+        if(existnull == false){
+            return;
+        }
+
         if (gameModel.getNumberOfColumns() == 1){
             return;
         }
@@ -102,6 +125,11 @@ public class OXOController {
     }
 
     public void decreaseWinThreshold() {
+        if (gameModel.getWinner() != null && gameModel.getWinThreshold() > 3){
+            gameModel.setWinThreshold(gameModel.getWinThreshold() - 1);
+            return;
+        }
+
         if (gameModel.getWinThreshold() == 3){
             return;
         }
@@ -133,6 +161,8 @@ public class OXOController {
             for (; y >= 0 && y < row && x >= 0 && x < col; y = y + dY[loop], x = x + dX[loop]){
                 if (gameModel.getCellOwner(y, x) == gameModel.getCellOwner(currentRow, currentCol)){
                     right++;
+                }else{
+                    break;
                 }
             }
             y = currentRow;
@@ -141,6 +171,8 @@ public class OXOController {
             for (; y >= 0 && y < row && x >= 0 && x < col; y = y - dY[loop], x = x - dX[loop]){
                 if (gameModel.getCellOwner(y, x) == gameModel.getCellOwner(currentRow, currentCol)){
                     right++;
+                }else{
+                    break;
                 }
             }
 
