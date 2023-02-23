@@ -72,6 +72,7 @@ public class OXOController {
                 return;
             }
         }
+
         boolean existnull = false;
         for (int j = 0; j < gameModel.getNumberOfRows() - 1; j++){
             for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
