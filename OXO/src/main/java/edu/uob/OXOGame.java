@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-
 public class OXOGame extends Frame implements WindowListener, ActionListener, MouseListener, KeyListener {
     @Serial private static final long serialVersionUID = 4493180057657097249L;
     private static Font FONT = new Font("SansSerif", Font.PLAIN, 14);
@@ -37,7 +36,6 @@ public class OXOGame extends Frame implements WindowListener, ActionListener, Mo
         OXOModel model = new OXOModel(3, 3, 3);
         model.addPlayer(new OXOPlayer('X'));
         model.addPlayer(new OXOPlayer('O'));
-
         controller = new OXOController(model);
         inputBox = new TextField("");
         inputBox.addActionListener(this);
