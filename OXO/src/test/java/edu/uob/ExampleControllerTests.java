@@ -65,7 +65,7 @@ class ExampleControllerTests {
     sendCommandToController("a2"); // First player
     sendCommandToController("b2"); // Second player
     sendCommandToController("a3"); // First player
-    sendCommandToController("b3"); // First player
+    sendCommandToController("b3"); 
 
     // a1, a2, a3 should be a win for the first player (since players alternate between moves)
     // Let's check to see whether the first moving player is indeed the winner
@@ -97,16 +97,16 @@ class ExampleControllerTests {
     sendCommandToController("b1"); // Second player
     sendCommandToController("a2"); // First player
     sendCommandToController("b2"); // Second player
-    sendCommandToController("a3"); // First player
-    sendCommandToController("b3"); // First player
-    sendCommandToController("a4"); // First player
-    sendCommandToController("b4"); // First player
-    sendCommandToController("a5"); // First player
-    sendCommandToController("b5"); // First player
-    sendCommandToController("a6"); // First player
-    sendCommandToController("b6"); // First player
-    sendCommandToController("a7"); // First player
-    sendCommandToController("b7"); // First player
+    sendCommandToController("a3"); 
+    sendCommandToController("b3"); 
+    sendCommandToController("a4"); 
+    sendCommandToController("b4"); 
+    sendCommandToController("a5"); 
+    sendCommandToController("b5"); 
+    sendCommandToController("a6"); 
+    sendCommandToController("b6"); 
+    sendCommandToController("a7"); 
+    sendCommandToController("b7"); 
 
     String failedTestComment = "Winner was expected to be " + firstMovingPlayer.getPlayingLetter() + " but wasn't";
     assertEquals(firstMovingPlayer, model.getWinner(), failedTestComment);
@@ -136,16 +136,16 @@ class ExampleControllerTests {
     sendCommandToController("a5"); // Second player
     sendCommandToController("b1"); // First player
     sendCommandToController("b5"); // Second player
-    sendCommandToController("c1"); // First player
-    sendCommandToController("c5"); // First player
-    sendCommandToController("d1"); // First player
-    sendCommandToController("d5"); // First player
-    sendCommandToController("e1"); // First player
-    sendCommandToController("e5"); // First player
-    sendCommandToController("f1"); // First player
-    sendCommandToController("f5"); // First player
-    sendCommandToController("g1"); // First player
-    sendCommandToController("g5"); // First player
+    sendCommandToController("c1"); 
+    sendCommandToController("c5"); 
+    sendCommandToController("d1");
+    sendCommandToController("d5");
+    sendCommandToController("e1"); 
+    sendCommandToController("e5"); 
+    sendCommandToController("f1"); 
+    sendCommandToController("f5"); 
+    sendCommandToController("g1"); 
+    sendCommandToController("g5"); 
 
     String failedTestComment = "Winner was expected to be " + firstMovingPlayer.getPlayingLetter() + " but wasn't";
     assertEquals(firstMovingPlayer, model.getWinner(), failedTestComment);
@@ -175,16 +175,16 @@ class ExampleControllerTests {
     sendCommandToController("a5"); // Second player
     sendCommandToController("b2"); // First player
     sendCommandToController("b5"); // Second player
-    sendCommandToController("c3"); // First player
-    sendCommandToController("c5"); // First player
-    sendCommandToController("d4"); // First player
-    sendCommandToController("d5"); // First player
-    sendCommandToController("e5"); // First player
-    sendCommandToController("e4"); // First player
-    sendCommandToController("f6"); // First player
-    sendCommandToController("f5"); // First player
-    sendCommandToController("g7"); // First player
-    sendCommandToController("g5"); // First player
+    sendCommandToController("c3"); 
+    sendCommandToController("c5"); 
+    sendCommandToController("d4"); 
+    sendCommandToController("d5"); 
+    sendCommandToController("e5"); 
+    sendCommandToController("e4"); 
+    sendCommandToController("f6"); 
+    sendCommandToController("f5"); 
+    sendCommandToController("g7"); 
+    sendCommandToController("g5"); 
 
     String failedTestComment = "Winner was expected to be " + firstMovingPlayer.getPlayingLetter() + " but wasn't";
     assertEquals(firstMovingPlayer, model.getWinner(), failedTestComment);
@@ -195,16 +195,16 @@ class ExampleControllerTests {
     sendCommandToController("a5"); // Second player
     sendCommandToController("b6"); // First player
     sendCommandToController("b5"); // Second player
-    sendCommandToController("c5"); // First player
-    sendCommandToController("c7"); // First player
-    sendCommandToController("d4"); // First player
-    sendCommandToController("d5"); // First player
-    sendCommandToController("e3"); // First player
-    sendCommandToController("e4"); // First player
-    sendCommandToController("f2"); // First player
-    sendCommandToController("f5"); // First player
-    sendCommandToController("g1"); // First player
-    sendCommandToController("g5"); // First player
+    sendCommandToController("c5"); 
+    sendCommandToController("c7"); 
+    sendCommandToController("d4"); 
+    sendCommandToController("d5"); 
+    sendCommandToController("e3"); 
+    sendCommandToController("e4"); 
+    sendCommandToController("f2"); 
+    sendCommandToController("f5"); 
+    sendCommandToController("g1"); 
+    sendCommandToController("g5"); 
 
     assertEquals(firstMovingPlayer, model.getWinner(), failedTestComment);
 
