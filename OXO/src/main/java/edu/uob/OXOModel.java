@@ -93,6 +93,10 @@ public class OXOModel {
     }
 
     public void addRow() {
+        if(getNumberOfRows() == 9){
+            return;
+        }
+
         List<OXOPlayer> temp = new ArrayList<>();
         for (int i = 0; i < getNumberOfColumns(); i++){
             temp.add(null);
@@ -102,6 +106,28 @@ public class OXOModel {
     }
 
     public void removeRow() {
+        if (getNumberOfRows() == 1){
+            return;
+        }
+
+        for (int i = 0; i < getNumberOfColumns(); i++){
+            if (getCellOwner(getNumberOfRows() - 1, i) != null){
+                return;
+            }
+        }
+
+        boolean existnull = false;
+        for (int j = 0; j < getNumberOfRows() - 1; j++){
+            for (int i = 0; i < getNumberOfColumns(); i++){
+                if (getCellOwner(j, i) == null){
+                    existnull = true;
+                }
+            }
+        }
+        if (existnull == false){
+            return;
+        }
+
         cells.remove(getNumberOfRows() - 1);
 
         for (int j = 0; j < getNumberOfRows(); j++){
@@ -115,6 +141,10 @@ public class OXOModel {
     }
 
     public void addColumn() {
+        if(getNumberOfColumns() == 9){
+            return;
+        }
+
         for (int j = 0; j < getNumberOfRows(); j++){
             cells.get(j).add(null);
         }
@@ -122,6 +152,28 @@ public class OXOModel {
     }
 
     public void removeColumn() {
+        for (int j = 0 ; j < getNumberOfRows(); j++){
+            if (getCellOwner(j, getNumberOfColumns() - 1)!= null){
+                return;
+            }
+        }
+
+        boolean existnull = false;
+        for (int j = 0; j < getNumberOfRows(); j++){
+            for (int i = 0; i < getNumberOfColumns() - 1; i++){
+                if (getCellOwner(j, i) == null){
+                    existnull = true;
+                }
+            }
+        }
+        if(existnull == false){
+            return;
+        }
+
+        if (getNumberOfColumns() == 1){
+            return;
+        }
+
         for (int j = 0 ; j < getNumberOfRows(); j++){
             cells.get(j).remove(cells.get(j).size() - 1);
         }

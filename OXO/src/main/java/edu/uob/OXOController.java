@@ -56,68 +56,15 @@ public class OXOController {
     }
 
     public void addRow() {
-        if(gameModel.getNumberOfRows() == 9){
-            return;
-        }
-
         gameModel.addRow();
     }
     public void removeRow() {
-        if (gameModel.getNumberOfRows() == 1){
-            return;
-        }
-
-        for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
-            if (gameModel.getCellOwner(gameModel.getNumberOfRows() - 1, i) != null){
-                return;
-            }
-        }
-
-        boolean existnull = false;
-        for (int j = 0; j < gameModel.getNumberOfRows() - 1; j++){
-            for (int i = 0; i < gameModel.getNumberOfColumns(); i++){
-                if (gameModel.getCellOwner(j, i) == null){
-                    existnull = true;
-                }
-            }
-        }
-        if (existnull == false){
-            return;
-        }
-
-
         gameModel.removeRow();
     }
     public void addColumn() {
-        if(gameModel.getNumberOfColumns() == 9){
-            return;
-        }
-
         gameModel.addColumn();
     }
     public void removeColumn() {
-        for (int j = 0 ; j < gameModel.getNumberOfRows(); j++){
-            if (gameModel.getCellOwner(j, gameModel.getNumberOfColumns() - 1)!= null){
-                return;
-            }
-        }
-
-        boolean existnull = false;
-        for (int j = 0; j < gameModel.getNumberOfRows(); j++){
-            for (int i = 0; i < gameModel.getNumberOfColumns() - 1; i++){
-                if (gameModel.getCellOwner(j, i) == null){
-                    existnull = true;
-                }
-            }
-        }
-        if(existnull == false){
-            return;
-        }
-
-        if (gameModel.getNumberOfColumns() == 1){
-            return;
-        }
-
         gameModel.removeColumn();
 
     }
@@ -142,7 +89,6 @@ public class OXOController {
                 }
             }
         }
-
         gameModel.setWinThreshold(gameModel.getWinThreshold() - 1);
     }
 

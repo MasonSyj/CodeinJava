@@ -404,8 +404,18 @@ class ExampleControllerTests {
     sendCommandToController("a3");
     controller.decreaseWinThreshold();
     assertEquals(3, model.getWinThreshold(), failedTestComment2);
-
-
+    controller.increaseWinThreshold();
+    assertEquals(4, model.getWinThreshold(), "WinThreshold should be 4, but it isn't");
+    controller.addColumn();
+    sendCommandToController("b3");
+    sendCommandToController("a2");
+    sendCommandToController("b2");
+    sendCommandToController("a1");
+    sendCommandToController("b1");
+    sendCommandToController("a4");
+    assertEquals(model.getWinner(), model.getCellOwner(0, 0));
+    controller.decreaseWinThreshold();
+    assertEquals(3, model.getWinThreshold(), "When there's a winner, winThreshold can be decreased ");
 
   }
 
@@ -452,7 +462,7 @@ class ExampleControllerTests {
     sendCommandToController("b3");
     assertFalse(model.isGameDrawn(), "Game isn't Drawn, still spaces in last row to fill in");
     model.removeRow();
-    assertTrue(model.isGameDrawn(), "Game should be Drawn cuz no spaces left");
+    assertFalse(model.isGameDrawn(), "Game shouldn't be drawn becuase of removal of row");
 
     model.reset();
 
@@ -466,7 +476,7 @@ class ExampleControllerTests {
     sendCommandToController("c2");
     assertFalse(model.isGameDrawn(), "Game isn't Drawn, still spaces in last column to fill in");
     model.removeColumn();
-    assertTrue(model.isGameDrawn(), "Game should be Drawn cuz no spaces left");
+    assertFalse(model.isGameDrawn(), "Game shouldn't be drawn becuase of removal of row");
 
   }
 
