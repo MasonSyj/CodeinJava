@@ -43,12 +43,16 @@ public class Questions {
         // Hints: ifPresent, sorted, findFirst, Stream.of
         List<String> listNames = new ArrayList<>(Arrays.asList("Ava", "Aneri", "Alberto"));
 
-//        Stream.of(listNames).forEach(System.out::println);
-//
-//        Stream.of(listNames).
+//        String[] s = (String[]) listNames.toArray();
+        Stream.of(listNames.toArray()).sorted().findFirst().ifPresent(System.out::println);
+
+
+/*        System.out.println(Stream.of(listNames));
+        System.out.println(listNames.stream());*/
+
 
         Stream<String> stream = listNames.stream();
-//
+
         stream.sorted().findFirst().ifPresent(System.out::println);
     }
     // ---------------------------------------------------------------------------
@@ -121,14 +125,18 @@ public class Questions {
     public static void streamRowsFromCSVParseRows() throws IOException {
         // Hints: forEach, filter, filter, map
         Stream<String> bands = Files.lines(Paths.get("data.txt"));
-        List<String[]> res = bands.map(x -> x.split(",")).filter(x -> x.length == 3).filter(x -> Integer.parseInt(x[1]) > 15).toList();
+//        List<String[]> res = bands.map(x -> x.split(",")).filter(x -> x.length == 3).filter(x -> Integer.parseInt(x[1]) > 15).toList();
+//
+//        for (int j = 0; j < res.size(); j++){
+//            for (int i = 0; i < res.get(j).length; i++) {
+//                System.out.print(res.get(j)[i] + "  ");
+//            }
+//            System.out.println();
+//        }
+//
 
-        for (int j = 0; j < res.size(); j++){
-            for (int i = 0; i < res.get(j).length; i++) {
-                System.out.print(res.get(j)[i] + "  ");
-            }
-            System.out.println();
-        }
+        bands.map(x -> x.split(",")).filter(x -> x.length == 3).filter(x -> Integer.parseInt(x[1]) > 15).
+                map(x -> x[0] + "  " + x[1] + "  " + x[2]).forEach(System.out::println);
     }
     // ---------------------------------------------------------------------------
 
