@@ -1,0 +1,69 @@
+import java.io.*;
+
+public class Main {
+
+    public static void main(String[] args) {
+        //by default under the DBTest path
+        /*
+        String filename = "../people.tab";
+        String filename = "/home/tj22981/CodeinJava/DBTest/src/people.tab";
+        */
+
+        String FileName = "src" + File.separator + "people.tab";
+
+        File file = new File(FileName);
+        if (file.exists()){
+            System.out.println("This file exists");
+        }else{
+//            System.out.println("File failed to read or doesn't exist");
+            try{
+                file.createNewFile();
+            }catch (IOException e){
+                System.out.println("Unable to create file due to permission denied or others");
+            }
+
+        }
+
+        String DirNama = "tmp";
+
+        File dir = new File(DirNama);
+        if (dir.isDirectory()){
+            System.out.println("exist a directory called tmp");
+        }else{
+            dir.mkdir();
+        }
+
+        FileWriter writer;
+        try{
+            writer = new FileWriter(FileName);
+            writer.write("Hello World!\n");
+            writer.write("From Bristol\n");
+            writer.write("Week 8\n");
+            writer.flush();
+            writer.close();
+        }catch(IOException e){
+            System.out.println("unable to write things into this file");
+        }
+
+        try {
+            FileReader reader = new FileReader(FileName);
+            BufferedReader bReader = new BufferedReader(reader);
+
+            /*
+            char[] buffer = new char[50];
+            reader.read(buffer, 0, buffer.length);
+            */
+
+            System.out.println(bReader.readLine());
+            reader.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+
+
+    }
+}
