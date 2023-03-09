@@ -1,69 +1,71 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Main {
 
+
+
     public static void main(String[] args) {
-        //by default under the DBTest path
-        /*
-        String filename = "../people.tab";
-        String filename = "/home/tj22981/CodeinJava/DBTest/src/people.tab";
-        */
-
-        String FileName = "src" + File.separator + "people.tab";
-
-        File file = new File(FileName);
-        if (file.exists()){
-            System.out.println("This file exists");
-        }else{
-//            System.out.println("File failed to read or doesn't exist");
-            try{
-                file.createNewFile();
-            }catch (IOException e){
-                System.out.println("Unable to create file due to permission denied or others");
-            }
-
-        }
-
-        String DirNama = "tmp";
-
-        File dir = new File(DirNama);
-        if (dir.isDirectory()){
-            System.out.println("exist a directory called tmp");
-        }else{
-            dir.mkdir();
-        }
-
-        FileWriter writer;
-        try{
-            writer = new FileWriter(FileName);
-            writer.write("Hello World!\n");
-            writer.write("From Bristol\n");
-            writer.write("Week 8\n");
-            writer.flush();
-            writer.close();
-        }catch(IOException e){
-            System.out.println("unable to write things into this file");
-        }
+        File file = new File("src" + File.separator + "people.tab");
+        BufferedReader reader;
 
         try {
-            FileReader reader = new FileReader(FileName);
-            BufferedReader bReader = new BufferedReader(reader);
-
-            /*
-            char[] buffer = new char[50];
-            reader.read(buffer, 0, buffer.length);
-            */
-
-            System.out.println(bReader.readLine());
-            reader.close();
+            reader = new BufferedReader(new FileReader(file));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
+        }
+
+        People[] arr = new People[3];
+        int cnt = 0;
+        String line = null;
+        String firstline = null;
+
+        try {
+            firstline = reader.readLine();
+            System.out.println("firstline: " + firstline);
+            line = reader.readLine();
+            while (line != null && line.length() > 0){
+                People thispeople = People.lineParser(line);
+                thispeople.setRandomage();
+                arr[cnt++] = thispeople;
+                System.out.println(thispeople.toDefaultString());
+                line = reader.readLine();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-
+//
+//        try{
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+//            writer.write(firstline);
+//            for (int i = 0; i < 3; i++){
+//                writer.write(arr[i].toDefaultString());
+//            }
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        try{
+//            reader = new BufferedReader(new FileReader(file));
+//            line = reader.readLine();
+//            while (line != null){
+//                System.out.println(line);
+//                line = reader.readLine();
+//            }
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
 
     }
+
+
+
 }
