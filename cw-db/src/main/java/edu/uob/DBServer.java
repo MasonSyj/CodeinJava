@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
 import java.nio.file.Files;
+import java.util.List;
 
 /** This class implements the DB server. */
 public class DBServer {
@@ -43,7 +44,9 @@ public class DBServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
-
+        List<String> tokens = Token.setup(command);
+        Parser parser = new Parser(tokens);
+        parser.cmdSearch();
         return command;
     }
 

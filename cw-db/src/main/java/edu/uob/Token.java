@@ -56,7 +56,7 @@ public class Token {
 
 	public static void main(String[] args){
 
-		String query = "  INSERT  INTO  people   VALUES(  'Simon Lock'  ,35, 'simon@bristol.ac.uk' , 1.8  ) ; ";
+		String query = "  INSERT  INTO  people.233   VALUES(  'Simon Lock'  ,35, 'simon@bristol.ac.uk' , 1.8  ) ; ";
 
 		List<String> first = Token.setup(query);
 
