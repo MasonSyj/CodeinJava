@@ -2,14 +2,16 @@ package edu.uob;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Token {
 
-	String query;
+//	String query;
+// 	ArrayList<String> tokens;
 	static String[] specialCharacters = {"(",")",",",";"};
-	ArrayList<String> tokens;
 
-	void setup() {
+	public static List<String> setup(String query) {
+		List<String> tokens = new ArrayList<String>();
 		// Remove any whitespace at the beginning and end of the query
 		query = query.trim();
 		// Split the query on single quotes (to separate out query characters from string literals)
@@ -27,12 +29,16 @@ public class Token {
 		}
 
 		// Finally, loop through the result array list, printing out each token a line at a time
+		/*
 		for (int i = 0; i < tokens.size(); i++) {
 			System.out.println(tokens.get(i));
 		}
+		 */
+
+		return tokens;
 	}
 
-	String[] tokenise(String input)
+	public static String[] tokenise(String input)
 	{
 		// Add in some extra padding spaces around the "special characters"
 		// so we can be sure that they are separated by AT LEAST one space (possibly more)
@@ -51,20 +57,20 @@ public class Token {
 	public static void main(String[] args){
 
 		String query = "  INSERT  INTO  people   VALUES(  'Simon Lock'  ,35, 'simon@bristol.ac.uk' , 1.8  ) ; ";
-//		String[] specialCharacters = {"(",")",",",";"};
-		ArrayList<String> tokens = new ArrayList<String>();
 
-		Token test = new Token();
+		List<String> first = Token.setup(query);
 
-/*		String[] res = test.tokenise(query);
-		for (String str: res){
+		String[] second = Token.tokenise(query);
+
+		for (String str: first){
 			System.out.println(str);
-		}*/
+		}
 
-		test.tokens = new ArrayList<>();
-		test.query = query;
-		test.setup();
+		System.out.println("----------Separate Line--------");
 
+		for (String str: second){
+			System.out.println(str);
+		}
 
 
 	}

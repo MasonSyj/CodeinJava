@@ -1,42 +1,52 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
 
-
-
     public static void main(String[] args) {
-        File file = new File("src" + File.separator + "people.tab");
-        BufferedReader reader;
+        FileDealer test = new FileDealer("src", "people.tab");
+        Table table = test.file2Table();
+        table.printTable();
+    }
 
-        try {
-            reader = new BufferedReader(new FileReader(file));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        People[] arr = new People[3];
-        int cnt = 0;
-        String line = null;
-        String firstline = null;
-
-        try {
-            firstline = reader.readLine();
-            System.out.println("firstline: " + firstline);
-            line = reader.readLine();
-            while (line != null && line.length() > 0){
-                People thispeople = People.lineParser(line);
-                thispeople.setRandomage();
-                arr[cnt++] = thispeople;
-                System.out.println(thispeople.toDefaultString());
-                line = reader.readLine();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//    public static void main(String[] args) {
+//        File file = new File("src" + File.separator + "people.tab");
+//        BufferedReader reader;
+//
+//        try {
+//            reader = new BufferedReader(new FileReader(file));
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//
+//        String line = null;
+//        String attributeLine = null;
+//
+//        List<String> attributesList = new ArrayList<String>();
+//
+//        try {
+//            attributeLine = reader.readLine();
+//            attributesList = csvLineParse(attributeLine);
+//
+//            line = reader.readLine();
+//
+//            while (line != null && line.length() > 0){
+//                List valueList = new ArrayList();
+//                valueList = valuesParse(line);
+//
+//                thispeople.setRandomage();
+//                arr[cnt++] = thispeople;
+//                System.out.println(thispeople.toDefaultString());
+//                line = reader.readLine();
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        for (String str: attributesList){
+//            System.out.print(str + "\t");
+//        }
 
 //
 //        try{
@@ -62,10 +72,14 @@ public class Main {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
+//}
 
 
+    private static List<String> csvLineParse(String line) {
+        List<String> ans = new ArrayList<String>();
+        ans = Arrays.stream(line.split("\t")).toList();
+        return ans;
     }
-
 
 
 }

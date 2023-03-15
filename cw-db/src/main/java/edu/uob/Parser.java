@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
+
+	private String DBName;
 	private List<String> tokens;
 //	private CommandType cmdType;
 
@@ -28,7 +30,7 @@ public class Parser {
 
 	private void parseINSERT() {
 		if (!tokens.get(1).toLowerCase().equals("into")){
-			throw new IllegalArgumentException("INSERT cmd should come with a INTO")
+			throw new IllegalArgumentException("INSERT cmd should come with a INTO");
 		}
 		String tableName = tokens.get(2);
 
@@ -46,7 +48,7 @@ public class Parser {
 
 		List<String> valueList = parseValueList(tokens);
 
-		InsertCmd insertCmd = new InsertCmd(tableName, valueList);
+		InsertCmd insertCmd = new InsertCmd(DBName, tableName, valueList);
 	}
 
 	private List<String> parseValueList(List<String> tokens) {
