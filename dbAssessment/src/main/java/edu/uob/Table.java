@@ -6,12 +6,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 public class Table {
 	private String DBName;
 	private String tableName;
 	private List<String> attributesName;
 	private List<Column> columns;
+
+	private static HashMap<String, Integer> ref;
 
 	private int numofAttributes;
 	private int numofItems;
@@ -108,6 +111,19 @@ public class Table {
 		attributesName.add(col.getColumnName());
 		columns.add(col);
 		numofAttributes++;
+
+		for (int i = 0; i < numofItems; i++){
+			columns.get(columns.size() - 1).addValue(null);
+		}
+	}
+
+	public boolean dropExistedColumn(Column col){
+		if (!getAttributesName().contains(col.toString())){
+			return false;
+		}else{
+			String colName = col.toString();
+			Column col =
+		}
 	}
 
 	public void addColumns(List<String> attributes){
@@ -116,46 +132,37 @@ public class Table {
 		}
 	}
 
-	public void printTable(){
+
+	public void updateFile(){
 		try {
-			BufferedWriter writer = getAccordingFile();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), false));
+			writer.write("");
+			writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
+			int row = columns.get(0).getColumnBody().size();
+			int col = columns.size();
+			String AttributesLine = "";
+			for (String attribute: attributesName){
+
+				AttributesLine = AttributesLine + attribute + "\t";
+			}
+			writer.write(AttributesLine);
+			writer.newLine();
+
+			for (int i = 0; i < row; i++){
+				String entry = "";
+				for (int j = 0; j < col; j++){
+					entry = entry + columns.get(j).getColumnBody().get(i) + "\t";
+				}
+				writer.write(entry);
+				writer.newLine();
+			}
+			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		int row = columns.get(0).getColumnBody().size();
-		int col = columns.size();
-		String AttributesLine = "";
-		for (String attribute: attributesName){
-			System.out.print(attribute + "\t");
-			AttributesLine = AttributesLine + "\t";
-		}
-		System.out.println();
 
-		for (int i = 0; i < row; i++){
-			for (int j = 0; j < col; j++){
-				System.out.print(columns.get(j).getColumnBody().get(i) + "\t");
-			}
-			System.out.println();
-		}
 	}
-
-	// this function is here and not finished.
-//	public void printTablePartially(){
-//		int row = columns.get(0).getColumnBody().size();
-//		int col = columns.size();
-//		for (String attribute: attributesName){
-//			System.out.print(attribute + "\t");
-//		}
-//		System.out.println();
-//
-//		for (int i = 0; i < row; i++){
-//			for (int j = 0; j < col; j++){
-//				System.out.print(columns.get(j).getColumnBody().get(i) + "\t");
-//			}
-//			System.out.println();
-//		}
-//	}
 
 	public void addValue(List value) {
 		numofItems++;

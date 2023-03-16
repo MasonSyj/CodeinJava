@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Test {
 	public static void main(String[] args) {
-		Table testTable = new Table(null,"Student");
+		Table testTable = new Table(".","Student");
 		Column id = new Column<Integer>("id");
 		id.addValue(0);
 		id.addValue(1);
@@ -22,11 +22,11 @@ public class Test {
 
 		testTable.addNewColumn(id);
 		testTable.addNewColumn(name);
-		testTable.printTable();
+		testTable.updateFile();
 
 		System.out.println();
 
-		Table robotTable = new Table(null, "Robot");
+		Table robotTable = new Table(".", "Robot");
 		robotTable.addNewColumn(new Column<Integer>("id"));
 		robotTable.addNewColumn(new Column<String>("name"));
 		robotTable.addNewColumn(new Column<Integer>("price"));
@@ -38,7 +38,9 @@ public class Test {
 
 		robotTable.addValue(c3po);
 
-		robotTable.printTable();
+		robotTable.addNewColumn(new Column("speed"));
+
+		robotTable.updateFile();
 	}
 }
 
