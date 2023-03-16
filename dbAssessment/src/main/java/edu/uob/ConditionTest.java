@@ -83,15 +83,12 @@ public class ConditionTest {
         FileDealer fd = new FileDealer(".", "PhoneBrand");
         Table t = fd.file2Table();
 
-        Stack<String> stack = new Stack<String>();
+        Stack<List<String>> stack = new Stack<>();
         for (int i = 0; i < res.size(); i++){
             if (res.get(i).toLowerCase().equals("and") || res.get(i).toLowerCase().equals("or")){
-                AndOr operator;
 
-                String a = stack.pop();
-                String b = stack.pop();
-                List<String> itema = t.predicate(a);
-                List<String> itemb = t.predicate(b);
+                List<String> itema = stack.pop();
+                List<String> itemb = stack.pop();
                 List<String> ansItem;
 
                 if (res.get(i).toLowerCase().equals("and")){
@@ -99,12 +96,20 @@ public class ConditionTest {
                 }else{
                     ansItem = t.or(itema, itemb);
                 }
-                stack.add
+                stack.add(ansItem);
 
             }else{
-                stack.add(res.get(i));
+                List<String> curres = t.predicate(res.get(i));
+                stack.add(curres);
             }
         }
+
+        System.out.println("stack size: " + stack.size());
+        for (String s: stack.get(0)){
+            System.out.println(s);
+        }
+
+
     }
 
 }
