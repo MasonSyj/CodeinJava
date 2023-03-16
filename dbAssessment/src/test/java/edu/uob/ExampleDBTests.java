@@ -89,6 +89,11 @@ public class ExampleDBTests {
         System.out.println("-----------S L------------");
         System.out.println(response);
         assertTrue(response.contains("Steve"), "Steve was added to a table and the server restarted - but Steve was not returned by SELECT *");
+        System.out.println("---------test selct wildAttributeList-----------");
+        response = sendCommandToServer("Select name, pass from marks;");
+        assertTrue((response.contains("name")));
+        assertTrue((response.contains("pass")));
+        assertTrue(!(response.contains("mark")));
     }
 
     // Test to make sure that the [ERROR] tag is returned in the case of an error (and NOT the [OK] tag)

@@ -1,5 +1,6 @@
 package edu.uob;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SelectCmd extends Command{
@@ -14,13 +15,26 @@ public class SelectCmd extends Command{
     @Override
     public String execute() {
         try{
-            FileDealer fd = new FileDealer(getDBName(), getTableName());
-            Table table = fd.file2Table();
-            List<String> all = table.getAllItems();
-            String allItemsinString = all.toString();
-            System.out.print("all:");
-            System.out.println(allItemsinString + "\n");
-            return "[OK] " + allItemsinString;
+            if (attributeList == null){
+                FileDealer fd = new FileDealer(getDBName(), getTableName());
+                Table table = fd.file2Table();
+                List<String> all = table.getAllItems();
+                String allItemsinString = all.toString();
+                return "[OK] " + allItemsinString;
+            }else{
+                List<String> attributesNames = new ArrayList<String>();
+                for (List<String> list: attributeList){
+                    String name = list.get(1);
+                    attributesNames.add(name);
+                }
+
+                FileDealer fd = new FileDealer(getDBName(), getTableName());
+                Table table = fd.file2Table();
+                List<String> all = table.getParialColumn(attributesNames);
+                String allItemsinString = all.toString();
+                return "[OK] " + allItemsinString;
+            }
+
         } catch (Exception e){
             return "[ERROR], failed to get all items.\n";
         }

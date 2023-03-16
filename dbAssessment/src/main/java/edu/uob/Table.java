@@ -53,6 +53,12 @@ public class Table {
 	public List<String> getAllItems(){
 		List<String> ans = new ArrayList<>();
 
+		String firstRow = "";
+		for (String name: getAttributesName()){
+			firstRow = firstRow + name + "\t";
+		}
+		ans.add(firstRow);
+
 		int row = columns.get(0).getColumnBody().size();
 		int col = columns.size();
 
@@ -65,6 +71,36 @@ public class Table {
 			ans.add(item);
 			System.out.println();
 		}
+		return ans;
+	}
+
+	public List<String> getParialColumn(List<String> attributesName){
+		List<String> ans = new ArrayList<>();
+
+		String firstRow = "";
+		for (String name: attributesName){
+			firstRow = firstRow + name + "\t";
+		}
+		ans.add(firstRow);
+
+		int row = columns.get(0).getColumnBody().size();
+		int col = columns.size();
+
+		for (int i = 0; i < row; i++){
+			String item = "";
+			for (int j = 0; j < col; j++){
+				if (!attributesName.contains(getAttributesName().get(j))){
+					continue;
+				}
+
+				item = item + columns.get(j).getColumnBody().get(i) + "\t";
+				System.out.print(columns.get(j).getColumnBody().get(i) + "\t");
+			}
+			ans.add(item);
+			System.out.println();
+		}
+
+
 		return ans;
 	}
 

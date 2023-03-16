@@ -23,16 +23,16 @@ public class Parser {
 			throw new IllegalArgumentException("Query doesn't end with ';'");
 		}
 
-		switch(cmd){
-			case "INSERT": parseINSERT(); break;
+		switch(cmd.toUpperCase()){
 			case "USE": parseUSE(); break;
 			case "CREATE": parseCREATE(); break;
+			case "INSERT": parseINSERT(); break;
+			case "SELECT": parseSELECT(); break;
 //			case "UPDATE": parseUPDATE(); break;
 //			case "ALTER": parseALTER(); break;
 //			case "DELETE": parseDELETE(); break;
 //			case "DROP": parseDROP(); break;
 			case "JOIN": parseJOIN(); break;
-			case "SELECT": parseSELECT(); break;
 		}
 	}
 
@@ -44,6 +44,22 @@ public class Parser {
 
 			SelectCmd selectCmd = new SelectCmd(currentDBName, tokens.get(3), null);
 			execResult = selectCmd.execute();
+		}else{
+			// find the index of "from"
+			int indexofFrom = 2;
+			for (int i = 0; i < tokens.size(); i++){
+				if (tokens.get(i).toLowerCase().equals("from")){
+					indexofFrom = i;
+					break;
+				}
+			}
+			// the next one is tablename
+			String tableName = tokens.get(indexofFrom + 1);
+			// from 1 to n is attributslist
+			List<List<String>> attributesList = parseAttributeList(tokens, tableName, 1);
+			SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList);
+			execResult = selectCmd.execute();
+
 		}
 	}
 
@@ -114,7 +130,7 @@ public class Parser {
 	private List<List<String>> parseAttributeList(List<String> tokens, String DefaultTableName, int index) {
 		List<List<String>> ans = new ArrayList<>();
 		try{
-			while (!tokens.get(index).equals(")")){
+			while (!tokens.get(index).equals(")") && !tokens.get(index).toLowerCase().equals("from")){
 				if (!tokens.get(index).equals(",")){
 					if (tokens.get(index).contains(".")){
 						ans.add(Arrays.stream(tokens.get(index).split(".")).toList());
