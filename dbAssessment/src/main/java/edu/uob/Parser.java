@@ -30,10 +30,22 @@ public class Parser {
 			case "SELECT": parseSELECT(); break;
 //			case "UPDATE": parseUPDATE(); break;
 			case "ALTER": parseALTER(); break;
-//			case "DELETE": parseDELETE(); break;
+			case "DELETE": parseDELETE(); break;
 			case "DROP": parseDROP(); break;
 //			case "JOIN": parseJOIN(); break;
 		}
+	}
+
+	private void parseDELETE() {
+		if (!tokens.get(1).toLowerCase().equals("table")){
+			throw new IllegalArgumentException("DELETE operation must come with a FROM");
+		}
+
+		if (!tokens.get(1).toLowerCase().equals("where")){
+			throw new IllegalArgumentException("DELETE operation must hava a WHERE");
+		}
+
+
 	}
 
 	private void parseALTER() {

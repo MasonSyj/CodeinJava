@@ -12,4 +12,15 @@ public class FuncTest {
         File filetest = new File("aFile");
         filetest.createNewFile();
     }
+    /*
+    Condition examples:
+    age > 30;
+    (age > 30);
+    mark > 60;
+    (mark > 60);
+
+
+    age > 30 AND mark > 60
+    age > 30 OR mark > 60
+     */
 }
