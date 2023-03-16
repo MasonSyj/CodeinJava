@@ -7,12 +7,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-public class Table {
+public class Table implements Predicate<String> {
 	private String DBName;
 	private String tableName;
 	private List<String> attributesName;
 	private List<Column> columns;
+
+	private String value;
+	private String operator;
+	private String attribute;
+
+	private int attributeIndex;
 
 	private static HashMap<String, Integer> ref;
 
@@ -56,11 +64,11 @@ public class Table {
 	public List<String> getAllItems(){
 		List<String> ans = new ArrayList<>();
 
-		String firstRow = "";
-		for (String name: getAttributesName()){
-			firstRow = firstRow + name + "\t";
-		}
-		ans.add(firstRow);
+//		String firstRow = "";
+//		for (String name: getAttributesName()){
+//			firstRow = firstRow + name + "\t";
+//		}
+//		ans.add(firstRow);
 
 		int row = columns.get(0).getColumnBody().size();
 		int col = columns.size();
@@ -69,10 +77,8 @@ public class Table {
 			String item = "";
 			for (int j = 0; j < col; j++){
 				item = item + columns.get(j).getColumnBody().get(i) + "\t";
-				System.out.print(columns.get(j).getColumnBody().get(i) + "\t");
 			}
 			ans.add(item);
-			System.out.println();
 		}
 		return ans;
 	}
@@ -208,5 +214,36 @@ public class Table {
 
 	public BufferedWriter getAccordingFile() throws IOException {
 		return new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
+	}
+
+	public List<String> predicate(String t){
+		attribute = t.split(" ")[0];
+		operator = t.split(" ")[1];
+		value = t.split(" ")[2];
+
+		attributeIndex = attributesName.indexOf(attribute);
+
+		return getAllItems().stream().filter(this).collect(Collectors.toList());
+	}
+
+	@Override
+	public boolean test(String t) {
+		if (operator.equals("==")){
+			return Integer.parseInt(t.split("\t")[attributeIndex]) == Integer.valueOf(value);
+		}else if (operator.equals(">")){
+			return Integer.parseInt(t.split("\t")[attributeIndex]) > Integer.valueOf(value);
+		}else if (operator.equals("<")){
+			return Integer.parseInt(t.split("\t")[attributeIndex]) < Integer.valueOf(value);
+		}else if (operator.equals(">=")){
+			return Integer.parseInt(t.split("\t")[attributeIndex]) >= Integer.valueOf(value);
+		}else if (operator.equals("<=")){
+			return Integer.parseInt(t.split("\t")[attributeIndex]) <= Integer.valueOf(value);
+		}else if (operator.equals("!=")){
+			return Integer.parseInt(t.split("\t")[attributeIndex]) != Integer.valueOf(value);
+		}else if (operator.toUpperCase().equals("LIKE")){
+			return t.split("\t")[attributeIndex].equals(value);
+		}else{
+			return false;
+		}
 	}
 }
