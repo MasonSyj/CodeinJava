@@ -25,6 +25,16 @@ public class Column<T> implements Predicate<String> {
 		columnBody.add(value);
 	}
 
+	public void set(int index, T t){
+		columnBody.set(index, t);
+	}
+
+	public void clean(){
+		while (columnBody.size() != 0){
+			columnBody.remove(0);
+		}
+	}
+
 	@Override
 	public boolean test(String t) {
 		String attribute = t.split(" ")[0];

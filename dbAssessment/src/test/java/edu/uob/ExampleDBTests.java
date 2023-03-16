@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExampleDBTests {
 
@@ -160,7 +162,51 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks drop UnknownName;");
         assertTrue(response.contains("[ERROR]"));
+    }
+
+    @Test
+    public void testTableUpdateClass(){
+        Table t = new Table(".", "PhoneBrand");
+        t.addNewColumn(new Column("Name"));
+        t.addNewColumn(new Column("Brand"));
+        t.addNewColumn(new Column("Price"));
+
+        List<String> value1 = new ArrayList<String>();
+        value1.add("Pixel 7");
+        value1.add("Google");
+        value1.add("6000");
+        t.addValue(value1);
+
+        List<String> value2 = new ArrayList<String>();
+        value2.add("Iphone 13");
+        value2.add("Apple");
+        value2.add("8000");
+
+        t.addValue(value2);
+
+        List<String> value3 = new ArrayList<String>();
+        value3.add("Xiaomi 10");
+        value3.add("Xiaomi");
+        value3.add("7000");
+        t.addValue(value3);
+
+        t.updateFile();
+
+        assertTrue(t.getNumofItems() == 3);
+
+        String newvalu1 = "Huawei\tMate40\t5000";
+        List<String> ref = new ArrayList<String>();
+        ref.add(newvalu1);
+        t.updateClass(ref);
+
+        assertTrue(t.getNumofItems() == 1);
 
     }
 
 }
+
+//    String DBname = "DigitalDevice";
+//        String TableName = "Phones";
+//        sendCommandToServer("CREATE DATABASE " + DBname + ";");
+//        sendCommandToServer("USE " + DBname + ";");
+//        sendCommandToServer("CREATE TABLE marks (name, mark, pass);")

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.HashMap;
 import java.util.function.Predicate;
@@ -46,6 +47,10 @@ public class Table implements Predicate<String> {
 
 	public List<String> getAttributesName(){
 		return attributesName;
+	}
+
+	public int getNumofItems() {
+		return numofItems;
 	}
 
 	public List<Column> getColumns() {
@@ -214,6 +219,26 @@ public class Table implements Predicate<String> {
 
 	public BufferedWriter getAccordingFile() throws IOException {
 		return new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
+	}
+
+	public void cleanAll(){
+		for (int j = 0; j < numofAttributes; j++){
+			columns.get(j).clean();
+		}
+	}
+
+	public void updateClass(List<String> ref){
+		cleanAll();
+		int j = 0;
+		for (String entry: ref){
+			List<String> splited = Arrays.stream(entry.split("\t")).toList();
+			for (int i = 0; i < numofAttributes; i++){
+				columns.get(i).addValue(splited.get(i));
+//				columns.get(i).set(j, splited.get(i));
+			}
+		}
+		numofItems = ref.size();
+		updateFile();
 	}
 
 	public List<String> predicate(String t){
