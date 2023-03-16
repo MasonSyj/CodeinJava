@@ -109,4 +109,36 @@ public class ExampleDBTests {
         assertFalse(response.contains("[OK]"), "An attempt was made to access a non-existent table, however an [OK] tag was returned");
     }
 
+    @Test
+    public void testDropCommand(){
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        sendCommandToServer("CREATE TABLE units (name, points, category);");
+
+        String response = sendCommandToServer("DROP table marks;");
+        assertTrue(response.contains("[OK]"));
+
+        response = sendCommandToServer("DROP table marks;");
+        assertTrue(response.contains("[ERROR]"));
+
+//        response = sendCommandToServer("DROP table units;");
+//        assertTrue(response.contains("[OK]"));
+
+        response = sendCommandToServer("DROP DATABASE " + randomName + ";");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("DROP DATABASE " + randomName + ";");
+        assertTrue(response.contains("[ERROR]"));
+
+//        randomName = generateRandomName();
+//        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+//        sendCommandToServer("USE " + randomName + ";");
+//        sendCommandToServer("CREATE TABLE sports (name, category, expenses);");
+
+
+
+    }
+
 }

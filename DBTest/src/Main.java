@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -7,6 +8,31 @@ public class Main {
         FileDealer test = new FileDealer("src", "people.tab");
         Table table = test.file2Table();
         table.printTable();
+
+        String first = "name\tmark\tpass\t";
+        String sam = "sam\t90\ttrue";
+        String tom = "tom\t49\ttalse";
+
+        List<String> markTable = new ArrayList<>();
+        markTable.add(first);
+        markTable.add(sam);
+        markTable.add(tom);
+
+        markTable.remove(0);
+
+        System.out.println(markTable);
+
+        List<String> filtered = markTable.stream()
+                .filter(mark -> Integer.parseInt(mark.split("\t")[1]) < 50)
+                .collect(Collectors.toList());
+
+        System.out.println("after stream");
+
+        System.out.println(filtered);
+//        for(String str: filtered){
+//            System.out.println(str);
+//        }
+
     }
 
 //    public static void main(String[] args) {

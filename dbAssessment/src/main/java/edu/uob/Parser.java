@@ -31,8 +31,20 @@ public class Parser {
 //			case "UPDATE": parseUPDATE(); break;
 //			case "ALTER": parseALTER(); break;
 //			case "DELETE": parseDELETE(); break;
-//			case "DROP": parseDROP(); break;
+			case "DROP": parseDROP(); break;
 			case "JOIN": parseJOIN(); break;
+		}
+	}
+
+	private void parseDROP() {
+		if (tokens.get(1).toLowerCase().equals("database")){
+			DropDBCmd dropDBCmd = new DropDBCmd(tokens.get(2), null);
+			execResult = dropDBCmd.execute();
+		}else if (tokens.get(1).toLowerCase().equals("table")){
+			DropTableCmd dropTableCmd = new DropTableCmd(currentDBName, tokens.get(2));
+			execResult = dropTableCmd.execute();
+		}else{
+			throw new IllegalArgumentException("Drop Query needs to know it's database or table");
 		}
 	}
 
