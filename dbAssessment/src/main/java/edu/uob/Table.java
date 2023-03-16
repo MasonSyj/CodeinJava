@@ -115,15 +115,20 @@ public class Table {
 		for (int i = 0; i < numofItems; i++){
 			columns.get(columns.size() - 1).addValue(null);
 		}
+		updateFile();
 	}
 
-	public boolean dropExistedColumn(Column col){
-		if (!getAttributesName().contains(col.toString())){
+	public boolean dropExistedColumn(String attributeName){
+		if (!getAttributesName().toString().contains(attributeName)){
 			return false;
 		}else{
-			String colName = col.toString();
-			Column col =
+			int index = attributesName.indexOf(attributeName);
+			attributesName.remove(index);
+			columns.remove(index);
+			updateFile();
+			return true;
 		}
+
 	}
 
 	public void addColumns(List<String> attributes){

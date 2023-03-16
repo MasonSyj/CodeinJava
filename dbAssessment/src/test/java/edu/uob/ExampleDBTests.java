@@ -141,4 +141,26 @@ public class ExampleDBTests {
 
     }
 
+    @Test
+    public void testAlterCommand(){
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
+        String response = sendCommandToServer("ALTER TABLE marks add rank;");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("ALTER TABLE marks add rank;");
+        assertTrue(response.contains("[ERROR]"));
+
+        response = sendCommandToServer("ALTER TABLE marks drop pass;");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("ALTER TABLE marks drop pass;");
+        assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("ALTER TABLE marks drop UnknownName;");
+        assertTrue(response.contains("[ERROR]"));
+
+    }
+
 }

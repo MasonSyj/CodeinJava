@@ -29,10 +29,28 @@ public class Parser {
 			case "INSERT": parseINSERT(); break;
 			case "SELECT": parseSELECT(); break;
 //			case "UPDATE": parseUPDATE(); break;
-//			case "ALTER": parseALTER(); break;
+			case "ALTER": parseALTER(); break;
 //			case "DELETE": parseDELETE(); break;
 			case "DROP": parseDROP(); break;
-			case "JOIN": parseJOIN(); break;
+//			case "JOIN": parseJOIN(); break;
+		}
+	}
+
+	private void parseALTER() {
+		if (!tokens.get(1).toLowerCase().equals("table")){
+			throw new IllegalArgumentException("ALTER operation must come with a TABLE");
+		}else{
+			AlterationType type;
+			if (tokens.get(3).toLowerCase().equals("add")){
+				type = AlterationType.ADD;
+			}else if (tokens.get(3).toLowerCase().equals("drop")){
+				type = AlterationType.DROP;
+			}else{
+				throw new IllegalArgumentException("Alter operation doesn't do add or drop.");
+			}
+
+			AlterCmd alterCmd = new AlterCmd(currentDBName, tokens.get(2), type, tokens.get(4));
+			execResult = alterCmd.execute();
 		}
 	}
 
