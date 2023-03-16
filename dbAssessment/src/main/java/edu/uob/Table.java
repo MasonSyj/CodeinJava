@@ -148,6 +148,11 @@ public class Table implements Predicate<String> {
 		}
 	}
 
+	public List<String> csvLineParse(String line) {
+		List<String> ans = new ArrayList<String>();
+		ans = Arrays.stream(line.split("\t")).toList();
+		return ans;
+	}
 
 	public void updateFile(){
 		try {
@@ -225,6 +230,29 @@ public class Table implements Predicate<String> {
 		for (int j = 0; j < numofAttributes; j++){
 			columns.get(j).clean();
 		}
+	}
+
+	public List<String> or(List<String> a, List<String> b){
+		List<String> res = new ArrayList<>();
+		for (String str: a){
+			res.add(str);
+		}
+		for (String str: b){
+			res.add(str);
+		}
+
+		return res.stream().distinct().collect(Collectors.toList());
+	}
+
+	public List<String> and(List<String> a, List<String> b){
+		List<String> res = new ArrayList<>();
+		for (String str: a){
+			if (b.contains(str)){
+				res.add(str);
+			}
+		}
+
+		return res;
 	}
 
 	public void updateClass(List<String> ref){

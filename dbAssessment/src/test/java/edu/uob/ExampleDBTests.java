@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ExampleDBTests {
@@ -203,7 +204,27 @@ public class ExampleDBTests {
 
     }
 
+    @Test
+    public void testListStringAndOrOperation(){
+        String a = "Apple 5 UK";
+        String b = "Pear 6 France";
+        String c = "Banana 4 German";
+        String d = "Orange 9 Italy";
+
+
+        List<String> first = Arrays.asList(a, b, c);
+        List<String> second = Arrays.asList(a, b, d);
+
+        FuncTest2 test = new FuncTest2();
+        List<String> res1 = test.and(first, second);
+        System.out.println(res1.toString());
+
+        List<String> res2 = test.or(first, second);
+        System.out.println(res2.toString());
+    }
 }
+
+
 
 //    String DBname = "DigitalDevice";
 //        String TableName = "Phones";

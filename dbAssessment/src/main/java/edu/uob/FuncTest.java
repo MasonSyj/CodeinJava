@@ -22,7 +22,7 @@ public class FuncTest {
 
         value.add("Pixel 7");
         value.add("Google");
-        value.add("6000");
+        value.add("7000");
         t.addValue(value);
 
 
@@ -49,8 +49,10 @@ public class FuncTest {
 
         value.add("Xiaomi 10");
         value.add("Xiaomi");
-        value.add("7000");
+        value.add("6000");
         t.addValue(value);
+
+        t.addValue(t.csvLineParse("Huawei\tMate40\t5000"));
 
         t.updateFile();
 
@@ -71,8 +73,42 @@ public class FuncTest {
             System.out.println(str);
         }
 
+//        res = t.predicate("Brand like Apple or Price >= 7000");
+
+        List<String> ref = test.parseConditions("Brand like Apple or Price >= 7000");
+        String first = ref.get(0);
+        String second = ref.get(1);
+        List<String> firstResult = t.predicate(first);
+        List<String> secondResult = t.predicate(second);
+        List<String> resListString = t.or(firstResult, secondResult);
+        System.out.println(resListString);
 
     }
+
+    public List<String> parseConditions(String t){
+        List<String> res = new ArrayList<String>();
+        String[] tokens = t.split(" ");
+        for (int i = 0; i < tokens.length; i++){
+            if (tokens[i].toUpperCase().equals("AND") || tokens[i].toUpperCase().equals("OR")){
+                String singleConditionFirst = tokens[i - 3] + " " + tokens[i - 2] + " " + tokens[i - 1];
+
+//                Condition condition = new Condition(singleConditionFirst);
+                System.out.println(singleConditionFirst);
+
+                String singleConditionSecond = tokens[i + 1] + " " + tokens[i + 2] + " " + tokens[i + 3];
+//                condition = new Condition(singleConditionSecond);
+                System.out.println(singleConditionSecond);
+
+                res.add(singleConditionFirst);
+                res.add(singleConditionSecond);
+            }
+        }
+        return res;
+    }
+
+    // ((Brand like Apple and Price >= 7000) or Name like Mate40)
+
+    // (Sirname like Li and (Age > 20 or Occ like manager) or Salary > 8000)
 
 //    public void predicateOne(Table t){
 //        t.getColumns().stream().filter().collect(Collectors.toList());
