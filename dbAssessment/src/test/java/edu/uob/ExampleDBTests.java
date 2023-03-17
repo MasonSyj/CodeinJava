@@ -134,6 +134,7 @@ public class ExampleDBTests {
         System.out.println("fjkldsajfklsjadf");
         System.out.println("responese:" + response);
         assertTrue(response.contains("[ERROR]"));
+        response.len
 
     }
 
