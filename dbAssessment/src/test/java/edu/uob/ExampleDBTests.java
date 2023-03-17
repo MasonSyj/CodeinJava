@@ -181,6 +181,22 @@ public class ExampleDBTests {
     }
 
     @Test
+    public void testUpdate(){
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        String response = sendCommandToServer("update marks set Price = 10000, Brand = HUAWEINB where Brand like Huawei;");
+        assertTrue(response.contains("[OK]"));
+    }
+
+    @Test
     public void testSelectWildWithConditions() {
         String randomName = generateRandomName();
         System.out.println(randomName);

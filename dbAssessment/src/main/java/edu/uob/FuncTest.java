@@ -25,15 +25,12 @@ public class FuncTest {
         value.add("7000");
         t.addValue(value);
 
-
 //        for (int i = 0; i < value.size(); i++){
 //            value.remove(i);
 //        }
         while (value.size() != 0){
             value.remove(0);
         }
-
-//        System.out.println(value.size());
 
         value.add("Iphone 13");
         value.add("Apple");
@@ -44,8 +41,6 @@ public class FuncTest {
         while (value.size() != 0){
             value.remove(0);
         }
-
-//        System.out.println(value.size());
 
         value.add("Xiaomi 10");
         value.add("Xiaomi");

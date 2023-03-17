@@ -270,6 +270,8 @@ public class Table implements Predicate<String>, Cloneable{
 		numofItems = ref.size();
 	}
 
+
+
 	public List<String> predicate(String t){
 		attribute = t.split(" ")[0];
 		operator = t.split(" ")[1];

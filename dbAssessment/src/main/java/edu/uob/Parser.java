@@ -28,12 +28,40 @@ public class Parser {
 			case "CREATE": parseCREATE(); break;
 			case "INSERT": parseINSERT(); break;
 			case "SELECT": parseSELECT(); break;
-//			case "UPDATE": parseUPDATE(); break;
+			case "UPDATE": parseUPDATE(); break;
 			case "ALTER": parseALTER(); break;
 			case "DELETE": parseDELETE(); break;
 			case "DROP": parseDROP(); break;
 //			case "JOIN": parseJOIN(); break;
 		}
+	}
+
+	private void parseUPDATE() {
+		if (!tokens.get(2).toLowerCase().equals("set")){
+
+		}
+
+		int ConditionBeginIndex = -1;
+		for (int i = 6; i < tokens.size(); i++){
+			if (tokens.get(i).toLowerCase().equals("where")){
+				ConditionBeginIndex = i + 1;
+				break;
+			}
+		}
+
+		if (ConditionBeginIndex == -1){
+			throw new IllegalArgumentException("Update operation needs to have a where");
+		}
+
+		if (ConditionBeginIndex == tokens.size()){
+			throw new IllegalArgumentException("Update operation must have condition(s)");
+		}
+
+		parseConditions(ConditionBeginIndex);
+		List<String> conditionTokens = tokens.subList(ConditionBeginIndex, tokens.size());
+		UpdateCmd updateCmd = new UpdateCmd(currentDBName, tokens.get(1), parseNameValueList(tokens), conditionTokens);
+		execResult = updateCmd.execute();
+
 	}
 
 	private void parseDELETE() {
@@ -191,6 +219,34 @@ public class Parser {
 		}
 
 		return ans;
+	}
+
+	public List<List<String>> parseNameValueList(List<String> tokens){
+		List<List<String>> res = new ArrayList<>();
+
+		int i = 3;
+		while (!tokens.get(i).toLowerCase().equals("where")){
+			List<String> curNameValuePair = new ArrayList<>();
+			try{
+				for (int cnt = 0; cnt < 3; cnt++){
+					if (cnt == 1 && !tokens.get(i).equals("=")){
+						throw new IllegalArgumentException("Set Name Value List needs to have a equation including a '='");
+					}
+					curNameValuePair.add(tokens.get(i++));
+
+				}
+				res.add(curNameValuePair);
+				// maybe improved here
+				if (tokens.get(i).equals(",")){
+					i++;
+				}
+			} catch (Exception e){
+				throw new IllegalArgumentException("NameValueList is incomplete");
+			}
+
+		}
+
+		return res;
 	}
 
 	private List<List<String>> parseAttributeList(List<String> tokens, String DefaultTableName, int index) {
