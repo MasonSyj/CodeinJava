@@ -10,6 +10,7 @@ public class CreateDBCmd extends Command{
 
     public String execute(){
         try{
+//            File theDir = new File("databases" + File.separator + getDBName());
             File theDir = new File(getDBName());
             if (!theDir.exists()){
                 theDir.mkdirs();

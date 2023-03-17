@@ -47,9 +47,9 @@ public class DBServer {
         List<String> tokens = Token.setup(command);
         Parser parser = new Parser(tokens);
         parser.cmdSearch();
-        if (parser.getExecResult() != null){
-            System.out.println(parser.getExecResult());
-        }
+//        if (parser.getExecResult() != null){
+//            System.out.println(parser.getExecResult());
+//        }
 
         return parser.getExecResult();
     }

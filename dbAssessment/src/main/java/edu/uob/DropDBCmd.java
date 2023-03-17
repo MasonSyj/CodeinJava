@@ -26,9 +26,9 @@ public class DropDBCmd extends Command{
 			// Delete the top-level directory itself
 			Files.deleteIfExists(directoryRepresentDB);
 
-			return "[OK]， Database droped succesfully";
+			return "[OK] ， Database droped succesfully";
 		} catch (IOException e) {
-			return "[ERROR], Database failed to drop";
+			return "[ERROR] , Database failed to drop";
 		}
 
 	}

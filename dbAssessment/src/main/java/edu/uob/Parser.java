@@ -32,7 +32,7 @@ public class Parser {
 			case "ALTER": parseALTER(); break;
 			case "DELETE": parseDELETE(); break;
 			case "DROP": parseDROP(); break;
-//			case "JOIN": parseJOIN(); break;
+			case "JOIN": parseJOIN(); break;
 		}
 	}
 
@@ -151,6 +151,16 @@ public class Parser {
 	}
 
 	private void parseJOIN() {
+		if (!tokens.get(2).toLowerCase().equals("and")){
+			throw new IllegalArgumentException("Join operation needs an AND after first tablename");
+		}else if (!tokens.get(4).toLowerCase().equals("on")){
+			throw new IllegalArgumentException("Join operation needs an ON after second tablename");
+		}else if (!tokens.get(6).toLowerCase().equals("and")){
+			throw new IllegalArgumentException("Join operation needs an AND after first Attribute name");
+		}
+
+		JoinCmd joinCmd = new JoinCmd(currentDBName, tokens.get(1), tokens.get(3), tokens.get(5), tokens.get(7));
+		execResult = joinCmd.execute();
 
 	}
 

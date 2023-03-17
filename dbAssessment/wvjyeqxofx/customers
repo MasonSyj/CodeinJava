@@ -1,0 +1,6 @@
+id	name	email	
+1	'John Doe'	'johndoe@example.com'	
+2	'Jane Smith'	'janesmith@example.com'	
+3	'Bob Johnson'	'bjohnson@example.com'	
+1	'2022-01-01'	100	
+3	'2022-02-15'	75	
