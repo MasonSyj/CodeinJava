@@ -37,15 +37,18 @@ public class Parser {
 	}
 
 	private void parseDELETE() {
-		if (!tokens.get(1).toLowerCase().equals("table")){
+		if (!tokens.get(1).toLowerCase().equals("from")){
 			throw new IllegalArgumentException("DELETE operation must come with a FROM");
 		}
 
-		if (!tokens.get(1).toLowerCase().equals("where")){
+		if (!tokens.get(3).toLowerCase().equals("where")){
 			throw new IllegalArgumentException("DELETE operation must hava a WHERE");
 		}
 
-
+		parseConditions(4);
+		List<String> conditionTokens = tokens.subList(4, tokens.size());
+		DeleteCmd deleteCmd = new DeleteCmd(currentDBName, tokens.get(2), conditionTokens);
+		execResult = deleteCmd.execute();
 	}
 
 	private void parseALTER() {
@@ -79,12 +82,21 @@ public class Parser {
 	}
 
 	private void parseSELECT() {
+		List<String> conditionTokens = null;
+		for (int i = 0; i < tokens.size(); i++){
+			if (tokens.get(i).toLowerCase().equals("where")){
+				parseConditions(i + 1);
+				conditionTokens = tokens.subList(i + 1, tokens.size());
+			}
+		}
+
+
 		if (tokens.get(1).equals("*")){
 			if (!tokens.get(2).toLowerCase().equals("from")){
 				throw new IllegalArgumentException("Select Query needs to have word: 'from'\n");
 			}
 
-			SelectCmd selectCmd = new SelectCmd(currentDBName, tokens.get(3), null);
+			SelectCmd selectCmd = new SelectCmd(currentDBName, tokens.get(3), null, conditionTokens);
 			execResult = selectCmd.execute();
 		}else{
 			// find the index of "from"
@@ -95,11 +107,9 @@ public class Parser {
 					break;
 				}
 			}
-			// the next one is tablename
 			String tableName = tokens.get(indexofFrom + 1);
-			// from 1 to n is attributslist
 			List<List<String>> attributesList = parseAttributeList(tokens, tableName, 1);
-			SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList);
+			SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList, conditionTokens);
 			execResult = selectCmd.execute();
 
 		}
@@ -151,6 +161,20 @@ public class Parser {
 		List<String> valueList = parseValueList(tokens, 5);
 
 		InsertCmd insertCmd = new InsertCmd(currentDBName, tableName, valueList);
+	}
+
+	public void parseConditions(int index){
+		for (int i = index; i < tokens.size() - 1; i++){
+			for (String specialChar: ConditionTest.operator){
+				if (tokens.get(i).equals(specialChar)){
+					String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " " + tokens.get(i + 1);
+					tokens.remove(i);
+					tokens.remove(i);
+					tokens.set(i - 1, singleCondition);
+				}
+			}
+		}
+		tokens.remove(tokens.size() - 1);
 	}
 
 	private List<String> parseValueList(List<String> tokens, int index) {

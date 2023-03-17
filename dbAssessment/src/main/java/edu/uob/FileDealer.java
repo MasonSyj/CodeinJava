@@ -46,10 +46,11 @@ public class FileDealer {
 				ans.addValue(valueList);
 				line = reader.readLine();
 			}
+			reader.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
+		ans.updateFile();
 		return ans;
 	}
 

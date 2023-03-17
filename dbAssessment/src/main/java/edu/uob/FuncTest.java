@@ -52,7 +52,7 @@ public class FuncTest {
         value.add("6000");
         t.addValue(value);
 
-        t.addValue(t.csvLineParse("Huawei\tMate40\t5000"));
+        t.addValue(t.csvLineParse("Mate40\tHuawei\t5000"));
 
         t.updateFile();
 

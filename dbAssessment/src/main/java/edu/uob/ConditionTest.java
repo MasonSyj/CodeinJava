@@ -57,7 +57,7 @@ public class ConditionTest {
 
 
     public static void main(String[] args) {
-        String str = "((Brand like Apple and Price >= 7000) or Name like Mate40)";
+        String str = "((Brand like Apple or Price >= 7000) or Name like Mate40)";
         List<String> tokens = Token.setup(str);
         for (int i = 0; i < tokens.size(); i++){
             for (String specialChar: ConditionTest.operator){
@@ -76,12 +76,11 @@ public class ConditionTest {
 
         System.out.println("--------Separate Line-----------");
 
-        List<String> res = ConditionTest.convertToSuffix(tokens);
-        for (String string: res){
-            System.out.println(string);
-        }
-        FileDealer fd = new FileDealer(".", "PhoneBrand");
-        Table t = fd.file2Table();
+    }
+
+    public static List<String> conditionExecute(List<String> conditions, Table t){
+        List<String> res = ConditionTest.convertToSuffix(conditions);
+
 
         Stack<List<String>> stack = new Stack<>();
         for (int i = 0; i < res.size(); i++){
@@ -104,12 +103,7 @@ public class ConditionTest {
             }
         }
 
-        System.out.println("stack size: " + stack.size());
-        for (String s: stack.get(0)){
-            System.out.println(s);
-        }
-
-
+        return stack.get(0);
     }
 
 }

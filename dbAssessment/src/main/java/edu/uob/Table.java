@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class Table implements Predicate<String> {
+public class Table implements Predicate<String>, Cloneable{
 	private String DBName;
 	private String tableName;
 	private List<String> attributesName;
@@ -20,13 +20,12 @@ public class Table implements Predicate<String> {
 	private String value;
 	private String operator;
 	private String attribute;
-
 	private int attributeIndex;
-
-	private static HashMap<String, Integer> ref;
 
 	private int numofAttributes;
 	private int numofItems;
+
+	private static HashMap<String, Integer> ref;
 
 	public Table(String DBName, String tableName){
 		this.DBName = DBName;
@@ -108,10 +107,10 @@ public class Table implements Predicate<String> {
 				}
 
 				item = item + columns.get(j).getColumnBody().get(i) + "\t";
-				System.out.print(columns.get(j).getColumnBody().get(i) + "\t");
+
 			}
 			ans.add(item);
-			System.out.println();
+
 		}
 
 
@@ -230,6 +229,7 @@ public class Table implements Predicate<String> {
 		for (int j = 0; j < numofAttributes; j++){
 			columns.get(j).clean();
 		}
+		numofItems = 0;
 	}
 
 	public List<String> or(List<String> a, List<String> b){
@@ -265,8 +265,9 @@ public class Table implements Predicate<String> {
 //				columns.get(i).set(j, splited.get(i));
 			}
 		}
+//		updateFile();
+
 		numofItems = ref.size();
-		updateFile();
 	}
 
 	public List<String> predicate(String t){
@@ -298,5 +299,10 @@ public class Table implements Predicate<String> {
 		}else{
 			return false;
 		}
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 }

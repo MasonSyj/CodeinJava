@@ -140,8 +140,6 @@ public class ExampleDBTests {
 //        sendCommandToServer("USE " + randomName + ";");
 //        sendCommandToServer("CREATE TABLE sports (name, category, expenses);");
 
-
-
     }
 
     @Test
@@ -163,6 +161,68 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks drop UnknownName;");
         assertTrue(response.contains("[ERROR]"));
+    }
+
+    @Test
+    public void testSelectAllWithConditions() {
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        sendCommandToServer("SELECT * FROM marks where Price > 6000;");
+        System.out.println("-----------Separate Line-----------");
+        sendCommandToServer("SELECT * FROM marks where Brand like Huawei;");
+    }
+
+    @Test
+    public void testSelectWildWithConditions() {
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        System.out.println("-----------Separate Line-----------");
+        sendCommandToServer("SELECT Name, Brand FROM marks where Price > 6000 and Brand like Apple;");
+        System.out.println("-----------Separate Line-----------");
+        sendCommandToServer("SELECT Name, Price FROM marks where Brand like Huawei;");
+    }
+
+    @Test
+    public void testDeleteWithCondition(){
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+
+        FileDealer fd = new FileDealer(randomName, "marks");
+        Table table = fd.file2Table();
+
+        assertTrue(table.getNumofItems() == 5);
+
+        String response = sendCommandToServer("DELETE FROM marks Where Price < 5500;");
+        assertTrue(response.contains("[OK]"));
+        System.out.println(table.getNumofItems());
+        // what the....
+        table = fd.file2Table();
+        assertTrue(table.getNumofItems() == 4);
+
     }
 
     @Test
@@ -222,6 +282,8 @@ public class ExampleDBTests {
         List<String> res2 = test.or(first, second);
         System.out.println(res2.toString());
     }
+
+
 }
 
 
