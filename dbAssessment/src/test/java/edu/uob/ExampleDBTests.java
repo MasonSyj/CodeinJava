@@ -214,7 +214,7 @@ public class ExampleDBTests {
         System.out.println(randomName);
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
-        sendCommandToServer("CREATE TABLE customers (id, name, email);");
+        sendCommandToServer("CREATE TABLE customers (name, email);");
         sendCommandToServer("CREATE TABLE orders (id, order_date, cost);");
         sendCommandToServer("INSERT INTO customers VALUES (1, 'John Doe', 'johndoe@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (2, 'Jane Smith', 'janesmith@example.com');");
