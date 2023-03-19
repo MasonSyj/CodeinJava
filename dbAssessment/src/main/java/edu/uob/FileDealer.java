@@ -44,19 +44,20 @@ public class FileDealer {
 			while (line != null && line.length() > 0){
 				List valueList = new ArrayList();
 				valueList = csvLineParse(line);
-				ans.addValue(valueList);
+				ans.addItem(valueList);
 				line = reader.readLine();
 			}
 			reader.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		ans.updateFile();
+		// wrong direction, why write things back to a file?
+		ans.write2File();
 		return ans;
 	}
 
 	// change tab-separated data per line into List<String>
-	public List<String> csvLineParse(String line) {
+	public static List<String> csvLineParse(String line) {
 		List<String> ans = new ArrayList<String>();
 		ans = Arrays.stream(line.split("\t")).toList();
 		return ans;

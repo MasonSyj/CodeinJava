@@ -146,6 +146,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	}
 
 	// this is not what a table should do
+	// make a static same method in FileDealer and use that instead
 	public List<String> csvLineParse(String line) {
 		List<String> ans = new ArrayList<String>();
 		ans = Arrays.stream(line.split("\t")).toList();
