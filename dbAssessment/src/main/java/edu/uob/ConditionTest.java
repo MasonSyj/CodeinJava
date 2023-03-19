@@ -9,33 +9,39 @@ public class ConditionTest {
     Stack<String> op;
 
     public static List<String> convertToSuffix(List<String> tokens) {
-        StringBuilder suffix = new StringBuilder();
-        Deque<String> operatorStack = new ArrayDeque<>();
+//        StringBuilder suffix = new StringBuilder();
+        String suffix = "";
+
+        Deque<String> stack = new ArrayDeque<>();
 
         for (String token : tokens) {
             if (isOperand(token)) {
-                suffix.append(token).append("\t");
+//                suffix.append(token).append("\t");
+                suffix = suffix + token + "\t";
             } else if (token.equals("(")) {
-                operatorStack.push(token);
+                stack.push(token);
             } else if (token.equals(")")) {
-                while (!operatorStack.isEmpty() && !operatorStack.peek().equals("(")) {
-                    suffix.append(operatorStack.pop()).append("\t");
+                while (!stack.isEmpty() && !stack.peek().equals("(")) {
+//                    suffix.append(operatorStack.pop()).append("\t");
+                    suffix = suffix + stack.pop() + "\t";
                 }
 
-                if (!operatorStack.isEmpty() && operatorStack.peek().equals("(")) {
-                    operatorStack.pop();
+                if (!stack.isEmpty() && stack.peek().equals("(")) {
+                    stack.pop();
                 }
             } else {
-                while (!operatorStack.isEmpty() && precedence(token) <= precedence(operatorStack.peek())) {
-                    suffix.append(operatorStack.pop()).append("\t");
+//                while (!operatorStack.isEmpty() && precedence(token) <= precedence(operatorStack.peek())) {
+//                suffix.append(operatorStack.pop()).append("\t");
+                while (!stack.isEmpty() && opcmp(token, stack.peek())) {
+                    suffix = suffix + stack.pop() + "\t";
                 }
 
-                operatorStack.push(token);
+                stack.push(token);
             }
         }
 
-        while (!operatorStack.isEmpty()) {
-            suffix.append(operatorStack.pop()).append(" ");
+        while (!stack.isEmpty()) {
+            suffix = suffix + stack.pop() + " ";
         }
 
         return Arrays.stream(suffix.toString().trim().split("\t")).toList();
@@ -51,8 +57,27 @@ public class ConditionTest {
         }
     }
 
+    private static boolean opcmp(String op1, String op2){
+        if (op2.equals("and")){
+            return true;
+        }else {
+            if (!op1.equals("and")){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
     private static boolean isOperand(String token) {
-        return !token.equals("and") && !token.equals("or") && !token.equals("(") && !token.equals(")");
+        try{
+            int value = Integer.parseInt(token);
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+//        return !token.equals("and") && !token.equals("or") && !token.equals("(") && !token.equals(")");
     }
 
 
