@@ -136,7 +136,7 @@ public class Parser {
 				}
 			}
 			String tableName = tokens.get(indexofFrom + 1);
-			List<List<String>> attributesList = parseAttributeList(tokens, tableName, 1);
+			List<String[]> attributesList = parseAttributeList(tokens, tableName, 1);
 			SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList, conditionTokens);
 			execResult = selectCmd.execute();
 
@@ -170,8 +170,8 @@ public class Parser {
 			CreateDBCmd createDBCmd = new CreateDBCmd(tokens.get(2));
 		} else if (tokens.get(1).toLowerCase().equals("table")){
 			if (tokens.get(3).equals("(")){
-				List<List<String>> ref = parseAttributeList(tokens, tokens.get(2), 4);
-				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), ref);
+				List<String[]> attributeList = parseAttributeList(tokens, tokens.get(2), 4);
+				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), attributeList);
 			}else{
 				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), null);
 			}
@@ -259,24 +259,29 @@ public class Parser {
 		return res;
 	}
 
-	private List<List<String>> parseAttributeList(List<String> tokens, String DefaultTableName, int index) {
-		List<List<String>> ans = new ArrayList<>();
+	private List<String[]> parseAttributeList(List<String> tokens, String defaultTableName, int index) {
+		List<String[]> ans = new ArrayList<>();
 		try{
 			while (!tokens.get(index).equals(")") && !tokens.get(index).toLowerCase().equals("from")){
-				if (!tokens.get(index).equals(",")){
-					if (tokens.get(index).contains(".")){
-						ans.add(Arrays.stream(tokens.get(index).split(".")).toList());
-					}else{
-						List<String> curAttribute = new ArrayList<String>();
-						curAttribute.add(DefaultTableName);
-						curAttribute.add(tokens.get(index));
-						ans.add(curAttribute);
-					}
+//				if (!tokens.get(index).equals(",")){
+				String[] curAttributeName = new String[2];
+				if (tokens.get(index).contains(".")){
+					curAttributeName[0] = tokens.get(index).split(".")[0];
+					curAttributeName[1] = tokens.get(index).split(".")[1];
+//					ans.add(Arrays.stream(tokens.get(index).split(".")).toList());
+				}else{
+					curAttributeName[0] = defaultTableName;
+					curAttributeName[1] = tokens.get(index);
+//					List<String> curAttribute = new ArrayList<String>();
+//					curAttribute.add(DefaultTableName);
+//					curAttribute.add(tokens.get(index));
 				}
+				ans.add(curAttributeName);
+//				}
 				index++;
 			}
 		}catch (Exception e){
-			throw new RuntimeException("ValueList didn't end correctly");
+			throw new RuntimeException("AttributeList didn't build correctly");
 		}
 
 		return ans;

@@ -14,6 +14,7 @@ public class FileDealer {
 		this.TableName = TableName;
 	}
 
+	// locate the file representing the table, then use the data to instanitise a table object
 	public Table file2Table(){
 		File file = new File(DBName + File.separator + TableName);
 
@@ -54,12 +55,11 @@ public class FileDealer {
 		return ans;
 	}
 
+	// change tab-separated data per line into List<String>
 	public List<String> csvLineParse(String line) {
 		List<String> ans = new ArrayList<String>();
 		ans = Arrays.stream(line.split("\t")).toList();
 		return ans;
 	}
-
-
 
 }

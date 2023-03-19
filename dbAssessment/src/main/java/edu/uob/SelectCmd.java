@@ -5,10 +5,10 @@ import java.util.List;
 
 public class SelectCmd extends Command{
 
-    List<List<String>> attributeList;
+    List<String[]> attributeList;
     List<String> ConditionTokens;
 
-    public SelectCmd(String DBName, String tableName, List<List<String>> attributeList, List<String> ConditionTokens) {
+    public SelectCmd(String DBName, String tableName, List<String[]> attributeList, List<String> ConditionTokens) {
         super(DBName, tableName);
         this.attributeList = attributeList;
         this.ConditionTokens = ConditionTokens;
@@ -17,6 +17,7 @@ public class SelectCmd extends Command{
     @Override
     public String execute() {
         try{
+            // this function must chnage heavily!!!
             if (attributeList == null){
                 FileDealer fd = new FileDealer(getDBName(), getTableName());
                 Table table = fd.file2Table();
@@ -34,9 +35,9 @@ public class SelectCmd extends Command{
             }else{
                 // need to sort heavily here
                 List<String> attributesNames = new ArrayList<String>();
-                for (List<String> list: attributeList){
-                    String name = list.get(1);
-                    attributesNames.add(name);
+                for (String[] list: attributeList){
+                    String attributeName = list[1];
+                    attributesNames.add(attributeName);
                 }
                 if (ConditionTokens == null){
 

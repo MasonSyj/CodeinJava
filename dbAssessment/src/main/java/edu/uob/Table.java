@@ -11,9 +11,11 @@ import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class Table implements Predicate<String>, Cloneable{
+public class Table implements Predicate<String>, Cloneable, Writeable{
 	private String DBName;
 	private String tableName;
+
+	//numof AttributesName is equal to numof columns
 	private List<String> attributesName;
 	private List<Column> columns;
 
@@ -65,14 +67,9 @@ public class Table implements Predicate<String>, Cloneable{
 		return null;
 	}
 
+
 	public List<String> getAllItems(){
 		List<String> ans = new ArrayList<>();
-
-//		String firstRow = "";
-//		for (String name: getAttributesName()){
-//			firstRow = firstRow + name + "\t";
-//		}
-//		ans.add(firstRow);
 
 		int row = columns.get(0).getColumnBody().size();
 		int col = columns.size();
@@ -87,6 +84,7 @@ public class Table implements Predicate<String>, Cloneable{
 		return ans;
 	}
 
+	//get all items but partially by give attributeNames
 	public List<String> getParialColumn(List<String> attributesName){
 		List<String> ans = new ArrayList<>();
 
@@ -125,17 +123,17 @@ public class Table implements Predicate<String>, Cloneable{
 		for (int i = 0; i < numofItems; i++){
 			columns.get(columns.size() - 1).addValue(null);
 		}
-		updateFile();
+		write2File();
 	}
 
-	public boolean dropExistedColumn(String attributeName){
+	public boolean dropColumn(String attributeName){
 		if (!getAttributesName().toString().contains(attributeName)){
 			return false;
 		}else{
 			int index = attributesName.indexOf(attributeName);
 			attributesName.remove(index);
 			columns.remove(index);
-			updateFile();
+			write2File();
 			return true;
 		}
 
@@ -143,17 +141,19 @@ public class Table implements Predicate<String>, Cloneable{
 
 	public void addColumns(List<String> attributes){
 		for (String attribute: attributes){
-			addNewColumn(new Column<>(attribute));
+			addNewColumn(new Column(attribute));
 		}
 	}
 
+	// this is not what a table should do
 	public List<String> csvLineParse(String line) {
 		List<String> ans = new ArrayList<String>();
 		ans = Arrays.stream(line.split("\t")).toList();
 		return ans;
 	}
 
-	public void updateFile(){
+	// it's strange a table can update file, logically doesn't make sense
+	public void write2File(){
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), false));
 			writer.write("");
@@ -184,7 +184,8 @@ public class Table implements Predicate<String>, Cloneable{
 
 	}
 
-	public void addValue(List value) {
+	// maynbe insert can use this function
+	public void addItem(List value) {
 		numofItems++;
 
 		if (value.size() != this.numofAttributes){
@@ -196,6 +197,7 @@ public class Table implements Predicate<String>, Cloneable{
 		}
 	}
 
+	//seems conflict to the updateFile method
 	public void write2File(File file){
 		try{
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -221,6 +223,7 @@ public class Table implements Predicate<String>, Cloneable{
 		}
 	}
 
+	//maybe doesn't make any use here
 	public BufferedWriter getAccordingFile() throws IOException {
 		return new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
 	}
@@ -232,6 +235,7 @@ public class Table implements Predicate<String>, Cloneable{
 		numofItems = 0;
 	}
 
+	// make a Class that responsible for and / or operation
 	public List<String> or(List<String> a, List<String> b){
 		List<String> res = new ArrayList<>();
 		for (String str: a){
@@ -270,8 +274,6 @@ public class Table implements Predicate<String>, Cloneable{
 		numofItems = ref.size();
 	}
 
-
-
 	public List<String> predicate(String t){
 		attribute = t.split(" ")[0];
 		operator = t.split(" ")[1];
@@ -297,7 +299,7 @@ public class Table implements Predicate<String>, Cloneable{
 		}else if (operator.equals("!=")){
 			return Integer.parseInt(t.split("\t")[attributeIndex]) != Integer.valueOf(value);
 		}else if (operator.toUpperCase().equals("LIKE")){
-			return t.split("\t")[attributeIndex].equals(value);
+			return t.split("\t")[attributeIndex].contains(value);
 		}else{
 			return false;
 		}

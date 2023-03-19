@@ -24,7 +24,7 @@ public class InsertCmd extends Command{
 			//2. instantiate the table
 			Table table = fileContaningTable.file2Table();
 			//3. add new value into the table
-			table.addValue(valueList);
+			table.addItem(valueList);
 			//4. update the file
 			String newValueLine = "";
 			for (String str: valueList){

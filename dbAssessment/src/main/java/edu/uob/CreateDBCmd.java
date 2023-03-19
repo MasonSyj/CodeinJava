@@ -10,15 +10,14 @@ public class CreateDBCmd extends Command{
 
     public String execute(){
         try{
-//            File theDir = new File("databases" + File.separator + getDBName());
-            File theDir = new File(getDBName());
+            File theDir = new File("databases" + File.separator + getDBName());
+//            File theDir = new File(getDBName());
             if (!theDir.exists()){
                 theDir.mkdirs();
             }
-            return "[OK]";
+            return "[OK], Database created successfully";
         }catch (Exception e){
-            String str = "[ERROR], Create Database Command Failed.";
-            return str;
+            return "[ERROR], Database failed to create.";
         }
     }
 

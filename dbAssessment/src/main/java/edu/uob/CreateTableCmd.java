@@ -9,23 +9,25 @@ import java.util.List;
 
 public class CreateTableCmd extends Command{
 
-    private List<List<String>> ref;
+    //maybe List<String> will be just fine
+    private List<String[]> attributeList;
 
-    public CreateTableCmd(String DBName, String tableName, List<List<String>> ref){
+    public CreateTableCmd(String DBName, String tableName, List<String[]> attributeList){
         super(DBName, tableName);
-        this.ref = ref;
+        this.attributeList = attributeList;
         execute();
     }
 
     @Override
     public String execute() {
         try {
-            File fileContainTable = new File(getDBName() + File.separator + getTableName());
+            File fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
+            //this seems to nested here, change, +
             if (fileContainTable.createNewFile()) {
-                if (ref != null){
+                if (attributeList != null){
                     List<String> attributes = new ArrayList<String>();
-                    for (List<String> list: ref){
-                        String attribute = list.get(1) + "\t";
+                    for (String[] list: attributeList){
+                        String attribute = list[1]+ "\t";
                         attributes.add(attribute);
                     }
                     String attributeLine = attributes.toString();

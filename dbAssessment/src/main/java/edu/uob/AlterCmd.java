@@ -36,7 +36,7 @@ public class AlterCmd extends Command{
     public String dropAttribute(){
         FileDealer fd = new FileDealer(getDBName(), getTableName());
         Table table = fd.file2Table();
-        if (table.dropExistedColumn(attributeName)){
+        if (table.dropColumn(attributeName)){
             return "[OK], drop attribute " + attributeName + " successfully";
         }else{
             return "[ERROR], failed to drop attribute " + attributeName;
