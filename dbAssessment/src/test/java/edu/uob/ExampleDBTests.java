@@ -266,15 +266,17 @@ public class ExampleDBTests {
         System.out.println(randomName);
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
-        sendCommandToServer("CREATE TABLE customers (name, email);");
+        sendCommandToServer("CREATE TABLE customers (id, name, email);");
         sendCommandToServer("CREATE TABLE orders (id, order_date, cost);");
         sendCommandToServer("INSERT INTO customers VALUES (1, 'John Doe', 'johndoe@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (2, 'Jane Smith', 'janesmith@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (3, 'Bob Johnson', 'bjohnson@example.com');");
+        String response = sendCommandToServer("Select * from customers;");
+        System.out.println(response);
 
         sendCommandToServer("INSERT INTO orders VALUES (1, '2022-01-01', 100);");
         sendCommandToServer("INSERT INTO orders VALUES (3, '2022-02-15', 75);");
-        String response = sendCommandToServer("JOIN customers AND orders ON orders.id AND customers.id;");
+        response = sendCommandToServer("JOIN customers AND orders ON orders.id AND customers.id;");
         System.out.println(response);
     }
 

@@ -12,7 +12,7 @@ public class DropDBCmd extends Command{
 		super(DBName, tableName);
 	}
 
-	public String deleteDirectory(File directory){
+	public void deleteDirectory(File directory){
 		try{
 			if (directory.isDirectory()){
 				File[] files = directory.listFiles();
@@ -29,13 +29,13 @@ public class DropDBCmd extends Command{
 				directory.delete();
 			}
 
-			if(!directory.delete()){
-				return "[ERROR] , Database failed to drop";
-			}else{
-				return "[OK] ， Database droped succesfully";
-			}
+//			if(!directory.delete()){
+//				return "[ERROR] , Database failed to drop";
+//			}else{
+//				return "[OK] ， Database droped succesfully";
+//			}
 		} catch (Exception e){
-			return "[ERROR] , Database failed to drop";
+			throw new RuntimeException("[ERROR] happened , Database failed to drop");
 		}
 	}
 	@Override
@@ -45,9 +45,15 @@ public class DropDBCmd extends Command{
 				return "[ERROR] , Database doesn't exist";
 			}
 
-			return deleteDirectory(directoryRepresentDB);
+			deleteDirectory(directoryRepresentDB);
 
+			directoryRepresentDB.delete();
 
+			if(directoryRepresentDB.exists()){
+				return "[ERROR] , Database failed to drop";
+			}else{
+				return "[OK] ， Database droped succesfully";
+			}
 
 	}
 }

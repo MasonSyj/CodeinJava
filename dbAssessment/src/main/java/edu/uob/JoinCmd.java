@@ -46,7 +46,6 @@ public class JoinCmd extends Command{
             indexFirstTable = firstTable.getAttributesName().indexOf(name);
         }
 
-//        int indexFirstTable = firstTable.getAttributesName().indexOf(firstAttributeName.split("\\.")[0]);
 
         int indexSecondTable = -1;
         if (secondAttributeName.split("\\.").length != 0){
