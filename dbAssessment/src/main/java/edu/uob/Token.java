@@ -8,7 +8,7 @@ public class Token {
 
 //	String query;
 // 	ArrayList<String> tokens;
-	static String[] specialCharacters = {"(",")",",",";"};
+	static String[] specialCharacters = {"(",")",",",";","=", ">", "<", ">=", "<=", "!="};
 
 	public static List<String> setup(String query) {
 		List<String> tokens = new ArrayList<String>();
@@ -50,6 +50,18 @@ public class Token {
 		while (input.contains("  ")) input = input.replaceAll("  ", " ");
 		// Again, remove any whitespace from the beginning and end that might have been introduced
 		input = input.trim();
+
+		if (input.contains("> =")){
+			input = input.replaceAll("> =", ">=");
+		}
+
+		if (input.contains("< =")){
+			input = input.replaceAll("< =", "<=");
+		}
+
+		if (input.contains("= =")){
+			input = input.replaceAll("= =", "==");
+		}
 		// Finally split on the space char (since there will now ALWAYS be a space between tokens)
 		return input.split(" ");
 	}

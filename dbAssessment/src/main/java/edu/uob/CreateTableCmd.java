@@ -17,7 +17,6 @@ public class CreateTableCmd extends Command{
     public CreateTableCmd(String DBName, String tableName, List<String[]> attributeList){
         super(DBName, tableName);
         this.attributeList = attributeList;
-
     }
 
     @Override
@@ -26,7 +25,7 @@ public class CreateTableCmd extends Command{
             File fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
             //this seems to nested here, change, +
             if (fileContainTable.createNewFile()) {
-                String attributeLine = "";
+                String attributeLine = "id\t";
                 // attributeName consists of 0.tablename 1.attribute
                 for (String[] attributeName: attributeList){
                     attributeLine = attributeLine + attributeName[1]+ "\t";

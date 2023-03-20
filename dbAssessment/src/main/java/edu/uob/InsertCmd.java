@@ -21,7 +21,7 @@ public class InsertCmd extends Command{
 			FileDealer fileContaningTable = new FileDealer(getDBName(), getTableName());
 			Table table = fileContaningTable.file2Table();
 
-			if (table.getNumofAttributes() != valueList.size()){
+			if (table.getNumofAttributes() != valueList.size() + 1){
 				return "[ERROR], A table will n attribute must insert into n values.";
 			}
 

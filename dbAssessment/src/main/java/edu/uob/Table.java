@@ -19,21 +19,38 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	private List<String> attributesName;
 	private List<Column> columns;
 
+	private String tableKey;
+
 	Condition condition;
 	private int attributeIndex;
 
 	private int numofAttributes;
 	private int numofItems;
 
-	private static HashMap<String, Integer> ref;
+	private static HashMap<String, Integer> ref = new HashMap<String, Integer>();
+
+//	public Table(String DBName, String tableName, TableType type){
+//		this.DBName = DBName;
+//		this.tableName = tableName;
+//		attributesName = new ArrayList<String>();
+//		columns = new ArrayList<Column>();
+//		numofItems = 0;
+//		tableKey = getDBName() + getTableName();
+//		ref.put(tableKey, 0);
+//
+//		attributesName.add("id");
+//		columns.add(new Column("id"));
+//		numofAttributes = 1;
+//	}
 
 	public Table(String DBName, String tableName){
 		this.DBName = DBName;
 		this.tableName = tableName;
 		attributesName = new ArrayList<String>();
 		columns = new ArrayList<Column>();
-		numofAttributes = 0;
 		numofItems = 0;
+		tableKey = getDBName() + getTableName();
+		ref.put(tableKey, 0);
 	}
 
 	public String getDBName() {
@@ -167,13 +184,15 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	public void addItem(List value) {
 		numofItems++;
 
-		if (value.size() != this.numofAttributes){
+		if (value.size() != this.numofAttributes - 1){
 			return;
 		}
 
-		for (int j = 0; j < numofAttributes; j++){
-			columns.get(j).addValue(String.valueOf(value.get(j)));
+		for (int j = 1; j < numofAttributes; j++){
+			columns.get(j).addValue(String.valueOf(value.get(j - 1)));
 		}
+		columns.get(0).addValue(String.valueOf(ref.get(tableKey) + 1));
+		ref.replace(tableKey, ref.get(tableKey) + 1);
 	}
 
 	public void cleanAll(){
