@@ -29,11 +29,6 @@ public class DropDBCmd extends Command{
 				directory.delete();
 			}
 
-//			if(!directory.delete()){
-//				return "[ERROR] , Database failed to drop";
-//			}else{
-//				return "[OK] ， Database droped succesfully";
-//			}
 		} catch (Exception e){
 			throw new RuntimeException("[ERROR] happened , Database failed to drop");
 		}
@@ -41,19 +36,18 @@ public class DropDBCmd extends Command{
 	@Override
 	public String execute() {
 		File directoryRepresentDB = new File("databases" + File.separator + getDBName());
-			if (!directoryRepresentDB.exists()){
-				return "[ERROR] , Database doesn't exist";
-			}
+		if (!directoryRepresentDB.exists()){
+			return "[ERROR] , Database doesn't exist";
+		}
 
-			deleteDirectory(directoryRepresentDB);
+		deleteDirectory(directoryRepresentDB);
 
-			directoryRepresentDB.delete();
+		directoryRepresentDB.delete();
 
-			if(directoryRepresentDB.exists()){
-				return "[ERROR] , Database failed to drop";
-			}else{
-				return "[OK] ， Database droped succesfully";
-			}
-
+		if(directoryRepresentDB.exists()){
+			return "[ERROR] , Database failed to drop";
+		}else{
+			return "[OK] ， Database droped succesfully";
+		}
 	}
 }

@@ -48,7 +48,7 @@ public class UpdateCmd extends Command{
                 }
             }
 
-            List<String> all = table.or(others, revisied);
+            List<String> all = BoolOperation.or(others, revisied);
             table.cleanAll();
             table.updateClass(all);
             table.write2File();

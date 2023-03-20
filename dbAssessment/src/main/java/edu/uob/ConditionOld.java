@@ -55,29 +55,6 @@ public class ConditionOld {
         return !token.equals("and") && !token.equals("or") && !token.equals("(") && !token.equals(")");
     }
 
-
-    public static void main(String[] args) {
-        String str = "((Brand like Apple or Price >= 7000) or Name like Mate40)";
-        List<String> tokens = Token.setup(str);
-        for (int i = 0; i < tokens.size(); i++){
-            for (String specialChar: ConditionTest.operator){
-                if (tokens.get(i).equals(specialChar)){
-                    String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " " + tokens.get(i + 1);
-                    tokens.remove(i);
-                    tokens.remove(i);
-                    tokens.set(i - 1, singleCondition);
-                }
-            }
-        }
-
-        for (String string: tokens){
-            System.out.println(string);
-        }
-
-        System.out.println("--------Separate Line-----------");
-
-    }
-
     public static List<String> conditionExecute(List<String> conditions, Table t){
         List<String> res = ConditionTest.convertToSuffix(conditions);
 
@@ -91,9 +68,9 @@ public class ConditionOld {
                 List<String> ansItem;
 
                 if (res.get(i).toLowerCase().equals("and")){
-                    ansItem = t.and(itema, itemb);
+                    ansItem = BoolOperation.and(itema, itemb);
                 }else{
-                    ansItem = t.or(itema, itemb);
+                    ansItem = BoolOperation.or(itema, itemb);
                 }
                 stack.add(ansItem);
 

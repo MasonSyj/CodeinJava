@@ -39,7 +39,9 @@ public class FileDealer {
 			line = reader.readLine();
 
 			ans = new Table(DBName, TableName);
-			ans.addColumns(attributesList);
+			for (String attribute: attributesList){
+				ans.addNewColumn(attribute);
+			}
 
 			while (line != null && line.length() > 0){
 				List valueList = new ArrayList();

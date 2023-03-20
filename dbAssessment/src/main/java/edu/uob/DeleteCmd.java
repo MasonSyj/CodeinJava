@@ -37,9 +37,9 @@ public class DeleteCmd extends Command{
                 List<String> ansItem;
 
                 if (conditionTokens.get(i).toLowerCase().equals("and")){
-                    ansItem = t.and(itema, itemb);
+                    ansItem = BoolOperation.and(itema, itemb);
                 }else{
-                    ansItem = t.or(itema, itemb);
+                    ansItem = BoolOperation.or(itema, itemb);
                 }
                 stack.add(ansItem);
 

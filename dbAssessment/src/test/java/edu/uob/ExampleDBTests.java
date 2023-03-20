@@ -94,7 +94,7 @@ public class ExampleDBTests {
         System.out.println(response);
         assertTrue(response.contains("Steve"), "Steve was added to a table and the server restarted - but Steve was not returned by SELECT *");
         System.out.println("---------test selct wildAttributeList-----------");
-        response = sendCommandToServer("Select name, pass from marks;");
+        response = sendCommandToServer("Select pass, name from marks;");
         System.out.println(response);
         assertTrue((response.contains("name")));
         assertTrue((response.contains("pass")));
@@ -357,11 +357,10 @@ public class ExampleDBTests {
         List<String> first = Arrays.asList(a, b, c);
         List<String> second = Arrays.asList(a, b, d);
 
-        FuncTest2 test = new FuncTest2();
-        List<String> res1 = test.and(first, second);
+        List<String> res1 = BoolOperation.and(first, second);
         assertTrue(res1.size() == 2);
 
-        List<String> res2 = test.or(first, second);
+        List<String> res2 = BoolOperation.or(first, second);
         assertTrue(res2.size() == 4);
     }
 

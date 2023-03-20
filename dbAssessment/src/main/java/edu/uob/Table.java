@@ -19,9 +19,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	private List<String> attributesName;
 	private List<Column> columns;
 
-	private String value;
-	private String operator;
-	private String attribute;
+	Condition condition;
 	private int attributeIndex;
 
 	private int numofAttributes;
@@ -75,44 +73,43 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	public List<String> getAllItems(){
 		List<String> ans = new ArrayList<>();
 
-		int row = columns.get(0).getColumnBody().size();
+		int row = getNumofItems();
 		int col = columns.size();
 
-		for (int i = 0; i < row; i++){
+		for (int j = 0; j < row; j++){
 			String item = "";
-			for (int j = 0; j < col; j++){
-				item = item + columns.get(j).getColumnBody().get(i) + "\t";
+			for (int i = 0; i < col; i++){
+				item = item + columns.get(i).getColumnBody().get(j) + "\t";
 			}
-			ans.add(item);
+			ans.add(item.substring(0, item.length() - 1));
 		}
 		return ans;
 	}
 
 	//get all items but partially by give attributeNames
-	public List<String> getParialColumn(List<String> attributesName){
+	public List<String> getParialColumn(List<String> attributesNameList){
 		List<String> ans = new ArrayList<>();
 
 		String firstRow = "";
-		for (String name: attributesName){
+		for (String name: attributesNameList){
 			firstRow = firstRow + name + "\t";
 		}
-		ans.add(firstRow);
 
-		int row = columns.get(0).getColumnBody().size();
-		int col = columns.size();
+		ans.add(firstRow.substring(0, firstRow.length() - 1));
 
-		for (int i = 0; i < row; i++){
+		int row = getNumofItems();
+
+		int[] index = new int[attributesNameList.size()];
+		int cnt = 0;
+		for (String attribute: attributesNameList){
+			index[cnt++] = getAttributesName().indexOf(attribute);
+		}
+		for (int j = 0; j < row; j++){
 			String item = "";
-			for (int j = 0; j < col; j++){
-				if (!attributesName.contains(getAttributesName().get(j))){
-					continue;
-				}
-
-				item = item + columns.get(j).getColumnBody().get(i) + "\t";
-
+			for (int i = 0; i < index.length; i++){
+				item = item + columns.get(index[i]).getColumnBody().get(j) + "\t";
 			}
-			ans.add(item);
-
+			ans.add(item.substring(0, item.length() - 1));
 		}
 
 
@@ -140,24 +137,9 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 			write2File();
 			return true;
 		}
-
 	}
 
-	public void addColumns(List<String> attributes){
-		for (String attribute: attributes){
-			addNewColumn(attribute);
-		}
-	}
-
-	// this is not what a table should do
-	// make a static same method in FileDealer and use that instead
-	public List<String> csvLineParse(String line) {
-		List<String> ans = new ArrayList<String>();
-		ans = Arrays.stream(line.split("\t")).toList();
-		return ans;
-	}
-
-	// it's strange a table can update file, logically doesn't make sense
+	@Override
 	public void write2File(){
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("databases" + File.separator + getDBName() + File.separator + getTableName()), false));
@@ -186,7 +168,6 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		}
 	}
 
-	// maynbe insert can use this function
 	public void addItem(List value) {
 		numofItems++;
 
@@ -199,66 +180,11 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		}
 	}
 
-	//seems conflict to the updateFile method
-	public void write2File(File file){
-		try{
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			String line = "";
-			for (String attribute: attributesName){
-				line = line + attribute + "\t";
-			}
-			writer.write(line);
-
-			int row = columns.get(0).getColumnBody().size();
-			int col = columns.size();
-
-			for (int i = 0; i < row; i++){
-				line = "";
-				for (int j = 0; j < col; j++){
-					line = line + columns.get(j).getColumnBody().get(i) + "\t";
-				}
-				writer.write(line);
-			}
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	//maybe doesn't make any use here
-	public BufferedWriter getAccordingFile() throws IOException {
-		return new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
-	}
-
 	public void cleanAll(){
 		for (int j = 0; j < numofAttributes; j++){
 			columns.get(j).clean();
 		}
 		numofItems = 0;
-	}
-
-	// make a Class that responsible for and / or operation
-	public List<String> or(List<String> a, List<String> b){
-		List<String> res = new ArrayList<>();
-		for (String str: a){
-			res.add(str);
-		}
-		for (String str: b){
-			res.add(str);
-		}
-
-		return res.stream().distinct().collect(Collectors.toList());
-	}
-
-	public List<String> and(List<String> a, List<String> b){
-		List<String> res = new ArrayList<>();
-		for (String str: a){
-			if (b.contains(str)){
-				res.add(str);
-			}
-		}
-
-		return res;
 	}
 
 	public void updateClass(List<String> ref){
@@ -268,38 +194,37 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 			List<String> splited = Arrays.stream(entry.split("\t")).toList();
 			for (int i = 0; i < numofAttributes; i++){
 				columns.get(i).addValue(splited.get(i));
-//				columns.get(i).set(j, splited.get(i));
 			}
 		}
-//		updateFile();
 
 		numofItems = ref.size();
 	}
 
 	public List<String> predicate(String t){
-		attribute = t.split(" ")[0];
-		operator = t.split(" ")[1];
-		value = t.split(" ")[2];
 
-		attributeIndex = attributesName.indexOf(attribute);
+		condition = new Condition(t);
 
 		return getAllItems().stream().filter(this).collect(Collectors.toList());
 	}
 
 	@Override
 	public boolean test(String t) {
+		String operator = condition.getOperator();
+		String value = condition.getValue();
+		int attributeIndex = attributesName.indexOf(condition.getAttribute());
+
 		if (operator.equals("==")){
-			return Integer.parseInt(t.split("\t")[attributeIndex]) == Integer.valueOf(value);
+			return Double.valueOf(t.split("\t")[attributeIndex]) == Double.valueOf(value);
 		}else if (operator.equals(">")){
-			return Integer.parseInt(t.split("\t")[attributeIndex]) > Integer.valueOf(value);
+			return Double.valueOf(t.split("\t")[attributeIndex]) > Double.valueOf(value);
 		}else if (operator.equals("<")){
-			return Integer.parseInt(t.split("\t")[attributeIndex]) < Integer.valueOf(value);
+			return Double.valueOf(t.split("\t")[attributeIndex]) < Double.valueOf(value);
 		}else if (operator.equals(">=")){
-			return Integer.parseInt(t.split("\t")[attributeIndex]) >= Integer.valueOf(value);
+			return Double.valueOf(t.split("\t")[attributeIndex]) >= Double.valueOf(value);
 		}else if (operator.equals("<=")){
-			return Integer.parseInt(t.split("\t")[attributeIndex]) <= Integer.valueOf(value);
+			return Double.valueOf(t.split("\t")[attributeIndex]) <= Double.valueOf(value);
 		}else if (operator.equals("!=")){
-			return Integer.parseInt(t.split("\t")[attributeIndex]) != Integer.valueOf(value);
+			return Double.valueOf(t.split("\t")[attributeIndex]) != Double.valueOf(value);
 		}else if (operator.toUpperCase().equals("LIKE")){
 			return t.split("\t")[attributeIndex].contains(value);
 		}else{
