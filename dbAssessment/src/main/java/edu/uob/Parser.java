@@ -9,6 +9,10 @@ public class Parser {
 //	private CommandType cmdType;
 	private String execResult;
 
+	public static String getCurrentDBName() {
+		return currentDBName;
+	}
+
 	public Parser(List<String> tokens) {
 		this.tokens = tokens;
 	}
@@ -117,7 +121,6 @@ public class Parser {
 				conditionTokens = tokens.subList(i + 1, tokens.size());
 			}
 		}
-
 
 		if (tokens.get(1).equals("*")){
 			if (!tokens.get(2).toLowerCase().equals("from")){

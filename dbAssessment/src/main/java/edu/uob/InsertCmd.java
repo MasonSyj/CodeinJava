@@ -21,30 +21,19 @@ public class InsertCmd extends Command{
 			FileDealer fileContaningTable = new FileDealer(getDBName(), getTableName());
 			//2. instantiate the table
 			Table table = fileContaningTable.file2Table();
+
 			if (table.getNumofAttributes() != valueList.size()){
-				throw new IllegalArgumentException("A table will n attribute must insert into n values.");
+				return "[ERROR], A table will n attribute must insert into n values.";
 			}
 			//3. add new value into the table
 			table.addItem(valueList);
 			//4. update the file
 			table.write2File();
 
-//			String newValueLine = "";
-//			for (String str: valueList){
-//				newValueLine = newValueLine + str + "\t";
-//			}
-//			table
-//
-//			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
-//
-//			writer.write(newValueLine);
-//			writer.newLine();
-//			writer.flush();
-
 			return "[OK]";
 		}catch(Exception e){
 			String str = "[ERROR], Insert Command Failed.";
-			return str;
+			return "[ERROR], Insert Command Failed.";
 		}
 
 	}

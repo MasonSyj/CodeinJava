@@ -24,8 +24,6 @@ public class UpdateCmd extends Command{
 
             List<String> revisied = new ArrayList<String>();
 
-
-
             for (int i = 0; i < others.size(); i++){
                 if (qualifiedItems.contains(others.get(i))){
                     others.remove(i);

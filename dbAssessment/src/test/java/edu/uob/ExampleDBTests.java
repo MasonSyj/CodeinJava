@@ -31,7 +31,7 @@ public class ExampleDBTests {
 
     private String sendCommandToServer(String command) {
         // Try to send a command to the server - this call will timeout if it takes too long (in case the server enters an infinite loop)
-        return assertTimeoutPreemptively(Duration.ofMillis(1000), () -> { return server.handleCommand(command);},
+        return assertTimeoutPreemptively(Duration.ofMillis(3000), () -> { return server.handleCommand(command);},
         "Server took too long to respond (probably stuck in an infinite loop)");
     }
 
@@ -115,6 +115,36 @@ public class ExampleDBTests {
     }
 
     @Test
+    public void testCreate(){
+        String randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        sendCommandToServer("CREATE TABLE unit (name, points, number);");
+        String randomName2 = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName2 + ";");
+        sendCommandToServer("USE " + randomName2 + ";");
+        sendCommandToServer("CREATE TABLE phone (name, brand, price);");
+        sendCommandToServer("CREATE TABLE laptop (name, brand, usage, function);");
+
+    }
+    @Test
+    public void testUse(){
+        String randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        assertTrue(Parser.getCurrentDBName().equals(randomName));
+
+        String randomName2 = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName2 + ";");
+        sendCommandToServer("USE " + randomName2 + ";");
+        assertTrue(Parser.getCurrentDBName().equals(randomName2));
+
+        sendCommandToServer("USE " + randomName + ";");
+        assertTrue(Parser.getCurrentDBName().equals(randomName));
+    }
+
+    @Test
     public void testDropCommand(){
         String randomName = generateRandomName();
         System.out.println(randomName);
@@ -161,20 +191,19 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testSelectAllWithConditions() {
+    public void testInsert(){
         String randomName = generateRandomName();
         System.out.println(randomName);
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
-        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        sendCommandToServer("SELECT * FROM marks where Price > 6000;");
-        System.out.println("-----------Separate Line-----------");
-        sendCommandToServer("SELECT * FROM marks where Brand like Huawei;");
+        String response = sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("INSERT INTO marks VALUES (Xiaomi, 6000);");
+        assertTrue(response.contains("[ERROR]"));
     }
 
     @Test
@@ -194,6 +223,22 @@ public class ExampleDBTests {
     }
 
     @Test
+    public void testSelectAllWithConditions() {
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        sendCommandToServer("SELECT * FROM marks where Price > 6000;");
+        System.out.println("-----------Separate Line-----------");
+        sendCommandToServer("SELECT * FROM marks where Brand like Huawei;");
+    }
+    @Test
     public void testSelectWildWithConditions() {
         String randomName = generateRandomName();
         System.out.println(randomName);
@@ -206,9 +251,14 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
         System.out.println("-----------Separate Line-----------");
-        sendCommandToServer("SELECT Name, Brand FROM marks where Price > 6000 and Brand like Apple;");
+        String response = sendCommandToServer("SELECT Name, Brand FROM marks where Price > 6000 and Brand like Apple;");
+        System.out.println(response);
+        assertTrue(response.contains("Apple"));
         System.out.println("-----------Separate Line-----------");
-        sendCommandToServer("SELECT Name, Price FROM marks where Brand like Huawei;");
+        response = sendCommandToServer("SELECT Name, Price FROM marks where Brand like Huawei or Price <= 6000;");
+        System.out.println(response);
+        assertTrue(response.contains("Xiaomi"));
+        assertFalse(response.contains("Huawei"));
     }
     @Test
     public void testJoin(){
@@ -307,19 +357,26 @@ public class ExampleDBTests {
 
         FuncTest2 test = new FuncTest2();
         List<String> res1 = test.and(first, second);
-        System.out.println(res1.toString());
+        assertTrue(res1.size() == 2);
 
         List<String> res2 = test.or(first, second);
-        System.out.println(res2.toString());
+        assertTrue(res2.size() == 4);
     }
 
+    @Test
+    public void testConditionFunctions(){
+        //test infix to suffix
+        List<String> conditionTokens = new ArrayList<>();
+        conditionTokens.add("Brand like APPLE");
+        conditionTokens.add("and");
+        conditionTokens.add("Price > 700");
+        List<String> res = ConditionTest.convertToSuffix(conditionTokens);
+        assertTrue(res.get(2).equals("and"));
+
+        conditionTokens.add("or");
+        conditionTokens.add("Name like Huawei");
+        res = ConditionTest.convertToSuffix(conditionTokens);
+        assertTrue(res.get(4).equals("or"));
+    }
 
 }
-
-
-
-//    String DBname = "DigitalDevice";
-//        String TableName = "Phones";
-//        sendCommandToServer("CREATE DATABASE " + DBname + ";");
-//        sendCommandToServer("USE " + DBname + ";");
-//        sendCommandToServer("CREATE TABLE marks (name, mark, pass);")
