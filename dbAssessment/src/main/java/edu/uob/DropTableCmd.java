@@ -9,7 +9,7 @@ public class DropTableCmd extends Command{
 
 	@Override
 	public String execute() {
-		File file = new File(getDBName() + File.separator + getTableName());
+		File file = new File( "databases" + File.separator + getDBName() + File.separator + getTableName());
 
 		if (file.delete()) {
 			return "[OK]， Table " + getTableName() + " droped successfully";

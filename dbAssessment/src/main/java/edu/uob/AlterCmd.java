@@ -28,9 +28,9 @@ public class AlterCmd extends Command{
             return "[ERROR] attribute already exists";
         }else{
             table.addNewColumn(attributeName);
+            table.write2File();
             return "[OK] add attribute succesfully";
         }
-
     }
 
     public String dropAttribute(){

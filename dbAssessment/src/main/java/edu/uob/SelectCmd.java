@@ -46,7 +46,7 @@ public class SelectCmd extends Command{
                     List<String> all = table.getParialColumn(attributesNames);
                     all.remove(0);
                     String allItemsinString = all.toString();
-                    return "[OK] " + table.getAttributesName() + allItemsinString;
+                    return "[OK] " + attributesNames + allItemsinString;
                 }else{
                     FileDealer fd = new FileDealer(getDBName(), getTableName());
                     Table table = fd.file2Table();
@@ -57,7 +57,7 @@ public class SelectCmd extends Command{
                     clone.updateClass(values);
                     List<String> part = clone.getParialColumn(attributesNames);
                     part.remove(0);
-                    return "[OK] " + table.getAttributesName() + part;
+                    return "[OK] " + attributesNames + part;
                 }
 
             }

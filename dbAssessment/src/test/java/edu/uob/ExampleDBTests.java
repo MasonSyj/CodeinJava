@@ -130,10 +130,11 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"));
 
         response = sendCommandToServer("DROP DATABASE " + randomName + ";");
+        System.out.println("1: " + response);
         assertTrue(response.contains("[OK]"));
+
         response = sendCommandToServer("DROP DATABASE " + randomName + ";");
-        System.out.println("fjkldsajfklsjadf");
-        System.out.println("responese:" + response);
+        System.out.println("2: " + response);
         assertTrue(response.contains("[ERROR]"));
     }
 
@@ -148,6 +149,7 @@ public class ExampleDBTests {
         String response = sendCommandToServer("ALTER TABLE marks add rank;");
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("ALTER TABLE marks add rank;");
+        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
 
         response = sendCommandToServer("ALTER TABLE marks drop pass;");
@@ -251,7 +253,6 @@ public class ExampleDBTests {
         // what the....
         table = fd.file2Table();
         assertTrue(table.getNumofItems() == 4);
-
     }
 
     @Test

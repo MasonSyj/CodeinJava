@@ -14,22 +14,42 @@ public class DropDBCmd extends Command{
 
 	@Override
 	public String execute() {
-		Path directoryRepresentDB = Paths.get(getDBName());
+		File directoryRepresentDB = new File("databases" + File.separator + getDBName());
 
-		try {
+//		try {
 			// Recursively delete all files and subdirectories
-			Files.walk(directoryRepresentDB)
-					.sorted(java.util.Comparator.reverseOrder())
-					.map(Path::toFile)
-					.forEach(java.io.File::delete);
+//			Files.walk(directoryRepresentDB)
+//					.sorted(java.util.Comparator.reverseOrder())
+//					.map(Path::toFile)
+//					.forEach(java.io.File::delete);
+			if (!directoryRepresentDB.exists()){
+				return "[ERROR] , Database doesn't exist";
+			}
 
-			// Delete the top-level directory itself
-			Files.deleteIfExists(directoryRepresentDB);
+			try{
+				if (directoryRepresentDB.isDirectory()){
+					File[] files = directoryRepresentDB.listFiles();
+					for (int i = 0; i < files.length; i++){
+						files[i].delete();
+					}
+				}
 
-			return "[OK] ， Database droped succesfully";
-		} catch (IOException e) {
-			return "[ERROR] , Database failed to drop";
-		}
+				if(!directoryRepresentDB.delete()){
+					return "[ERROR] , Database failed to drop";
+				}else{
+					return "[OK] ， Database droped succesfully";
+				}
+				// Delete the top-level directory itself
+//			Files.deleteIfExists(directoryRepresentDB);
+
+
+			} catch (Exception e){
+				return "[ERROR] , Database failed to drop";
+			}
+
+//		} catch (Exception e) {
+//			return "[ERROR] , Database failed to drop";
+//		}
 
 	}
 }

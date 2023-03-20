@@ -59,7 +59,6 @@ public class JoinCmd extends Command{
             throw new IllegalArgumentException("Join command can't find common thing to join");
         }
 
-
         List<String> Joinedres = new ArrayList<String>();
         for (String stra : itemsFirstTable){
             for (String strb: itemsSecondTable){
