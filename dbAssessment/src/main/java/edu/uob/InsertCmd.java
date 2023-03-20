@@ -17,22 +17,19 @@ public class InsertCmd extends Command{
 	@Override
 	public String execute() {
 		try{
-			//1. find the file containing the table matched by tablName;
+
 			FileDealer fileContaningTable = new FileDealer(getDBName(), getTableName());
-			//2. instantiate the table
 			Table table = fileContaningTable.file2Table();
 
 			if (table.getNumofAttributes() != valueList.size()){
 				return "[ERROR], A table will n attribute must insert into n values.";
 			}
-			//3. add new value into the table
-			table.addItem(valueList);
-			//4. update the file
-			table.write2File();
 
+			table.addItem(valueList);
+			table.write2File();
 			return "[OK]";
+
 		}catch(Exception e){
-			String str = "[ERROR], Insert Command Failed.";
 			return "[ERROR], Insert Command Failed.";
 		}
 

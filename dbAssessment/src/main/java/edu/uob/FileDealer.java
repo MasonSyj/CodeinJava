@@ -65,4 +65,12 @@ public class FileDealer {
 		return ans;
 	}
 
+	// change List<String> back into tab-separated txt
+	public static String transform2csvLine(List<String> values){
+		String ans = "";
+		for (String str: values){
+			ans = ans + str + "\t";
+		}
+		return ans.substring(0, ans.length() - 1);
+	}
 }

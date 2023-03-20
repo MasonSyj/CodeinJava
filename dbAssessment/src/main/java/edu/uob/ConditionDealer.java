@@ -2,7 +2,7 @@ package edu.uob;
 
 import java.util.*;
 
-public class ConditionTest {
+public class ConditionDealer {
 
     static String[] operator = {"==" , ">" , "<" , ">=" , "<=" , "!=" , "LIKE", "like"};
 
@@ -54,7 +54,7 @@ public class ConditionTest {
     }
 
     public static List<String> conditionExecute(List<String> conditions, Table t){
-        List<String> res = ConditionTest.convertToSuffix(conditions);
+        List<String> res = ConditionDealer.convertToSuffix(conditions);
 
         Stack<List<String>> stack = new Stack<>();
         for (int i = 0; i < res.size(); i++){
@@ -72,8 +72,8 @@ public class ConditionTest {
                 stack.add(ansItem);
 
             }else{
-                List<String> curres = t.predicate(res.get(i));
-                stack.add(curres);
+                List<String> currentItem = t.predicate(res.get(i));
+                stack.add(currentItem);
             }
         }
 

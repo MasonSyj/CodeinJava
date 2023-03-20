@@ -20,7 +20,7 @@ public class UpdateCmd extends Command{
 
             List<String> others = table.getAllItems();
 
-            List<String> qualifiedItems = ConditionTest.conditionExecute(ConditionTokens, table);
+            List<String> qualifiedItems = ConditionDealer.conditionExecute(ConditionTokens, table);
 
             List<String> revisied = new ArrayList<String>();
 

@@ -14,49 +14,55 @@ public class SelectCmd extends Command{
         this.ConditionTokens = ConditionTokens;
     }
 
+    public List<String> getAttributeName(){
+        List<String> attributesNames = new ArrayList<String>();
+        for (String[] list: attributeList){
+            String attributeName = list[1];
+            attributesNames.add(attributeName);
+        }
+        return attributesNames;
+    }
+
     @Override
     public String execute() {
         try{
-            // this function must chnage heavily!!!
+            // change still needed
             FileDealer fd = new FileDealer(getDBName(), getTableName());
             Table table = fd.file2Table();
             if (attributeList == null){
-
-//                List<String> suffixCondition = ConditionTest.convertToSuffix(ConditionTokens);
+                String res = "[OK]\n" + FileDealer.transform2csvLine(table.getAttributesName()) + "\n";
                 if (ConditionTokens == null){
-                    List<String> all = table.getAllItems();
-                    String allItemsinString = all.toString();
-                    //when output, it should include attributesName
-
-                    return "[OK]\n" + table.getAttributesName() + "\n" + allItemsinString;
+                    for (String item: table.getAllItems()){
+                        res = res + item + "\n";
+                    }
+                    return res;
                 }else{
-                    return "[OK]\n" + table.getAttributesName() + "\n" + ConditionTest.conditionExecute(ConditionTokens, table);
+                    List<String> itemsAfterCondition = ConditionDealer.conditionExecute(ConditionTokens, table);
+                    for (String item: itemsAfterCondition){
+                        res = res + item + "\n";
+                    }
+                    return res;
                 }
-
             }else{
-                // need to sort heavily here
-                List<String> attributesNames = new ArrayList<String>();
-                for (String[] list: attributeList){
-                    String attributeName = list[1];
-                    attributesNames.add(attributeName);
-                }
-
+                List<String> attributesNames = getAttributeName();
+                String res = "[OK]\n";
                 if (ConditionTokens == null){
                     List<String> all = table.getParialColumn(attributesNames);
-                    return "[OK]\n" + all;
+                    for (String item: all){
+                        res = res + item + "\n";
+                    }
+                    return res;
                 }else{
-                    List<String> values = ConditionTest.conditionExecute(ConditionTokens, table);
-
+                    List<String> itemsAfterCondition = ConditionDealer.conditionExecute(ConditionTokens, table);
                     Table clone = (Table) table.clone();
-
-                    clone.updateClass(values);
+                    clone.updateClass(itemsAfterCondition);
                     List<String> part = clone.getParialColumn(attributesNames);
-                    part.remove(0);
-                    return "[OK]\n" + attributesNames + "\n" + part;
+                    for (String item: part){
+                        res = res + item + "\n";
+                    }
+                    return res;
                 }
-
             }
-
         } catch (Exception e){
             return "[ERROR], failed to get items.\n";
         }

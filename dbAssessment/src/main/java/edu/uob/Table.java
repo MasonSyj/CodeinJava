@@ -69,7 +69,6 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		return null;
 	}
 
-
 	public List<String> getAllItems(){
 		List<String> ans = new ArrayList<>();
 
@@ -77,12 +76,13 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		int col = columns.size();
 
 		for (int j = 0; j < row; j++){
-			String item = "";
+			List<String> currentItem = new ArrayList<>();
 			for (int i = 0; i < col; i++){
-				item = item + columns.get(i).getColumnBody().get(j) + "\t";
+				currentItem.add((String) columns.get(i).getColumnBody().get(j));
 			}
-			ans.add(item.substring(0, item.length() - 1));
+			ans.add(FileDealer.transform2csvLine(currentItem));
 		}
+
 		return ans;
 	}
 
@@ -90,12 +90,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	public List<String> getParialColumn(List<String> attributesNameList){
 		List<String> ans = new ArrayList<>();
 
-		String firstRow = "";
-		for (String name: attributesNameList){
-			firstRow = firstRow + name + "\t";
-		}
-
-		ans.add(firstRow.substring(0, firstRow.length() - 1));
+		ans.add(FileDealer.transform2csvLine(attributesNameList));
 
 		int row = getNumofItems();
 
@@ -104,12 +99,13 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		for (String attribute: attributesNameList){
 			index[cnt++] = getAttributesName().indexOf(attribute);
 		}
+
 		for (int j = 0; j < row; j++){
-			String item = "";
+			List<String> currentItem = new ArrayList<>();
 			for (int i = 0; i < index.length; i++){
-				item = item + columns.get(index[i]).getColumnBody().get(j) + "\t";
+				currentItem.add((String) columns.get(index[i]).getColumnBody().get(j));
 			}
-			ans.add(item.substring(0, item.length() - 1));
+			ans.add(FileDealer.transform2csvLine(currentItem));
 		}
 
 

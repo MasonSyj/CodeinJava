@@ -207,7 +207,7 @@ public class Parser {
 
 	public void parseConditions(int index){
 		for (int i = index; i < tokens.size() - 1; i++){
-			for (String specialChar: ConditionTest.operator){
+			for (String specialChar: ConditionDealer.operator){
 				if (tokens.get(i).equals(specialChar)){
 					String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " " + tokens.get(i + 1);
 					tokens.remove(i);

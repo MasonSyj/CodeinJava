@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 
 public class Column implements Predicate<String> {
 	private String columnName;
-	private List columnBody;
+	private List<String> columnBody;
 
 	public Column(String columnName){
 		this.columnName = columnName;

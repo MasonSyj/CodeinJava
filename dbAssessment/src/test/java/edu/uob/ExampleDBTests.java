@@ -86,19 +86,27 @@ public class ExampleDBTests {
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('sam', 80, TRUE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('tom', 45, FALSE);");
         // Create a new server object
         server = new DBServer();
         sendCommandToServer("USE " + randomName + ";");
+        System.out.println("-----------Condition 1------------");
         String response = sendCommandToServer("SELECT * FROM marks;");
-        System.out.println("-----------S L------------");
+        System.out.println(response);
+        System.out.println("-----------Condition 2------------");
+        response = sendCommandToServer("SELECT * FROM marks where pass like TRUE;");
         System.out.println(response);
         assertTrue(response.contains("Steve"), "Steve was added to a table and the server restarted - but Steve was not returned by SELECT *");
-        System.out.println("---------test selct wildAttributeList-----------");
+        System.out.println("-----------Condition 3------------");
         response = sendCommandToServer("Select pass, name from marks;");
         System.out.println(response);
         assertTrue((response.contains("name")));
         assertTrue((response.contains("pass")));
         assertFalse((response.contains("mark")));
+        System.out.println("-----------Condition 4------------");
+        response = sendCommandToServer("Select pass, name from marks where mark > 50;");
+        System.out.println(response);
     }
 
     // Test to make sure that the [ERROR] tag is returned in the case of an error (and NOT the [OK] tag)
@@ -295,14 +303,10 @@ public class ExampleDBTests {
 
         FileDealer fd = new FileDealer(randomName, "marks");
         Table table = fd.file2Table();
-
         assertTrue(table.getNumofItems() == 5);
 
         String response = sendCommandToServer("DELETE FROM marks Where Price < 5500;");
         assertTrue(response.contains("[OK]"));
-        System.out.println(table.getNumofItems());
-
-        // what the....
         table = fd.file2Table();
         assertTrue(table.getNumofItems() == 4);
     }
@@ -371,12 +375,12 @@ public class ExampleDBTests {
         conditionTokens.add("Brand like APPLE");
         conditionTokens.add("and");
         conditionTokens.add("Price > 700");
-        List<String> res = ConditionTest.convertToSuffix(conditionTokens);
+        List<String> res = ConditionDealer.convertToSuffix(conditionTokens);
         assertTrue(res.get(2).equals("and"));
 
         conditionTokens.add("or");
         conditionTokens.add("Name like Huawei");
-        res = ConditionTest.convertToSuffix(conditionTokens);
+        res = ConditionDealer.convertToSuffix(conditionTokens);
         assertTrue(res.get(4).equals("or"));
     }
 
