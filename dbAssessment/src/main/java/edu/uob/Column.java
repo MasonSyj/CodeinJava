@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Column<T> implements Predicate<String> {
+public class Column implements Predicate<String> {
 	private String columnName;
-	private List<T> columnBody;
+	private List columnBody;
 
 	public Column(String columnName){
 		this.columnName = columnName;
-		this.columnBody = new ArrayList<T>();
+		this.columnBody = new ArrayList<String>();
 	}
 
-	public List<T> getColumnBody() {
+	public List getColumnBody() {
 		return columnBody;
 	}
 
@@ -21,11 +21,11 @@ public class Column<T> implements Predicate<String> {
 		return columnName;
 	}
 
-	public void addValue(T value){
+	public void addValue(String value){
 		columnBody.add(value);
 	}
 
-	public void set(int index, T t){
+	public void set(int index, String t){
 		columnBody.set(index, t);
 	}
 

@@ -40,6 +40,7 @@ public class ExampleDBTests {
     @Test
     public void testBasicCreateAndQuery() {
         String randomName = generateRandomName();
+        System.out.println(randomName);
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
@@ -134,8 +135,6 @@ public class ExampleDBTests {
         System.out.println("fjkldsajfklsjadf");
         System.out.println("responese:" + response);
         assertTrue(response.contains("[ERROR]"));
-        response.len
-
     }
 
     @Test
@@ -258,30 +257,30 @@ public class ExampleDBTests {
     @Test
     public void testTableUpdateClass(){
         Table t = new Table(".", "PhoneBrand");
-        t.addNewColumn(new Column("Name"));
-        t.addNewColumn(new Column("Brand"));
-        t.addNewColumn(new Column("Price"));
+        t.addNewColumn("Name");
+        t.addNewColumn("Brand");
+        t.addNewColumn("Price");
 
         List<String> value1 = new ArrayList<String>();
         value1.add("Pixel 7");
         value1.add("Google");
         value1.add("6000");
-        t.addValue(value1);
+        t.addItem(value1);
 
         List<String> value2 = new ArrayList<String>();
         value2.add("Iphone 13");
         value2.add("Apple");
         value2.add("8000");
 
-        t.addValue(value2);
+        t.addItem(value2);
 
         List<String> value3 = new ArrayList<String>();
         value3.add("Xiaomi 10");
         value3.add("Xiaomi");
         value3.add("7000");
-        t.addValue(value3);
+        t.addItem(value3);
 
-        t.updateFile();
+        t.write2File();
 
         assertTrue(t.getNumofItems() == 3);
 

@@ -168,12 +168,12 @@ public class Parser {
 		if (tokens.get(1).toLowerCase().equals("database")){
 //			currentDBName = tokens.get(2);
 			CreateDBCmd createDBCmd = new CreateDBCmd(tokens.get(2));
+			execResult = createDBCmd.execute();
 		} else if (tokens.get(1).toLowerCase().equals("table")){
 			if (tokens.get(3).equals("(")){
 				List<String[]> attributeList = parseAttributeList(tokens, tokens.get(2), 4);
 				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), attributeList);
-			}else{
-				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), null);
+				execResult = createTableCmd.execute();
 			}
 
 		} else{
@@ -199,6 +199,7 @@ public class Parser {
 		List<String> valueList = parseValueList(tokens, 5);
 
 		InsertCmd insertCmd = new InsertCmd(currentDBName, tableName, valueList);
+		execResult = insertCmd.execute();
 	}
 
 	public void parseConditions(int index){
@@ -263,7 +264,12 @@ public class Parser {
 		List<String[]> ans = new ArrayList<>();
 		try{
 			while (!tokens.get(index).equals(")") && !tokens.get(index).toLowerCase().equals("from")){
-//				if (!tokens.get(index).equals(",")){
+
+				if (tokens.get(index).equals(",")){
+					index++;
+					continue;
+				}
+
 				String[] curAttributeName = new String[2];
 				if (tokens.get(index).contains(".")){
 					curAttributeName[0] = tokens.get(index).split(".")[0];

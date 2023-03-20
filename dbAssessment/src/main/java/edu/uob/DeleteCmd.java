@@ -63,7 +63,7 @@ public class DeleteCmd extends Command{
         }
         System.out.println("all.size(): " + all.size());
         t.updateClass(all);
-        t.updateFile();
+        t.write2File();
         System.out.println("after delete there are: " + t.getNumofItems());
     }
     public List<String> convertToSuffix(List<String> tokens) {

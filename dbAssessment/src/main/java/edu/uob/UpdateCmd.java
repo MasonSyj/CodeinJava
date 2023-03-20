@@ -53,7 +53,7 @@ public class UpdateCmd extends Command{
             List<String> all = table.or(others, revisied);
             table.cleanAll();
             table.updateClass(all);
-            table.updateFile();
+            table.write2File();
             return "[OK], update succeed";
         } catch (Exception e){
             return "[ERROR], failed to update";

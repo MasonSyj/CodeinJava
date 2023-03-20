@@ -5,7 +5,6 @@ import java.io.File;
 public class CreateDBCmd extends Command{
     public CreateDBCmd(String DBname){
         super(DBname, null);
-        this.execute();
     }
 
     public String execute(){

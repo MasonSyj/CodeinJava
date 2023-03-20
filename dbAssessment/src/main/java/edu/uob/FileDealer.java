@@ -16,7 +16,7 @@ public class FileDealer {
 
 	// locate the file representing the table, then use the data to instanitise a table object
 	public Table file2Table(){
-		File file = new File(DBName + File.separator + TableName);
+		File file = new File("databases" + File.separator + DBName + File.separator + TableName);
 
 		BufferedReader reader;
 
@@ -52,7 +52,7 @@ public class FileDealer {
 			throw new RuntimeException(e);
 		}
 		// wrong direction, why write things back to a file?
-		ans.write2File();
+//		ans.write2File();
 		return ans;
 	}
 

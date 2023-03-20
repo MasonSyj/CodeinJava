@@ -27,7 +27,7 @@ public class AlterCmd extends Command{
         if (table.getAttributesName().contains(attributeName)){
             return "[ERROR] attribute already exists";
         }else{
-            table.addNewColumn(new Column(attributeName));
+            table.addNewColumn(attributeName);
             return "[OK] add attribute succesfully";
         }
 

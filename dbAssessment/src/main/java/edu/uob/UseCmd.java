@@ -12,7 +12,7 @@ public class UseCmd extends Command{
 
     @Override
     public String execute() {
-        File file = new File(getDBName());
+        File file = new File("databases" + File.separator + getDBName());
         if (file.isDirectory()){
             return getDBName() + " exists";
         }else {

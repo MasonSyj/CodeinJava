@@ -6,14 +6,12 @@ import java.io.FileWriter;
 import java.util.List;
 
 public class InsertCmd extends Command{
-//	private String DBName;
-//	private String tableName;
 	private List<String> valueList;
 
 	public InsertCmd(String DBName, String tableName, List<String> valueList){
 		super(DBName, tableName);
 		this.valueList = valueList;
-		execute();
+
 	}
 
 	@Override
@@ -23,19 +21,25 @@ public class InsertCmd extends Command{
 			FileDealer fileContaningTable = new FileDealer(getDBName(), getTableName());
 			//2. instantiate the table
 			Table table = fileContaningTable.file2Table();
+			if (table.getNumofAttributes() != valueList.size()){
+				throw new IllegalArgumentException("A table will n attribute must insert into n values.");
+			}
 			//3. add new value into the table
 			table.addItem(valueList);
 			//4. update the file
-			String newValueLine = "";
-			for (String str: valueList){
-				newValueLine = newValueLine + str + "\t";
-			}
+			table.write2File();
 
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
-
-			writer.write(newValueLine);
-			writer.newLine();
-			writer.flush();
+//			String newValueLine = "";
+//			for (String str: valueList){
+//				newValueLine = newValueLine + str + "\t";
+//			}
+//			table
+//
+//			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
+//
+//			writer.write(newValueLine);
+//			writer.newLine();
+//			writer.flush();
 
 			return "[OK]";
 		}catch(Exception e){

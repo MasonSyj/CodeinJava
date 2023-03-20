@@ -9,16 +9,16 @@ import java.util.stream.Stream;
 public class TestNameValueList {
     public static void main(String[] args) {
         Table t = new Table(".", "PhoneBrand");
-        t.addNewColumn(new Column("Name"));
-        t.addNewColumn(new Column("Brand"));
-        t.addNewColumn(new Column("Price"));
+        t.addNewColumn("Name");
+        t.addNewColumn("Brand");
+        t.addNewColumn("Price");
 
         List<String> value = new ArrayList<String>();
 
         value.add("Pixel 7");
         value.add("Google");
         value.add("7000");
-        t.addValue(value);
+        t.addItem(value);
 
 //        for (int i = 0; i < value.size(); i++){
 //            value.remove(i);
@@ -31,7 +31,7 @@ public class TestNameValueList {
         value.add("Apple");
         value.add("8000");
 
-        t.addValue(value);
+        t.addItem(value);
 
         while (value.size() != 0){
             value.remove(0);
@@ -40,11 +40,11 @@ public class TestNameValueList {
         value.add("Xiaomi 10");
         value.add("Xiaomi");
         value.add("6000");
-        t.addValue(value);
+        t.addItem(value);
 
-        t.addValue(t.csvLineParse("Mate40\tHuawei\t5000"));
+        t.addItem(t.csvLineParse("Mate40\tHuawei\t5000"));
 
-        t.updateFile();
+        t.write2File();
 
         String str = "Xiaomi 10\tXaiomi\t6000";
         String str2 = "Mate40\tHuawei\t5000";

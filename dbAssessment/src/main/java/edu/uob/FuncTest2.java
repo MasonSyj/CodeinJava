@@ -39,7 +39,7 @@ public class FuncTest2 {
 
 //		robotTable.addValue(c3po);
 
-		robotTable.addNewColumn(new Column("speed"));
+		robotTable.addNewColumn("Speed");
 
 //		robotTable.updateFile();
 	}

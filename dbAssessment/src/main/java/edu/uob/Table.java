@@ -54,6 +54,10 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		return numofItems;
 	}
 
+	public int getNumofAttributes() {
+		return numofAttributes;
+	}
+
 	public List<Column> getColumns() {
 		return columns;
 	}
@@ -115,7 +119,8 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		return ans;
 	}
 
-	public void addNewColumn(Column col){
+	public void addNewColumn(String columnName){
+		Column col = new Column(columnName);
 		attributesName.add(col.getColumnName());
 		columns.add(col);
 		numofAttributes++;
@@ -123,7 +128,6 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		for (int i = 0; i < numofItems; i++){
 			columns.get(columns.size() - 1).addValue(null);
 		}
-		write2File();
 	}
 
 	public boolean dropColumn(String attributeName){
@@ -141,7 +145,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 
 	public void addColumns(List<String> attributes){
 		for (String attribute: attributes){
-			addNewColumn(new Column(attribute));
+			addNewColumn(attribute);
 		}
 	}
 
@@ -156,9 +160,8 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	// it's strange a table can update file, logically doesn't make sense
 	public void write2File(){
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), false));
-			writer.write("");
-			writer = new BufferedWriter(new FileWriter(new File(getDBName() + File.separator + getTableName()), true));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("databases" + File.separator + getDBName() + File.separator + getTableName()), false));
+//			writer.write("");
 			int row = columns.get(0).getColumnBody().size();
 			int col = columns.size();
 			String AttributesLine = "";
@@ -181,8 +184,6 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
-
 	}
 
 	// maynbe insert can use this function
@@ -194,7 +195,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		}
 
 		for (int j = 0; j < numofAttributes; j++){
-			columns.get(j).addValue(value.get(j));
+			columns.get(j).addValue(String.valueOf(value.get(j)));
 		}
 	}
 
