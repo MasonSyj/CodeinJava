@@ -72,33 +72,50 @@ public class JoinCmd extends Command {
         }
 
         List<String> rawJoin = BoolOperation.join(itemsFirstTable, itemsSecondTable, indexFirstTable, indexSecondTable);
-//        List<String> JoinedRes = new ArrayList<String>();
-//        for (String stra : itemsFirstTable){
-//            for (String strb: itemsSecondTable){
-//                if (Arrays.stream(stra.split("\t")).toList().get(indexFirstTable)
-//                        .equals(Arrays.stream(strb.split("\t")).toList().get(indexSecondTable))){
-//                    JoinedRes.add(stra + "\t" + strb);
-//                    break;
-//                }
-//            }
-//        }
 
-        List<String> TrimmedRes = new ArrayList<String>();
-        for (String item: rawJoin){
-            int cnt = 1;
-            String[] curItems = item.split("\t");
-            curItems[indexSecondTable + firstTable.getNumofAttributes()] = "";
-            String curItem = cnt++ + "\t" + String.join("\t", curItems);
-            TrimmedRes.add(curItem);
+        Table temp = new Table(getDBName(), "temp" + (int) (Math.random() * 1000));
+        int numofColumns = firstTable.getNumofAttributes() + secondTable.getNumofAttributes() - 2;
+        for (int i = 0; i < numofColumns + 2; i++){
+            temp.addNewColumn("null");
         }
+        temp.updateClass(rawJoin);
 
-        String ans = "";
-        for (String str: TrimmedRes){
-            ans = ans + str + "\n";
+        if (indexSecondTable != 0){
+            numofColumns--;
+        }
+        int[] indexs = new int[numofColumns];
+        int cnt = 0;
+
+        String attributeLine = "id\t";
+
+        for (int i = 1; i < firstTable.getNumofAttributes(); i++) {
+            indexs[cnt++] = i;
+            attributeLine = attributeLine + firstTable.getTableName() + "." + firstTable.getAttributesName().get(i) + "\t";
         }
 
 
-        return "[OK]\n" + ans;
+        for (int i = 1; i < secondTable.getNumofAttributes(); i++){
+            attributeLine = attributeLine + secondTable.getTableName() + "." + secondTable.getAttributesName().get(i) + "\t";
+            indexs[cnt++] = firstTable.getNumofAttributes() + i;
+        }
+
+        List<String> trimmedRes = new ArrayList<>();
+        for (int j = 0; j < rawJoin.size(); j++){
+            List<String> currentItem = new ArrayList<>();
+            for (int i = 0; i < indexs.length; i++){
+                currentItem.add(temp.getColumns().get(indexs[i]).getColumnBody().get(j));
+            }
+            trimmedRes.add(FileDealer.transform2csvLine(currentItem));
+        }
+
+        cnt = 1;
+        String ans = "[OK]\n" + attributeLine + "\n";
+        for (String item: trimmedRes){
+            ans = ans + cnt++ + "\t" + item + "\n";
+        }
+
+        return ans;
+
     }
 
 

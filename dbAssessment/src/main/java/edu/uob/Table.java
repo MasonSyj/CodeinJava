@@ -156,6 +156,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		}
 	}
 
+
 	@Override
 	public void write2File(){
 		try {

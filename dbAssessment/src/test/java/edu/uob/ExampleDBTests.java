@@ -471,10 +471,6 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
         String response = sendCommandToServer("select * from marks where Price>=7000;");
-        String response = sendCommandToServer("select * from marks where Price =7000;");
-        String response = sendCommandToServer("select * from marks where Price>=7000;");
-        String response = sendCommandToServer("select * from marks where Price>=7000;");
-        String response = sendCommandToServer("select * from marks where Price>=7000;");
         assertTrue(response.contains("Google"));
         assertTrue(response.contains("Apple"));
         assertFalse(response.contains("Xiami"));
