@@ -111,7 +111,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	public List<String> getParialColumn(List<String> attributesNameList){
 		List<String> ans = new ArrayList<>();
 
-		ans.add(FileDealer.transform2csvLine(attributesNameList));
+//		ans.add(FileDealer.transform2csvLine(attributesNameList));
 
 		int row = getNumofItems();
 

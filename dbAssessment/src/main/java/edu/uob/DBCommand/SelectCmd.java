@@ -27,51 +27,36 @@ public class SelectCmd extends Command {
         }
         return attributesNames;
     }
-
-
     @Override
-    public String execute() {
+    public String execute(){
         try{
-            // maube just split into four methods
             FileDealer fd = new FileDealer(getDBName(), getTableName());
             Table table = fd.file2Table();
-            if (attributeList == null){
-                String res = "[OK]\n" + FileDealer.transform2csvLine(table.getAttributesName()) + "\n";
-                if (ConditionTokens == null){
-                    for (String item: table.getAllItems()){
-                        res = res + item + "\n";
-                    }
-                    return res;
-                }else{
-                    List<String> itemsAfterCondition = ConditionDealer.conditionExecute(ConditionTokens, table);
-                    for (String item: itemsAfterCondition){
-                        res = res + item + "\n";
-                    }
-                    return res;
-                }
+
+            List<String> items;
+            if (ConditionTokens == null){
+                items = table.getAllItems();
             }else{
-                List<String> attributesNames = getAttributeName();
-                String res = "[OK]\n";
-                if (ConditionTokens == null){
-                    List<String> all = table.getParialColumn(attributesNames);
-                    for (String item: all){
-                        res = res + item + "\n";
-                    }
-                    return res;
-                }else{
-                    List<String> itemsAfterCondition = ConditionDealer.conditionExecute(ConditionTokens, table);
-                    Table clone = (Table) table.clone();
-                    clone.updateClass(itemsAfterCondition);
-                    List<String> part = clone.getParialColumn(attributesNames);
-                    for (String item: part){
-                        res = res + item + "\n";
-                    }
-                    return res;
-                }
+                items = ConditionDealer.conditionExecute(ConditionTokens, table);
             }
+            table.updateClass(items);
+
+            List<String> attributesNames;
+            if (attributeList == null){
+                attributesNames = table.getAttributesName();
+            }else{
+                attributesNames = getAttributeName();
+            }
+
+            String res = "[OK]\n" + FileDealer.transform2csvLine(attributesNames) + "\n";
+            for (String item: table.getParialColumn(attributesNames)){
+                res = res + item + "\n";
+            }
+
+            return res;
         } catch (Exception e){
             return "[ERROR], failed to get items.\n";
         }
-
     }
+
 }

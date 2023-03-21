@@ -96,8 +96,9 @@ public class ExampleDBTests {
         // Create a new server object
         server = new DBServer();
         sendCommandToServer("USE " + randomName + ";");
+        String response;
         System.out.println("-----------Condition 1------------");
-        String response = sendCommandToServer("SELECT * FROM marks;");
+        response = sendCommandToServer("SELECT * FROM marks;");
         System.out.println(response);
         System.out.println("-----------Condition 2------------");
         response = sendCommandToServer("SELECT * FROM marks where pass like TRUE;");
@@ -409,7 +410,7 @@ public class ExampleDBTests {
 
     @Test
     public void testEdgeCasesQuery(){
-        List<String> tokens = Token.setup("pass==False id=>7 num=<5");
+        List<String> tokens = Token.setup("pass==False id=>7 num=<5 mark > = 45");
         for (String token: tokens){
             System.out.println(token);
         }
