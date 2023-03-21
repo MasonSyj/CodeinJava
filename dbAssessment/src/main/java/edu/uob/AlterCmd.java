@@ -21,6 +21,11 @@ public class AlterCmd extends Command{
     }
 
     public String addAttribute(){
+        if (SQLKeywords.SQLKeyWords.contains(attributeName.toUpperCase())){
+            return "[ERROR], attribute Name cannot be SQL Keywords.";
+        }
+
+
         // this two line appeared many times, may add to the Parent Class: Command
         FileDealer fd = new FileDealer(getDBName(), getTableName());
         Table table = fd.file2Table();

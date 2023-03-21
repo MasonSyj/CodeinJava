@@ -13,7 +13,7 @@ public class Column implements Predicate<String> {
 		this.columnBody = new ArrayList<String>();
 	}
 
-	public List getColumnBody() {
+	public List<String> getColumnBody() {
 		return columnBody;
 	}
 

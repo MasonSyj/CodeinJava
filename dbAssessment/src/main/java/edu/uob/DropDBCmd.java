@@ -1,7 +1,7 @@
 package edu.uob;
 
+
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,13 +41,26 @@ public class DropDBCmd extends Command{
 		}
 
 		deleteDirectory(directoryRepresentDB);
-
 		directoryRepresentDB.delete();
 
-		if(directoryRepresentDB.exists()){
+		if (directoryRepresentDB.exists()){
 			return "[ERROR] , Database failed to drop";
 		}else{
 			return "[OK] ， Database droped succesfully";
 		}
+
+//		Path path = Paths.get("databases" + File.separator + getDBName());
+//		try {
+//			Files.walk(path)
+//					.sorted(java.util.Comparator.reverseOrder())
+//					.map(Path::toFile)
+//					.forEach(File::delete);
+//					Files.delete(path);
+//			return "[OK] ， Database drop successfully";
+//		} catch (Exception e) {
+//			return "[ERROR] , Database failed to drop: " + e.getMessage();
+//		}
+
+
 	}
 }

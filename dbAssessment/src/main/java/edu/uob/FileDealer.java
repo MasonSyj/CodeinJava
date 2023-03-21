@@ -42,7 +42,7 @@ public class FileDealer {
 			}
 
 			while (line != null && line.length() > 0){
-				List valueList = new ArrayList();
+				List<String> valueList = new ArrayList<String>();
 				valueList = csvLineParse(line);
 				ans.addItem(valueList, ItemType.OLD);
 				line = reader.readLine();

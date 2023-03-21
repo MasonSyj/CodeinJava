@@ -9,6 +9,9 @@ public class CreateDBCmd extends Command{
 
     public String execute(){
         try{
+            if (SQLKeywords.SQLKeyWords.contains(getDBName().toUpperCase())){
+                return "[ERROR], Database Name cannot be SQL Keywords.";
+            }
             File theDir = new File("databases" + File.separator + getDBName());
 //            File theDir = new File(getDBName());
             if (!theDir.exists()){

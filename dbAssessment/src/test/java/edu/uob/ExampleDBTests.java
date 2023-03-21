@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -277,14 +279,14 @@ public class ExampleDBTests {
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE customers (Customid, name, email);");
         sendCommandToServer("CREATE TABLE orders (Orderid, order_date, cost);");
-        sendCommandToServer("INSERT INTO customers VALUES (1, 'John Doe', 'johndoe@example.com');");
-        sendCommandToServer("INSERT INTO customers VALUES (2, 'Jane Smith', 'janesmith@example.com');");
-        sendCommandToServer("INSERT INTO customers VALUES (3, 'Bob Johnson', 'bjohnson@example.com');");
+        sendCommandToServer("INSERT INTO customers VALUES (21, 'John Doe', 'johndoe@example.com');");
+        sendCommandToServer("INSERT INTO customers VALUES (22, 'Jane Smith', 'janesmith@example.com');");
+        sendCommandToServer("INSERT INTO customers VALUES (23, 'Bob Johnson', 'bjohnson@example.com');");
         String response = sendCommandToServer("Select * from customers;");
         System.out.println(response);
 
-        sendCommandToServer("INSERT INTO orders VALUES (1, '2022-01-01', 100);");
-        sendCommandToServer("INSERT INTO orders VALUES (3, '2022-02-15', 75);");
+        sendCommandToServer("INSERT INTO orders VALUES (21, '2022-01-01', 100);");
+        sendCommandToServer("INSERT INTO orders VALUES (23, '2022-02-15', 75);");
         response = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND customers.Customid;");
         System.out.println(response);
     }
@@ -315,6 +317,11 @@ public class ExampleDBTests {
     @Test
     public void testTableUpdateClass(){
         Table t = new Table("Electronics", "PhoneBrand");
+        File directory = new File("databases" + File.separator + "Electronics");
+        if (!directory.exists()){
+            assertTrue(directory.mkdir(), "unable to create directory as prerequisite work for this test");
+        }
+
         t.addNewColumn("id");
         t.addNewColumn("Name");
         t.addNewColumn("Brand");
@@ -423,9 +430,30 @@ public class ExampleDBTests {
         System.out.println("-----------------------");
         sendCommandToServer("delete from marks where Price >= 7000;");
         sendCommandToServer("INSERT INTO marks VALUES ('galaxy22', Samsung, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
         reponse = sendCommandToServer("select * from marks;");
         System.out.println(reponse);
-
     }
+
+    //table db attribute name can't be keyword, and keyword is not case sensitive
+    @Test
+    public void testKeyWordsCase(){
+        String response = sendCommandToServer("CREATE DATABASE " + "create" + ";");
+        assertTrue(response.contains("[ERROR]"));
+
+        String randomName = generateRandomName();
+        response = sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        assertTrue(response.contains("[OK]"));
+        sendCommandToServer("USE " + randomName + ";");
+
+        response = sendCommandToServer("CREATE TABLE and (Name, Brand, Price);");
+        assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("CREATE TABLE marks (Name, or, Price);");
+        assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        assertTrue(response.contains("[OK]"));
+    }
+
+
 
 }

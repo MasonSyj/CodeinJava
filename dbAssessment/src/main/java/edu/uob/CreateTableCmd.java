@@ -22,12 +22,20 @@ public class CreateTableCmd extends Command{
     @Override
     public String execute() {
         try {
+            if (SQLKeywords.SQLKeyWords.contains(getTableName().toUpperCase())){
+                return "[ERROR], TableName Name cannot be SQL Keywords.";
+            }
+
             File fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
             //this seems to nested here, change, +
             if (fileContainTable.createNewFile()) {
                 String attributeLine = "id\t";
                 // attributeName consists of 0.tablename 1.attribute
                 for (String[] attributeName: attributeList){
+                    if (SQLKeywords.SQLKeyWords.contains(attributeName[1].toUpperCase())){
+                        fileContainTable.delete();
+                        return "[ERROR], attribute Name cannot be SQL Keywords.";
+                    }
                     attributeLine = attributeLine + attributeName[1]+ "\t";
                 }
                 attributeLine = attributeLine.substring(0, attributeLine.length() - 1);

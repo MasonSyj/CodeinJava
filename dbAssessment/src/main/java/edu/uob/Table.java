@@ -97,7 +97,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		for (int j = 0; j < row; j++){
 			List<String> currentItem = new ArrayList<>();
 			for (int i = 0; i < col; i++){
-				currentItem.add((String) columns.get(i).getColumnBody().get(j));
+				currentItem.add(columns.get(i).getColumnBody().get(j));
 			}
 			ans.add(FileDealer.transform2csvLine(currentItem));
 		}
@@ -122,7 +122,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		for (int j = 0; j < row; j++){
 			List<String> currentItem = new ArrayList<>();
 			for (int i = 0; i < index.length; i++){
-				currentItem.add((String) columns.get(index[i]).getColumnBody().get(j));
+				currentItem.add(columns.get(index[i]).getColumnBody().get(j));
 			}
 			ans.add(FileDealer.transform2csvLine(currentItem));
 		}
@@ -157,7 +157,9 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	@Override
 	public void write2File(){
 		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("databases" + File.separator + getDBName() + File.separator + getTableName()), false));
+			File file = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
+
 
 			writer.write(FileDealer.transform2csvLine(attributesName));
 			writer.newLine();
@@ -173,7 +175,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		}
 	}
 
-	public void addItem(List value, ItemType type) {
+	public void addItem(List<String> value, ItemType type) {
 		numofItems++;
 
 
