@@ -17,7 +17,6 @@ public class InsertCmd extends Command{
 	@Override
 	public String execute() {
 		try{
-
 			FileDealer fileContaningTable = new FileDealer(getDBName(), getTableName());
 			Table table = fileContaningTable.file2Table();
 
@@ -25,7 +24,7 @@ public class InsertCmd extends Command{
 				return "[ERROR], A table will n attribute must insert into n values.";
 			}
 
-			table.addItem(valueList);
+			table.addItem(valueList, ItemType.NEW);
 			table.write2File();
 			return "[OK]";
 

@@ -26,15 +26,13 @@ public class FileDealer {
 			throw new RuntimeException(e);
 		}
 
-		String line = null;
-		String attributeLine = null;
+		String line = "";
 		Table ans;
-
 		List<String> attributesList = new ArrayList<String>();
 
 		try {
-			attributeLine = reader.readLine();
-			attributesList = csvLineParse(attributeLine);
+			line = reader.readLine();
+			attributesList = csvLineParse(line);
 
 			line = reader.readLine();
 
@@ -46,7 +44,7 @@ public class FileDealer {
 			while (line != null && line.length() > 0){
 				List valueList = new ArrayList();
 				valueList = csvLineParse(line);
-				ans.addItem(valueList);
+				ans.addItem(valueList, ItemType.OLD);
 				line = reader.readLine();
 			}
 			reader.close();

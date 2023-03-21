@@ -1,10 +1,20 @@
 package edu.uob;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Test {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader
+                (new FileReader("databases" + File.separator + "vrwbjdwuri" + File.separator + "marks"));
+
+        String line = bufferedReader.readLine();
+        while (line != null){
+            System.out.println(line);
+            line = bufferedReader.readLine();
+        }
+
         Table t = new Table(".", "PhoneBrand");
         t.addNewColumn("Name");
         t.addNewColumn("Brand");
@@ -14,20 +24,20 @@ public class Test {
         value1.add("Pixel 7");
         value1.add("Google");
         value1.add("6000");
-        t.addItem(value1);
+        t.addItem(value1, ItemType.NEW);
 
         List<String> value2 = new ArrayList<String>();
         value2.add("Iphone 13");
         value2.add("Apple");
         value2.add("8000");
 
-        t.addItem(value2);
+        t.addItem(value2, ItemType.NEW);
 
         List<String> value3 = new ArrayList<String>();
         value3.add("Xiaomi 10");
         value3.add("Xiaomi");
         value3.add("7000");
-        t.addItem(value3);
+        t.addItem(value3, ItemType.NEW);
 
         t.write2File();
 

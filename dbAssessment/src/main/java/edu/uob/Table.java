@@ -50,7 +50,9 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		columns = new ArrayList<Column>();
 		numofItems = 0;
 		tableKey = getDBName() + getTableName();
-		ref.put(tableKey, 0);
+		if (!ref.containsKey(tableKey)){
+			ref.put(tableKey, 0);
+		}
 	}
 
 	public String getDBName() {
@@ -156,23 +158,13 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	public void write2File(){
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(new File("databases" + File.separator + getDBName() + File.separator + getTableName()), false));
-//			writer.write("");
-			int row = columns.get(0).getColumnBody().size();
-			int col = columns.size();
-			String AttributesLine = "";
-			for (String attribute: attributesName){
 
-				AttributesLine = AttributesLine + attribute + "\t";
-			}
-			writer.write(AttributesLine);
+			writer.write(FileDealer.transform2csvLine(attributesName));
 			writer.newLine();
 
-			for (int i = 0; i < row; i++){
-				String entry = "";
-				for (int j = 0; j < col; j++){
-					entry = entry + columns.get(j).getColumnBody().get(i) + "\t";
-				}
-				writer.write(entry);
+			List<String> items = getAllItems();
+			for (String item: items){
+				writer.write(item);
 				writer.newLine();
 			}
 			writer.close();
@@ -181,18 +173,23 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		}
 	}
 
-	public void addItem(List value) {
+	public void addItem(List value, ItemType type) {
 		numofItems++;
 
-		if (value.size() != this.numofAttributes - 1){
-			return;
+
+		if (type == ItemType.OLD && value.size() == this.numofAttributes){
+			for (int j = 0; j < numofAttributes; j++){
+				columns.get(j).addValue(String.valueOf(value.get(j)));
+			}
+		}else if (type == ItemType.NEW && value.size() + 1 == this.numofAttributes){
+			for (int j = 1; j < numofAttributes; j++){
+				columns.get(j).addValue(String.valueOf(value.get(j - 1)));
+			}
+			columns.get(0).addValue(String.valueOf(ref.get(tableKey) + 1));
+			ref.replace(tableKey, ref.get(tableKey) + 1);
 		}
 
-		for (int j = 1; j < numofAttributes; j++){
-			columns.get(j).addValue(String.valueOf(value.get(j - 1)));
-		}
-		columns.get(0).addValue(String.valueOf(ref.get(tableKey) + 1));
-		ref.replace(tableKey, ref.get(tableKey) + 1);
+
 	}
 
 	public void cleanAll(){
@@ -229,7 +226,8 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		int attributeIndex = attributesName.indexOf(condition.getAttribute());
 
 		if (operator.equals("==")){
-			return Double.valueOf(t.split("\t")[attributeIndex]) == Double.valueOf(value);
+			return t.split("\t")[attributeIndex].equals(value);
+//			return Double.valueOf(t.split("\t")[attributeIndex]) == Double.valueOf(value);
 		}else if (operator.equals(">")){
 			return Double.valueOf(t.split("\t")[attributeIndex]) > Double.valueOf(value);
 		}else if (operator.equals("<")){

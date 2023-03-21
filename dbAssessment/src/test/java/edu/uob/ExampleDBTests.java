@@ -46,13 +46,13 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
         sendCommandToServer("INSERT INTO marks VALUES ('Dave', 55, TRUE);");
-//        sendCommandToServer("INSERT INTO marks VALUES ('Bob', 35, FALSE);");
-//        sendCommandToServer("INSERT INTO marks VALUES ('Clive', 20, FALSE);");
-//        String response = sendCommandToServer("SELECT * FROM marks;");
-//        assertTrue(response.contains("[OK]"), "A valid query was made, however an [OK] tag was not returned");
-//        assertFalse(response.contains("[ERROR]"), "A valid query was made, however an [ERROR] tag was returned");
-//        assertTrue(response.contains("Steve"), "An attempt was made to add Steve to the table, but they were not returned by SELECT *");
-//        assertTrue(response.contains("Clive"), "An attempt was made to add Clive to the table, but they were not returned by SELECT *");
+        sendCommandToServer("INSERT INTO marks VALUES ('Bob', 35, FALSE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Clive', 20, FALSE);");
+        String response = sendCommandToServer("SELECT * FROM marks;");
+        assertTrue(response.contains("[OK]"), "A valid query was made, however an [OK] tag was not returned");
+        assertFalse(response.contains("[ERROR]"), "A valid query was made, however an [ERROR] tag was returned");
+        assertTrue(response.contains("Steve"), "An attempt was made to add Steve to the table, but they were not returned by SELECT *");
+        assertTrue(response.contains("Clive"), "An attempt was made to add Clive to the table, but they were not returned by SELECT *");
     }
 
     // A test to make sure that querying returns a valid ID (this test also implicitly checks the "==" condition)
@@ -65,6 +65,7 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
         String response = sendCommandToServer("SELECT id FROM marks WHERE name == 'Steve';");
+        System.out.println(response);
         // Convert multi-lined responses into just a single line
         String singleLine = response.replace("\n"," ").trim();
         // Split the line on the space character
@@ -313,7 +314,8 @@ public class ExampleDBTests {
 
     @Test
     public void testTableUpdateClass(){
-        Table t = new Table(".", "PhoneBrand");
+        Table t = new Table("Electronics", "PhoneBrand");
+        t.addNewColumn("id");
         t.addNewColumn("Name");
         t.addNewColumn("Brand");
         t.addNewColumn("Price");
@@ -322,32 +324,31 @@ public class ExampleDBTests {
         value1.add("Pixel 7");
         value1.add("Google");
         value1.add("6000");
-        t.addItem(value1);
+        t.addItem(value1, ItemType.NEW);
 
         List<String> value2 = new ArrayList<String>();
         value2.add("Iphone 13");
         value2.add("Apple");
         value2.add("8000");
 
-        t.addItem(value2);
+        t.addItem(value2, ItemType.NEW);
 
         List<String> value3 = new ArrayList<String>();
         value3.add("Xiaomi 10");
         value3.add("Xiaomi");
         value3.add("7000");
-        t.addItem(value3);
+        t.addItem(value3, ItemType.NEW);
 
         t.write2File();
 
         assertTrue(t.getNumofItems() == 3);
 
-        String newvalu1 = "Huawei\tMate40\t5000";
+        String newvalu1 = "4\tHuawei\tMate40\t5000";
         List<String> ref = new ArrayList<String>();
         ref.add(newvalu1);
         t.updateClass(ref);
 
         assertTrue(t.getNumofItems() == 1);
-
     }
 
     @Test
@@ -356,6 +357,7 @@ public class ExampleDBTests {
         String b = "Pear 6 France";
         String c = "Banana 4 German";
         String d = "Orange 9 Italy";
+        String e = "Orange 9 Italy";
 
 
         List<String> first = Arrays.asList(a, b, c);
@@ -365,6 +367,16 @@ public class ExampleDBTests {
         assertTrue(res1.size() == 2);
 
         List<String> res2 = BoolOperation.or(first, second);
+        assertTrue(res2.size() == 4);
+
+        first = Arrays.asList(a, b, c, e);
+        second = Arrays.asList(a, b, d, e);
+
+        res1 = BoolOperation.and(first, second);
+        assertTrue(res1.size() == 3);
+
+        res2 = BoolOperation.or(first, second);
+        System.out.println(res2.size());
         assertTrue(res2.size() == 4);
     }
 
@@ -390,6 +402,30 @@ public class ExampleDBTests {
         for (String token: tokens){
             System.out.println(token);
         }
+    }
+
+    @Test
+    public void testAutoId() {
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        sendCommandToServer("delete from marks where Brand like Huawei;");
+        sendCommandToServer("INSERT INTO marks VALUES ('galaxy23', Samsung, 6000);");
+        String reponse = sendCommandToServer("select * from marks;");
+        System.out.println(reponse);
+        System.out.println("-----------------------");
+        sendCommandToServer("delete from marks where Price >= 7000;");
+        sendCommandToServer("INSERT INTO marks VALUES ('galaxy22', Samsung, 7000);");
+        reponse = sendCommandToServer("select * from marks;");
+        System.out.println(reponse);
+
     }
 
 }
