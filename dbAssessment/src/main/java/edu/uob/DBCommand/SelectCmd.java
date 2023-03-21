@@ -2,6 +2,7 @@ package edu.uob.DBCommand;
 
 import edu.uob.ConditionDealer;
 import edu.uob.DBCommand.Command;
+import edu.uob.Exceptions.interpException;
 import edu.uob.FileDealer;
 import edu.uob.Table;
 
@@ -28,7 +29,7 @@ public class SelectCmd extends Command {
         return attributesNames;
     }
     @Override
-    public String execute(){
+    public String execute() throws interpException {
         try{
             FileDealer fd = new FileDealer(getDBName(), getTableName());
             Table table = fd.file2Table();
@@ -54,7 +55,7 @@ public class SelectCmd extends Command {
             }
             return res;
         } catch (Exception e){
-            return "[ERROR], failed to get items.\n";
+            throw new interpException("[ERROR], failed to get items.\n");
         }
     }
 

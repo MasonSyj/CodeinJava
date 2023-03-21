@@ -1,5 +1,6 @@
 package edu.uob.DBCommand;
 
+import edu.uob.Exceptions.interpException;
 import edu.uob.FileDealer;
 import edu.uob.Enums.ItemType;
 import edu.uob.Table;
@@ -16,13 +17,13 @@ public class InsertCmd extends Command {
 	}
 
 	@Override
-	public String execute() {
+	public String execute() throws interpException {
 		try{
 			FileDealer fileContaningTable = new FileDealer(getDBName(), getTableName());
 			Table table = fileContaningTable.file2Table();
 
 			if (table.getNumofAttributes() != valueList.size() + 1){
-				return "[ERROR], A table will n attribute must insert into n values.";
+				throw new interpException("[ERROR], A table will n attribute must insert into n values.");
 			}
 
 			table.addItem(valueList, ItemType.NEW);
@@ -30,7 +31,8 @@ public class InsertCmd extends Command {
 			return "[OK]";
 
 		}catch(Exception e){
-			return "[ERROR], Insert Command Failed.";
+			throw new interpException("[ERROR], Insert Command Failed.");
+
 		}
 
 	}

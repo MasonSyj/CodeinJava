@@ -1,8 +1,10 @@
 package edu.uob;
 
+import edu.uob.Exceptions.DBException;
+import edu.uob.Exceptions.parseException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -46,7 +48,11 @@ public class DBServer {
         // TODO implement your server logic here
         List<String> tokens = Token.setup(command);
         Parser parser = new Parser(tokens);
-        parser.cmdSearch();
+        try{
+            parser.cmdSearch();
+        }catch (DBException e){
+            return e.getMessage();
+        }
 
         return parser.getExecResult();
     }

@@ -2,6 +2,7 @@ package edu.uob;
 
 import edu.uob.DBCommand.*;
 import edu.uob.Enums.AlterationType;
+import edu.uob.Exceptions.parseException;
 
 import java.util.*;
 
@@ -24,16 +25,13 @@ public class Parser {
 		return execResult;
 	}
 
-	public void cmdSearch(){
+	public void cmdSearch() throws parseException {
 		if (tokens.contains(Token.wrongComparator)){
-			execResult = "[ERROR] Query contains wrong comparator.";
-			return;
+			throw new parseException("[ERROR] Query contains wrong comparator.");
 		}
 		String cmd = tokens.get(0);
 		if (!tokens.get(tokens.size() - 1).equals(";")){
-			execResult = "[ERROR] Query doesn't end with ';'";
-//			throw new IllegalArgumentException("Query doesn't end with ';'");
-			return;
+			throw new parseException("[ERROR] Query doesn't end with ';'");
 		}
 
 		switch(cmd.toUpperCase()){
@@ -46,10 +44,11 @@ public class Parser {
 			case "DELETE": parseDELETE(); break;
 			case "DROP": parseDROP(); break;
 			case "JOIN": parseJOIN(); break;
+			default: throw new parseException("[ERROR], Don't know what operation you want to do;");
 		}
 	}
 
-	private void parseUPDATE() {
+	private void parseUPDATE() throws parseException {
 		if (!tokens.get(2).toLowerCase().equals("set")){
 
 		}
@@ -63,11 +62,11 @@ public class Parser {
 		}
 
 		if (ConditionBeginIndex == -1){
-			throw new IllegalArgumentException("Update operation needs to have a where");
+			throw new parseException("[ERROR], Update operation needs to have a where");
 		}
 
 		if (ConditionBeginIndex == tokens.size()){
-			throw new IllegalArgumentException("Update operation must have condition(s)");
+			throw new parseException("[ERROR], Update operation must have condition(s)");
 		}
 
 		parseConditions(ConditionBeginIndex);
@@ -77,13 +76,13 @@ public class Parser {
 
 	}
 
-	private void parseDELETE() {
+	private void parseDELETE() throws parseException {
 		if (!tokens.get(1).toLowerCase().equals("from")){
-			throw new IllegalArgumentException("DELETE operation must come with a FROM");
+			throw new parseException("[ERROR], DELETE operation must come with a FROM");
 		}
 
 		if (!tokens.get(3).toLowerCase().equals("where")){
-			throw new IllegalArgumentException("DELETE operation must hava a WHERE");
+			throw new parseException("[ERROR], DELETE operation must hava a WHERE");
 		}
 
 		parseConditions(4);
@@ -92,9 +91,9 @@ public class Parser {
 		execResult = deleteCmd.execute();
 	}
 
-	private void parseALTER() {
+	private void parseALTER() throws parseException {
 		if (!tokens.get(1).toLowerCase().equals("table")){
-			throw new IllegalArgumentException("ALTER operation must come with a TABLE");
+			throw new parseException("[ERROR], ALTER operation must come with a TABLE");
 		}else{
 			AlterationType type;
 			if (tokens.get(3).toLowerCase().equals("add")){
@@ -102,7 +101,7 @@ public class Parser {
 			}else if (tokens.get(3).toLowerCase().equals("drop")){
 				type = AlterationType.DROP;
 			}else{
-				throw new IllegalArgumentException("Alter operation doesn't do add or drop.");
+				throw new parseException("[ERROR], Alter operation doesn't do add or drop.");
 			}
 
 			AlterCmd alterCmd = new AlterCmd(currentDBName, tokens.get(2), type, tokens.get(4));
@@ -110,7 +109,7 @@ public class Parser {
 		}
 	}
 
-	private void parseDROP() {
+	private void parseDROP() throws parseException {
 		if (tokens.get(1).toLowerCase().equals("database")){
 			DropDBCmd dropDBCmd = new DropDBCmd(tokens.get(2), null);
 			execResult = dropDBCmd.execute();
@@ -118,11 +117,11 @@ public class Parser {
 			DropTableCmd dropTableCmd = new DropTableCmd(currentDBName, tokens.get(2));
 			execResult = dropTableCmd.execute();
 		}else{
-			throw new IllegalArgumentException("Drop Query needs to know it's database or table");
+			throw new parseException("[ERROR], Drop Query needs to know it's database or table");
 		}
 	}
 
-	private void parseSELECT() {
+	private void parseSELECT() throws parseException {
 		List<String> conditionTokens = null;
 		for (int i = 0; i < tokens.size(); i++){
 			if (tokens.get(i).toLowerCase().equals("where")){
@@ -133,7 +132,7 @@ public class Parser {
 
 		if (tokens.get(1).equals("*")){
 			if (!tokens.get(2).toLowerCase().equals("from")){
-				throw new IllegalArgumentException("Select Query needs to have word: 'from'\n");
+				throw new parseException("[ERROR], Select Query needs to have word: 'from'\n");
 			}
 
 			SelectCmd selectCmd = new SelectCmd(currentDBName, tokens.get(3), null, conditionTokens);
@@ -157,18 +156,19 @@ public class Parser {
 
 	private void parseUSE() {
 		UseCmd useCmd = new UseCmd(tokens.get(1));
-		if (useCmd.execute().contains("exists")){
-			currentDBName = useCmd.getDBName().toString();
+		execResult = useCmd.execute();
+		if (execResult.contains("exists")){
+			currentDBName = useCmd.getDBName();
 		}
 	}
 
-	private void parseJOIN() {
+	private void parseJOIN() throws parseException {
 		if (!tokens.get(2).toLowerCase().equals("and")){
-			throw new IllegalArgumentException("Join operation needs an AND after first tablename");
+			throw new parseException("[ERROR], Join operation needs an AND after first tablename");
 		}else if (!tokens.get(4).toLowerCase().equals("on")){
-			throw new IllegalArgumentException("Join operation needs an ON after second tablename");
+			throw new parseException("[ERROR], Join operation needs an ON after second tablename");
 		}else if (!tokens.get(6).toLowerCase().equals("and")){
-			throw new IllegalArgumentException("Join operation needs an AND after first Attribute name");
+			throw new parseException("[ERROR], Join operation needs an AND after first Attribute name");
 		}
 
 		JoinCmd joinCmd = new JoinCmd(currentDBName, tokens.get(1), tokens.get(3), tokens.get(5), tokens.get(7));
@@ -176,7 +176,7 @@ public class Parser {
 
 	}
 
-	private void parseCREATE() {
+	private void parseCREATE() throws parseException {
 		if (tokens.get(1).toLowerCase().equals("database")){
 //			currentDBName = tokens.get(2);
 			CreateDBCmd createDBCmd = new CreateDBCmd(tokens.get(2));
@@ -189,23 +189,25 @@ public class Parser {
 			}
 
 		} else{
-			throw new IllegalArgumentException("CREATE cmd should come with DATABASE or TABLE");
+			throw new parseException("[ERROR], CREATE cmd should come with DATABASE or TABLE");
 		}
 
 	}
 
-	private void parseINSERT() {
+	private void parseINSERT() throws parseException {
 		if (!tokens.get(1).toLowerCase().equals("into")){
-			throw new IllegalArgumentException("INSERT cmd should come with a INTO");
+			execResult = "[ERROR], INSERT cmd should come with a INTO";
+//			throw new IllegalArgumentException("INSERT cmd should come with a INTO");
+			throw new parseException("[ERROR], INSERT cmd should come with a INTO");
 		}
 		String tableName = tokens.get(2);
 
 		if (!tokens.get(3).toLowerCase().equals("values")){
-			throw new IllegalArgumentException("INSERT cmd should come with a VALUES");
+			throw new parseException("[ERROR], INSERT cmd should come with a VALUES");
 		}
 
 		if (!tokens.get(4).equals("(")){
-			throw new IllegalArgumentException("INSERT cmd should come with a ( after VALUES)");
+			throw new parseException("[ERROR], INSERT cmd should come with a ( after VALUES)");
 		}
 
 		List<String> valueList = parseValueList(tokens, 5);
@@ -216,7 +218,6 @@ public class Parser {
 
 	public void parseConditions(int index){
 		for (int i = index; i < tokens.size() - 1; i++){
-//			System.out.println(tokens.get(i));
 			for (String specialChar: ConditionDealer.operator){
 				if (tokens.get(i).equals(specialChar)){
 					String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " " + tokens.get(i + 1);
@@ -229,7 +230,7 @@ public class Parser {
 		tokens.remove(tokens.size() - 1);
 	}
 
-	private List<String> parseValueList(List<String> tokens, int index) {
+	private List<String> parseValueList(List<String> tokens, int index) throws parseException {
 		List<String> ans = new ArrayList<String>();
 		try{
 			while (!tokens.get(index).equals(")")){
@@ -239,13 +240,13 @@ public class Parser {
 				index++;
 			}
 		}catch (Exception e){
-			throw new RuntimeException("ValueList didn't end correctly");
+			throw new parseException("[ERROR], ValueList didn't end correctly");
 		}
 
 		return ans;
 	}
 
-	public List<List<String>> parseNameValueList(List<String> tokens){
+	public List<List<String>> parseNameValueList(List<String> tokens) throws parseException {
 		List<List<String>> res = new ArrayList<>();
 
 		int i = 3;
@@ -254,7 +255,7 @@ public class Parser {
 			try{
 				for (int cnt = 0; cnt < 3; cnt++){
 					if (cnt == 1 && !tokens.get(i).equals("=")){
-						throw new IllegalArgumentException("Set Name Value List needs to have a equation including a '='");
+						throw new parseException("[ERROR], Set Name Value List needs to have a equation including a '='");
 					}
 					curNameValuePair.add(tokens.get(i++));
 
@@ -265,7 +266,7 @@ public class Parser {
 					i++;
 				}
 			} catch (Exception e){
-				throw new IllegalArgumentException("NameValueList is incomplete");
+				throw new parseException("[ERROR], NameValueList is incomplete");
 			}
 
 		}
@@ -273,7 +274,7 @@ public class Parser {
 		return res;
 	}
 
-	private List<String[]> parseAttributeList(List<String> tokens, String defaultTableName, int index) {
+	private List<String[]> parseAttributeList(List<String> tokens, String defaultTableName, int index) throws parseException {
 		List<String[]> ans = new ArrayList<>();
 		try{
 			while (!tokens.get(index).equals(")") && !tokens.get(index).toLowerCase().equals("from")){
@@ -300,7 +301,7 @@ public class Parser {
 				index++;
 			}
 		}catch (Exception e){
-			throw new RuntimeException("AttributeList didn't build correctly");
+			throw new parseException("AttributeList didn't build correctly");
 		}
 
 		return ans;

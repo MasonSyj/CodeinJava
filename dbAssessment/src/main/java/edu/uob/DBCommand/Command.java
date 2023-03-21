@@ -1,5 +1,7 @@
 package edu.uob.DBCommand;
 
+import edu.uob.Exceptions.interpException;
+
 public abstract class Command {
     private String DBName;
     private String tableName;
@@ -17,5 +19,5 @@ public abstract class Command {
         return tableName;
     }
 
-    public abstract String execute();
+    public abstract String execute() throws interpException;
 }

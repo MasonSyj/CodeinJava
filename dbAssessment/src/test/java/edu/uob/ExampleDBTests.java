@@ -278,14 +278,16 @@ public class ExampleDBTests {
     public void testJoin(){
         String randomName = generateRandomName();
         System.out.println(randomName);
+        String response;
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
-        sendCommandToServer("USE " + randomName + ";");
+        response = sendCommandToServer("USE " + randomName + ";");
+        System.out.println(response);
         sendCommandToServer("CREATE TABLE customers (Customid, name, email);");
         sendCommandToServer("CREATE TABLE orders (Orderid, order_date, cost);");
         sendCommandToServer("INSERT INTO customers VALUES (21, 'John Doe', 'johndoe@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (22, 'Jane Smith', 'janesmith@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (23, 'Bob Johnson', 'bjohnson@example.com');");
-        String response = sendCommandToServer("Select * from customers;");
+        response = sendCommandToServer("Select * from customers;");
         System.out.println(response);
 
         sendCommandToServer("INSERT INTO orders VALUES (21, '2022-01-01', 100);");

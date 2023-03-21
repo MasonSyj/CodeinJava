@@ -2,6 +2,7 @@ package edu.uob.DBCommand;
 
 import edu.uob.BoolOperation;
 import edu.uob.DBCommand.Command;
+import edu.uob.Exceptions.interpException;
 import edu.uob.FileDealer;
 import edu.uob.Table;
 
@@ -54,7 +55,7 @@ public class JoinCmd extends Command {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws interpException {
         FileDealer fd1 = new FileDealer(getDBName(), getTableName());
         FileDealer fd2 = new FileDealer(getDBName(), secondTableName);
 
@@ -68,7 +69,7 @@ public class JoinCmd extends Command {
         int indexSecondTable = getSecondTableIndex(secondTable);
 
         if (indexSecondTable == -1 || indexFirstTable == -1){
-            throw new IllegalArgumentException("Join command can't find common thing to join");
+            throw new interpException("Join command can't find common thing to join");
         }
 
         List<String> rawJoin = BoolOperation.join(itemsFirstTable, itemsSecondTable, indexFirstTable, indexSecondTable);
@@ -83,9 +84,9 @@ public class JoinCmd extends Command {
         if (indexSecondTable != 0){
             numofColumns--;
         }
+
         int[] indexs = new int[numofColumns];
         int cnt = 0;
-
         String attributeLine = "id\t";
 
         for (int i = 1; i < firstTable.getNumofAttributes(); i++) {
@@ -95,8 +96,11 @@ public class JoinCmd extends Command {
 
 
         for (int i = 1; i < secondTable.getNumofAttributes(); i++){
-            attributeLine = attributeLine + secondTable.getTableName() + "." + secondTable.getAttributesName().get(i) + "\t";
+            if (i == indexSecondTable){
+                continue;
+            }
             indexs[cnt++] = firstTable.getNumofAttributes() + i;
+            attributeLine = attributeLine + secondTable.getTableName() + "." + secondTable.getAttributesName().get(i) + "\t";
         }
 
         List<String> trimmedRes = new ArrayList<>();

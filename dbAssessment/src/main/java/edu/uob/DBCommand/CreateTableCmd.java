@@ -1,6 +1,7 @@
 package edu.uob.DBCommand;
 
 import edu.uob.DBCommand.Command;
+import edu.uob.Exceptions.interpException;
 import edu.uob.SQLKeywords;
 
 import java.io.BufferedWriter;
@@ -22,10 +23,10 @@ public class CreateTableCmd extends Command {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws interpException {
         File fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
         if (SQLKeywords.SQLKeyWords.contains(getTableName().toUpperCase())){
-            return "[ERROR], TableName Name cannot be SQL Keywords.";
+            throw new interpException("[ERROR], TableName Name cannot be SQL Keywords.");
         }
 
         try {
@@ -33,7 +34,7 @@ public class CreateTableCmd extends Command {
                 String attributeLine = setUpAttributeLine();
                 if (attributeLine == null){
                     fileContainTable.delete();
-                    return "[ERROR], AttributeName cannot be keywords.";
+                    throw new interpException("[ERROR], AttributeName cannot be keywords.");
                 }
                 BufferedWriter writer = new BufferedWriter(new FileWriter(fileContainTable));
                 writer.write(attributeLine);
@@ -43,7 +44,8 @@ public class CreateTableCmd extends Command {
                 return "[ERROR]. Table already exists";
             }
         } catch (IOException e) {
-            return "[ERROR], Failed to create Table";
+            throw new interpException("[ERROR], Failed to create Table");
+
         }
     }
 

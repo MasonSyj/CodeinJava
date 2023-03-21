@@ -2,6 +2,7 @@ package edu.uob.DBCommand;
 
 import edu.uob.*;
 import edu.uob.Enums.AlterationType;
+import edu.uob.Exceptions.interpException;
 
 public class AlterCmd extends Command {
     AlterationType alterationType;
@@ -13,7 +14,7 @@ public class AlterCmd extends Command {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws interpException {
         if (alterationType == AlterationType.ADD){
             return addAttribute();
         }else{
@@ -21,16 +22,17 @@ public class AlterCmd extends Command {
         }
     }
 
-    public String addAttribute(){
+    public String addAttribute() throws interpException {
         if (SQLKeywords.SQLKeyWords.contains(attributeName.toUpperCase())){
-            return "[ERROR], attribute Name cannot be SQL Keywords.";
+            throw new interpException("[ERROR], attribute Name cannot be SQL Keywords.");
         }
 
         // this two line appeared many times, may add to the Parent Class: Command
         FileDealer fd = new FileDealer(getDBName(), getTableName());
         Table table = fd.file2Table();
         if (table.getAttributesName().contains(attributeName)){
-            return "[ERROR] attribute already exists";
+            throw new interpException("[ERROR] attribute already exists");
+
         }else{
             table.addNewColumn(attributeName);
             table.write2File();
@@ -38,13 +40,13 @@ public class AlterCmd extends Command {
         }
     }
 
-    public String dropAttribute(){
+    public String dropAttribute() throws interpException {
         FileDealer fd = new FileDealer(getDBName(), getTableName());
         Table table = fd.file2Table();
         if (table.dropColumn(attributeName)){
             return "[OK], drop attribute " + attributeName + " successfully";
         }else{
-            return "[ERROR], failed to drop attribute " + attributeName;
+            throw new interpException("[ERROR], failed to drop attribute " + attributeName);
         }
     }
 

@@ -3,6 +3,7 @@ package edu.uob.DBCommand;
 import edu.uob.BoolOperation;
 import edu.uob.ConditionDealer;
 import edu.uob.DBCommand.Command;
+import edu.uob.Exceptions.interpException;
 import edu.uob.FileDealer;
 import edu.uob.Table;
 
@@ -26,7 +27,7 @@ public class UpdateCmd extends Command {
 
 
     @Override
-    public String execute() {
+    public String execute()  throws interpException{
         try{
             FileDealer fd = new FileDealer(getDBName(), getTableName());
             Table table = fd.file2Table();
@@ -50,7 +51,7 @@ public class UpdateCmd extends Command {
             table.write2File();
             return "[OK], update succeed";
         } catch (Exception e){
-            return "[ERROR], failed to update";
+            throw new interpException("[ERROR], failed to update");
         }
     }
 }

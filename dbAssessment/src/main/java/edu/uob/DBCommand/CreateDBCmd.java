@@ -1,6 +1,7 @@
 package edu.uob.DBCommand;
 
 import edu.uob.DBCommand.Command;
+import edu.uob.Exceptions.interpException;
 import edu.uob.SQLKeywords;
 
 import java.io.File;
@@ -10,10 +11,10 @@ public class CreateDBCmd extends Command {
         super(DBname, null);
     }
 
-    public String execute(){
+    public String execute() throws interpException {
         try{
             if (SQLKeywords.SQLKeyWords.contains(getDBName().toUpperCase())){
-                return "[ERROR], Database Name cannot be SQL Keywords.";
+                throw new interpException("[ERROR], Database Name cannot be SQL Keywords.");
             }
             File theDir = new File("databases" + File.separator + getDBName());
 //            File theDir = new File(getDBName());
@@ -22,7 +23,7 @@ public class CreateDBCmd extends Command {
             }
             return "[OK], Database created successfully";
         }catch (Exception e){
-            return "[ERROR], Database failed to create.";
+            throw new interpException("[ERROR], Database failed to create.");
         }
     }
 

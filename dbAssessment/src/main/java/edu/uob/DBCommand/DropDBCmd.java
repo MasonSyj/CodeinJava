@@ -2,6 +2,7 @@ package edu.uob.DBCommand;
 
 
 import edu.uob.DBCommand.Command;
+import edu.uob.Exceptions.interpException;
 
 import java.io.File;
 
@@ -11,7 +12,7 @@ public class DropDBCmd extends Command {
 		super(DBName, tableName);
 	}
 
-	public void deleteDirectory(File directory){
+	public void deleteDirectory(File directory) throws interpException {
 		try{
 			if (directory.isDirectory()){
 				File[] files = directory.listFiles();
@@ -29,11 +30,11 @@ public class DropDBCmd extends Command {
 			}
 
 		} catch (Exception e){
-			throw new RuntimeException("[ERROR] happened , Database failed to drop");
+			throw new interpException("[ERROR] happened , Database failed to drop");
 		}
 	}
 	@Override
-	public String execute() {
+	public String execute() throws interpException {
 		File directoryRepresentDB = new File("databases" + File.separator + getDBName());
 		if (!directoryRepresentDB.exists()){
 			return "[ERROR] , Database doesn't exist";
@@ -43,7 +44,7 @@ public class DropDBCmd extends Command {
 		directoryRepresentDB.delete();
 
 		if (directoryRepresentDB.exists()){
-			return "[ERROR] , Database failed to drop";
+			throw new interpException("[ERROR] happened , Database failed to drop");
 		}else{
 			return "[OK] ， Database droped succesfully";
 		}

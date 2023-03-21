@@ -2,6 +2,7 @@ package edu.uob.DBCommand;
 
 import edu.uob.ConditionDealer;
 import edu.uob.DBCommand.Command;
+import edu.uob.Exceptions.interpException;
 import edu.uob.FileDealer;
 import edu.uob.Table;
 
@@ -17,7 +18,7 @@ public class DeleteCmd extends Command {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws interpException {
         try {
             FileDealer fd = new FileDealer(getDBName(), getTableName());
             Table table = fd.file2Table();
@@ -30,7 +31,8 @@ public class DeleteCmd extends Command {
             table.write2File();
             return "[OK], items deleted successfully";
         } catch (Exception e) {
-            return "[ERROR], failed to delete items";
+            throw new interpException("[ERROR], failed to delete items");
+
         }
     }
 
