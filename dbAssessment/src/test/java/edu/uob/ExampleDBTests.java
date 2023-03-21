@@ -455,6 +455,7 @@ public class ExampleDBTests {
         response = sendCommandToServer("CREATE TABLE marks (Name, or, Price);");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
     }
 

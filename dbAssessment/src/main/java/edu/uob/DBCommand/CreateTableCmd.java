@@ -32,9 +32,9 @@ public class CreateTableCmd extends Command {
             if (fileContainTable.createNewFile()) {
                 String attributeLine = setUpAttributeLine();
                 if (attributeLine == null){
+                    fileContainTable.delete();
                     return "[ERROR], AttributeName cannot be keywords.";
                 }
-
                 BufferedWriter writer = new BufferedWriter(new FileWriter(fileContainTable));
                 writer.write(attributeLine);
                 writer.flush();
@@ -43,9 +43,6 @@ public class CreateTableCmd extends Command {
                 return "[ERROR]. Table already exists";
             }
         } catch (IOException e) {
-            if (fileContainTable.exists()){
-                fileContainTable.delete();
-            }
             return "[ERROR], Failed to create Table";
         }
     }

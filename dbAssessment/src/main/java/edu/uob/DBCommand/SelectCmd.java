@@ -28,10 +28,11 @@ public class SelectCmd extends Command {
         return attributesNames;
     }
 
+
     @Override
     public String execute() {
         try{
-            // change still needed
+            // maube just split into four methods
             FileDealer fd = new FileDealer(getDBName(), getTableName());
             Table table = fd.file2Table();
             if (attributeList == null){
