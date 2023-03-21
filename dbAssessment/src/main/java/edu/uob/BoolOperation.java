@@ -1,6 +1,7 @@
 package edu.uob;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,20 @@ public class BoolOperation {
         for (String str: a){
             if (b.contains(str)){
                 res.remove(str);
+            }
+        }
+        return res;
+    }
+
+    public static List<String> join(List<String> a, List<String> b, int indexA, int indexB){
+        List<String> res = new ArrayList<String>();
+        for (String stra : a){
+            for (String strb: b){
+                if (Arrays.stream(stra.split("\t")).toList().get(indexA)
+                        .equals(Arrays.stream(strb.split("\t")).toList().get(indexB))){
+                    res.add(stra + "\t" + strb);
+                    break;
+                }
             }
         }
         return res;

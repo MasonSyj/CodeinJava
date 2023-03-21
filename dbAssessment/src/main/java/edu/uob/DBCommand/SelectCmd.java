@@ -52,7 +52,6 @@ public class SelectCmd extends Command {
             for (String item: table.getParialColumn(attributesNames)){
                 res = res + item + "\n";
             }
-
             return res;
         } catch (Exception e){
             return "[ERROR], failed to get items.\n";

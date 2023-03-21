@@ -410,7 +410,7 @@ public class ExampleDBTests {
 
     @Test
     public void testEdgeCasesQuery(){
-        List<String> tokens = Token.setup("pass==False id=>7 num=<5 mark > = 45");
+        List<String> tokens = Token.setup("pass==False id=>7 num=<5 mark > = 45 height > = 180 height >= 180 height> =160");
         for (String token: tokens){
             System.out.println(token);
         }
