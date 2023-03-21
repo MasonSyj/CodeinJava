@@ -1,8 +1,9 @@
-package edu.uob;
+package edu.uob.DBCommand;
 
-import java.util.List;
+import edu.uob.*;
+import edu.uob.Enums.AlterationType;
 
-public class AlterCmd extends Command{
+public class AlterCmd extends Command {
     AlterationType alterationType;
     String attributeName;
     public AlterCmd(String DBName, String tableName, AlterationType type, String attributeName) {
@@ -24,7 +25,6 @@ public class AlterCmd extends Command{
         if (SQLKeywords.SQLKeyWords.contains(attributeName.toUpperCase())){
             return "[ERROR], attribute Name cannot be SQL Keywords.";
         }
-
 
         // this two line appeared many times, may add to the Parent Class: Command
         FileDealer fd = new FileDealer(getDBName(), getTableName());

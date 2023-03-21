@@ -1,5 +1,8 @@
 package edu.uob;
 
+import edu.uob.DBCommand.*;
+import edu.uob.Enums.AlterationType;
+
 import java.util.*;
 
 public class Parser {

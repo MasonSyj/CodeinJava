@@ -1,4 +1,9 @@
-package edu.uob;
+package edu.uob.DBCommand;
+
+import edu.uob.ConditionDealer;
+import edu.uob.DBCommand.Command;
+import edu.uob.FileDealer;
+import edu.uob.Table;
 
 import java.util.*;
 

@@ -1,11 +1,12 @@
-package edu.uob;
+package edu.uob.DBCommand;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import edu.uob.FileDealer;
+import edu.uob.Enums.ItemType;
+import edu.uob.Table;
+
 import java.util.List;
 
-public class InsertCmd extends Command{
+public class InsertCmd extends Command {
 	private List<String> valueList;
 
 	public InsertCmd(String DBName, String tableName, List<String> valueList){

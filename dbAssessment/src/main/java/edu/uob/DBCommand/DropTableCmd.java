@@ -1,8 +1,10 @@
-package edu.uob;
+package edu.uob.DBCommand;
+
+import edu.uob.DBCommand.Command;
 
 import java.io.File;
 
-public class DropTableCmd extends Command{
+public class DropTableCmd extends Command {
 	public DropTableCmd(String DBName, String tableName) {
 		super(DBName, tableName);
 	}

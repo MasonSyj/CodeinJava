@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.Enums;
 
 public enum AndOr {
     AND,

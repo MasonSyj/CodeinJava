@@ -1,8 +1,12 @@
-package edu.uob;
+package edu.uob.DBCommand;
+
+import edu.uob.DBCommand.Command;
+import edu.uob.FileDealer;
+import edu.uob.Table;
 
 import java.util.*;
 
-public class JoinCmd extends Command{
+public class JoinCmd extends Command {
     private String secondTableName;
     private String firstAttributeName;
     private String secondAttributeName;

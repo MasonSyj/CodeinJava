@@ -1,9 +1,10 @@
-package edu.uob;
+package edu.uob.DBCommand;
+
+import edu.uob.DBCommand.Command;
 
 import java.io.File;
-import java.nio.file.Files;
 
-public class UseCmd extends Command{
+public class UseCmd extends Command {
 
     public UseCmd(String DBname){
         super(DBname, null);

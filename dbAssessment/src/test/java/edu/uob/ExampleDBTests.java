@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+
+import edu.uob.Enums.ItemType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -370,6 +372,9 @@ public class ExampleDBTests {
         List<String> first = Arrays.asList(a, b, c);
         List<String> second = Arrays.asList(a, b, d);
 
+        List<String> minus = BoolOperation.AMinusB(first, second);
+        assertTrue(minus.size() == 1);
+
         List<String> res1 = BoolOperation.and(first, second);
         assertTrue(res1.size() == 2);
 
@@ -383,7 +388,6 @@ public class ExampleDBTests {
         assertTrue(res1.size() == 3);
 
         res2 = BoolOperation.or(first, second);
-        System.out.println(res2.size());
         assertTrue(res2.size() == 4);
     }
 
@@ -405,7 +409,7 @@ public class ExampleDBTests {
 
     @Test
     public void testEdgeCasesQuery(){
-        List<String> tokens = Token.setup("pass==False id>=7 num<=5");
+        List<String> tokens = Token.setup("pass==False id=>7 num=<5");
         for (String token: tokens){
             System.out.println(token);
         }

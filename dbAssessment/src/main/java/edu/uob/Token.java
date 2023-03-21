@@ -51,17 +51,40 @@ public class Token {
 		// Again, remove any whitespace from the beginning and end that might have been introduced
 		input = input.trim();
 
-		if (input.contains("> =")){
+		while (input.contains("> =")){
 			input = input.replaceAll("> =", ">=");
 		}
 
-		if (input.contains("< =")){
+		while (input.contains("< =")){
 			input = input.replaceAll("< =", "<=");
 		}
 
-		if (input.contains("= =")){
+		while (input.contains("= =")){
 			input = input.replaceAll("= =", "==");
 		}
+
+		while (input.contains("> =")){
+			input = input.replaceAll("> =", ">=");
+		}
+
+		while (input.contains("= <")){
+			input = input.replaceAll("= <", "<=");
+		}
+
+		while (input.contains("= >")){
+			input = input.replaceAll("= >", ">=");
+		}
+
+//		while (input.contains("=>")){
+//			input = input.replaceAll("=>", ">=");
+//		}
+//
+//		if (input.contains("=<")){
+//			input = input.replaceAll("=<", "<=");
+//		}
+
+
+
 		// Finally split on the space char (since there will now ALWAYS be a space between tokens)
 		return input.split(" ");
 	}

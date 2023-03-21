@@ -1,12 +1,11 @@
-package edu.uob;
+package edu.uob.DBCommand;
 
+
+import edu.uob.DBCommand.Command;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class DropDBCmd extends Command{
+public class DropDBCmd extends Command {
 
 	public DropDBCmd(String DBName, String tableName) {
 		super(DBName, tableName);

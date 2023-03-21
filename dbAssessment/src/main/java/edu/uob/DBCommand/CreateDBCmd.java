@@ -1,8 +1,11 @@
-package edu.uob;
+package edu.uob.DBCommand;
+
+import edu.uob.DBCommand.Command;
+import edu.uob.SQLKeywords;
 
 import java.io.File;
 
-public class CreateDBCmd extends Command{
+public class CreateDBCmd extends Command {
     public CreateDBCmd(String DBname){
         super(DBname, null);
     }

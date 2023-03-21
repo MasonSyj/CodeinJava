@@ -1,4 +1,4 @@
-package edu.uob;
+package edu.uob.DBCommand;
 
 public abstract class Command {
     private String DBName;
