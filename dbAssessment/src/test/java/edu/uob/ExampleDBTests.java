@@ -35,7 +35,7 @@ public class ExampleDBTests {
 
     private String sendCommandToServer(String command) {
         // Try to send a command to the server - this call will timeout if it takes too long (in case the server enters an infinite loop)
-        return assertTimeoutPreemptively(Duration.ofMillis(3000), () -> { return server.handleCommand(command);},
+        return assertTimeoutPreemptively(Duration.ofMillis(1000), () -> { return server.handleCommand(command);},
         "Server took too long to respond (probably stuck in an infinite loop)");
     }
 
@@ -232,7 +232,7 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        String response = sendCommandToServer("update marks set Price = 10000, Brand = HUAWEINB where Brand like Huawei;");
+        String response = sendCommandToServer("update marks set Price =10000, Brand= HUAWEINB where Brand like Huawei;");
         assertTrue(response.contains("[OK]"));
     }
 
@@ -265,11 +265,11 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
         System.out.println("-----------Separate Line-----------");
-        String response = sendCommandToServer("SELECT Name, Brand FROM marks where Price > 6000 and Brand like Apple;");
+        String response = sendCommandToServer("SELECT Name, Brand FROM marks where Price >=6000 and Brand like Apple;");
         System.out.println(response);
         assertTrue(response.contains("Apple"));
         System.out.println("-----------Separate Line-----------");
-        response = sendCommandToServer("SELECT Name, Price FROM marks where Brand like Huawei or Price <= 6000;");
+        response = sendCommandToServer("SELECT Name, Price FROM marks where Brand like Huawei or Price<= 6000;");
         System.out.println(response);
         assertTrue(response.contains("Xiaomi"));
         assertFalse(response.contains("Huawei"));
@@ -458,6 +458,35 @@ public class ExampleDBTests {
         response = sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
         System.out.println(response);
         assertTrue(response.contains("[OK]"));
+    }
+
+    @Test
+    public void testWrongCondition() {
+        String randomName = generateRandomName();
+        System.out.println(randomName);
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        String response = sendCommandToServer("select * from marks where Price>=7000;");
+        String response = sendCommandToServer("select * from marks where Price =7000;");
+        String response = sendCommandToServer("select * from marks where Price>=7000;");
+        String response = sendCommandToServer("select * from marks where Price>=7000;");
+        String response = sendCommandToServer("select * from marks where Price>=7000;");
+        assertTrue(response.contains("Google"));
+        assertTrue(response.contains("Apple"));
+        assertFalse(response.contains("Xiami"));
+
+        response = sendCommandToServer("select * from marks where Price> =7000;");
+        assertTrue(response.contains("Query contains wrong comparator."));
+        System.out.println(response);
+
+        response = sendCommandToServer("select * from marks where Price>=7000");
+        assertTrue(response.contains("[ERROR] Query doesn't end with ';'"));
+        System.out.println(response);
+
     }
 
 

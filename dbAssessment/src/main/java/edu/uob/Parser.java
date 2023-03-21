@@ -25,9 +25,15 @@ public class Parser {
 	}
 
 	public void cmdSearch(){
+		if (tokens.contains(Token.wrongComparator)){
+			execResult = "[ERROR] Query contains wrong comparator.";
+			return;
+		}
 		String cmd = tokens.get(0);
 		if (!tokens.get(tokens.size() - 1).equals(";")){
-			throw new IllegalArgumentException("Query doesn't end with ';'");
+			execResult = "[ERROR] Query doesn't end with ';'";
+//			throw new IllegalArgumentException("Query doesn't end with ';'");
+			return;
 		}
 
 		switch(cmd.toUpperCase()){

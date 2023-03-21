@@ -220,6 +220,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 
 		condition = new Condition(t);
 
+
 		return getAllItems().stream().filter(this).collect(Collectors.toList());
 	}
 
@@ -241,7 +242,7 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 		}else if (operator.equals("<=")){
 			return Double.valueOf(t.split("\t")[attributeIndex]) <= Double.valueOf(value);
 		}else if (operator.equals("!=")){
-			return Double.valueOf(t.split("\t")[attributeIndex]) != Double.valueOf(value);
+			return !t.split("\t")[attributeIndex].equals(value);
 		}else if (operator.toUpperCase().equals("LIKE")){
 			return t.split("\t")[attributeIndex].contains(value);
 		}else{

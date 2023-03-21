@@ -8,7 +8,8 @@ public class Token {
 
 //	String query;
 // 	ArrayList<String> tokens;
-	static String[] specialCharacters = {"(",")",",",";", ">=", "<=", "!=", "==", "=>", "=<", ">", "=", "<"};
+	static String[] specialCharacters = {"(",")",",",";", ">=", "<=", "!=", "==", "=>", "=<", ">", "<", "="};
+	static String wrongComparator = "wrongComparator";
 
 	public static List<String> setup(String query) {
 		List<String> tokens = new ArrayList<String>();
@@ -40,6 +41,13 @@ public class Token {
 
 	public static String[] tokenise(String input)
 	{
+		while (input.contains(wrongComparator)){
+			wrongComparator = wrongComparator + "!";
+		}
+		while (input.contains("  ")) input = input.replaceAll("  ", " ");
+		while (input.contains("> =")) input = input.replaceAll("> =", " " + wrongComparator + " ");
+		while (input.contains("< =")) input = input.replaceAll("< =", " " + wrongComparator + " ");
+		while (input.contains("= =")) input = input.replaceAll("= =", " " + wrongComparator + " ");
 		// Add in some extra padding spaces around the "special characters"
 		// so we can be sure that they are separated by AT LEAST one space (possibly more)
 		for(int i=0; i<specialCharacters.length;i++) {
@@ -52,7 +60,7 @@ public class Token {
 		// Again, remove any whitespace from the beginning and end that might have been introduced
 		input = input.trim();
 
-				while (input.contains("=>")){
+		if (input.contains("=>")){
 			input = input.replaceAll("=>", ">=");
 		}
 
@@ -60,29 +68,29 @@ public class Token {
 			input = input.replaceAll("=<", "<=");
 		}
 
-//		while (input.contains("> =")){
-//			input = input.replaceAll("> =", ">=");
-//		}
-//
-//		while (input.contains("< =")){
-//			input = input.replaceAll("< =", "<=");
-//		}
-//
-//		while (input.contains("= =")){
-//			input = input.replaceAll("= =", "==");
-//		}
-//
-//		while (input.contains("> =")){
-//			input = input.replaceAll("> =", ">=");
-//		}
-//
-//		while (input.contains("= <")){
-//			input = input.replaceAll("= <", "<=");
-//		}
-//
-//		while (input.contains("= >")){
-//			input = input.replaceAll("= >", ">=");
-//		}
+		while (input.contains("> =")){
+			input = input.replaceAll("> =", ">=");
+		}
+
+		while (input.contains("< =")){
+			input = input.replaceAll("< =", "<=");
+		}
+
+		while (input.contains("= =")){
+			input = input.replaceAll("= =", "==");
+		}
+
+		while (input.contains("> =")){
+			input = input.replaceAll("> =", ">=");
+		}
+
+		while (input.contains("= <")){
+			input = input.replaceAll("= <", "<=");
+		}
+
+		while (input.contains("= >")){
+			input = input.replaceAll("= >", ">=");
+		}
 
 
 
