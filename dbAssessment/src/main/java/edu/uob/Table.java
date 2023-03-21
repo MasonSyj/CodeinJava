@@ -24,26 +24,11 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 	private String tableKey;
 
 	Condition condition;
-	private int attributeIndex;
 
 	private int numofAttributes;
 	private int numofItems;
 
 	private static HashMap<String, Integer> ref = new HashMap<String, Integer>();
-
-//	public Table(String DBName, String tableName, TableType type){
-//		this.DBName = DBName;
-//		this.tableName = tableName;
-//		attributesName = new ArrayList<String>();
-//		columns = new ArrayList<Column>();
-//		numofItems = 0;
-//		tableKey = getDBName() + getTableName();
-//		ref.put(tableKey, 0);
-//
-//		attributesName.add("id");
-//		columns.add(new Column("id"));
-//		numofAttributes = 1;
-//	}
 
 	public Table(String DBName, String tableName){
 		this.DBName = DBName;

@@ -488,6 +488,27 @@ public class ExampleDBTests {
 
     }
 
+    @Test
+    public void compuondTestOne(){
+        sendCommandToServer("  Create database delBeforeTest ; ");
+        sendCommandToServer("  Use delBeforeTest ; ");
+        sendCommandToServer("  Create table testTb1 (name ,age); ");
+        sendCommandToServer("   Insert into testTb1 VALUES ('London', 25);");
+        sendCommandToServer("   Insert into testTb1 VALUES ('Paris', 46);");
+        sendCommandToServer("   Insert into testTb1 VALUES ('Bristol', 12);");
+        sendCommandToServer("   Insert into testTb1 VALUES ('York', 10);");
+
+        sendCommandToServer("  Create table testTb2 (age ,address); ");
+        sendCommandToServer("   Insert into testTb2 VALUES (25, 'IH');");
+        sendCommandToServer("   Insert into testTb2 VALUES (25, 'BQ');");
+        sendCommandToServer("   Insert into testTb2 VALUES (46, 'YK');");
+        sendCommandToServer("   Insert into testTb2 VALUES (25, 'SD');");
+        sendCommandToServer("   Insert into testTb2 VALUES (46, 'LK');");
+        sendCommandToServer("   Insert into testTb2 VALUES (12, 'PO');");
+        System.out.println(sendCommandToServer(" JOIN testTb1 and testTb2 on age and age; "));
+
+        sendCommandToServer("  Drop database delBeforeTest ;");
+    }
 
 
 }
