@@ -10,6 +10,6 @@ public class interpException extends DBException{
 
     @Override
     public String getMessage() {
-        return null;
+        return message;
     }
 }

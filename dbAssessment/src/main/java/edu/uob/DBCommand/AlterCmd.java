@@ -32,7 +32,6 @@ public class AlterCmd extends Command {
         Table table = fd.file2Table();
         if (table.getAttributesName().contains(attributeName)){
             throw new interpException("[ERROR] attribute already exists");
-
         }else{
             table.addNewColumn(attributeName);
             table.write2File();

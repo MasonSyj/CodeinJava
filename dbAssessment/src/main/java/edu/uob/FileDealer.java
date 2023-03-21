@@ -1,6 +1,7 @@
 package edu.uob;
 
 import edu.uob.Enums.ItemType;
+import edu.uob.Exceptions.interpException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ public class FileDealer {
 	}
 
 	// locate the file representing the table, then use the data to instanitise a table object
-	public Table file2Table(){
+	public Table file2Table() throws interpException {
 		File file = new File("databases" + File.separator + DBName + File.separator + TableName);
 
 		BufferedReader reader;
@@ -25,7 +26,7 @@ public class FileDealer {
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
+			throw new interpException("[ERROR] this table doesn't exist;");
 		}
 
 		String line = "";

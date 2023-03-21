@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 import edu.uob.Enums.ItemType;
+import edu.uob.Exceptions.interpException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -297,7 +298,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testDeleteWithCondition(){
+    public void testDeleteWithCondition() throws interpException {
         String randomName = generateRandomName();
         System.out.println(randomName);
         sendCommandToServer("CREATE DATABASE " + randomName + ";");

@@ -54,6 +54,33 @@ public class JoinCmd extends Command {
         }
     }
 
+    private int numofindexs(int numofAttributesA, int numofAttributesB, int indexofAttributeB){
+        int ans = numofAttributesA + numofAttributesB - 2;
+        if (indexofAttributeB != 0){
+            ans--;
+        }
+        return ans;
+    }
+
+    private String buildIndexArrAndAttributeLine(int[] indexs, Table firstTable, Table secondTable, int indexSecondTable){
+        int cnt = 0;
+        String attributeLine = "id\t";
+
+        for (int i = 1; i < firstTable.getNumofAttributes(); i++) {
+            indexs[cnt++] = i;
+            attributeLine = attributeLine + firstTable.getTableName() + "." + firstTable.getAttributesName().get(i) + "\t";
+        }
+
+        for (int i = 1; i < secondTable.getNumofAttributes(); i++){
+            if (i == indexSecondTable){
+                continue;
+            }
+            indexs[cnt++] = firstTable.getNumofAttributes() + i;
+            attributeLine = attributeLine + secondTable.getTableName() + "." + secondTable.getAttributesName().get(i) + "\t";
+        }
+        return attributeLine;
+    }
+
     @Override
     public String execute() throws interpException {
         FileDealer fd1 = new FileDealer(getDBName(), getTableName());
@@ -75,33 +102,17 @@ public class JoinCmd extends Command {
         List<String> rawJoin = BoolOperation.join(itemsFirstTable, itemsSecondTable, indexFirstTable, indexSecondTable);
 
         Table temp = new Table(getDBName(), "temp" + (int) (Math.random() * 1000));
-        int numofColumns = firstTable.getNumofAttributes() + secondTable.getNumofAttributes() - 2;
-        for (int i = 0; i < numofColumns + 2; i++){
+
+        int totalLength = firstTable.getNumofAttributes() + secondTable.getNumofAttributes();
+        for (int i = 0; i < totalLength; i++){
             temp.addNewColumn("null");
         }
         temp.updateClass(rawJoin);
 
-        if (indexSecondTable != 0){
-            numofColumns--;
-        }
+        int numofColumns = numofindexs(firstTable.getNumofAttributes(), secondTable.getNumofAttributes(), indexSecondTable);
 
         int[] indexs = new int[numofColumns];
-        int cnt = 0;
-        String attributeLine = "id\t";
-
-        for (int i = 1; i < firstTable.getNumofAttributes(); i++) {
-            indexs[cnt++] = i;
-            attributeLine = attributeLine + firstTable.getTableName() + "." + firstTable.getAttributesName().get(i) + "\t";
-        }
-
-
-        for (int i = 1; i < secondTable.getNumofAttributes(); i++){
-            if (i == indexSecondTable){
-                continue;
-            }
-            indexs[cnt++] = firstTable.getNumofAttributes() + i;
-            attributeLine = attributeLine + secondTable.getTableName() + "." + secondTable.getAttributesName().get(i) + "\t";
-        }
+        String attributeLine = buildIndexArrAndAttributeLine(indexs, firstTable, secondTable, indexSecondTable);
 
         List<String> trimmedRes = new ArrayList<>();
         for (int j = 0; j < rawJoin.size(); j++){
@@ -112,7 +123,7 @@ public class JoinCmd extends Command {
             trimmedRes.add(FileDealer.transform2csvLine(currentItem));
         }
 
-        cnt = 1;
+        int cnt = 1;
         String ans = "[OK]\n" + attributeLine + "\n";
         for (String item: trimmedRes){
             ans = ans + cnt++ + "\t" + item + "\n";

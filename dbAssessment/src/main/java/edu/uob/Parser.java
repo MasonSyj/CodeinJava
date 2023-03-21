@@ -2,6 +2,7 @@ package edu.uob;
 
 import edu.uob.DBCommand.*;
 import edu.uob.Enums.AlterationType;
+import edu.uob.Exceptions.DBException;
 import edu.uob.Exceptions.parseException;
 
 import java.util.*;
@@ -25,7 +26,7 @@ public class Parser {
 		return execResult;
 	}
 
-	public void cmdSearch() throws parseException {
+	public void cmdSearch() throws DBException {
 		if (tokens.contains(Token.wrongComparator)){
 			throw new parseException("[ERROR] Query contains wrong comparator.");
 		}
@@ -48,7 +49,7 @@ public class Parser {
 		}
 	}
 
-	private void parseUPDATE() throws parseException {
+	private void parseUPDATE() throws DBException {
 		if (!tokens.get(2).toLowerCase().equals("set")){
 
 		}
@@ -76,7 +77,7 @@ public class Parser {
 
 	}
 
-	private void parseDELETE() throws parseException {
+	private void parseDELETE() throws DBException {
 		if (!tokens.get(1).toLowerCase().equals("from")){
 			throw new parseException("[ERROR], DELETE operation must come with a FROM");
 		}
@@ -91,7 +92,7 @@ public class Parser {
 		execResult = deleteCmd.execute();
 	}
 
-	private void parseALTER() throws parseException {
+	private void parseALTER() throws DBException {
 		if (!tokens.get(1).toLowerCase().equals("table")){
 			throw new parseException("[ERROR], ALTER operation must come with a TABLE");
 		}else{
@@ -109,7 +110,7 @@ public class Parser {
 		}
 	}
 
-	private void parseDROP() throws parseException {
+	private void parseDROP() throws DBException {
 		if (tokens.get(1).toLowerCase().equals("database")){
 			DropDBCmd dropDBCmd = new DropDBCmd(tokens.get(2), null);
 			execResult = dropDBCmd.execute();
@@ -121,7 +122,7 @@ public class Parser {
 		}
 	}
 
-	private void parseSELECT() throws parseException {
+	private void parseSELECT() throws DBException {
 		List<String> conditionTokens = null;
 		for (int i = 0; i < tokens.size(); i++){
 			if (tokens.get(i).toLowerCase().equals("where")){
@@ -154,7 +155,7 @@ public class Parser {
 		}
 	}
 
-	private void parseUSE() {
+	private void parseUSE() throws DBException{
 		UseCmd useCmd = new UseCmd(tokens.get(1));
 		execResult = useCmd.execute();
 		if (execResult.contains("exists")){
@@ -162,7 +163,7 @@ public class Parser {
 		}
 	}
 
-	private void parseJOIN() throws parseException {
+	private void parseJOIN() throws DBException {
 		if (!tokens.get(2).toLowerCase().equals("and")){
 			throw new parseException("[ERROR], Join operation needs an AND after first tablename");
 		}else if (!tokens.get(4).toLowerCase().equals("on")){
@@ -176,7 +177,7 @@ public class Parser {
 
 	}
 
-	private void parseCREATE() throws parseException {
+	private void parseCREATE() throws DBException {
 		if (tokens.get(1).toLowerCase().equals("database")){
 //			currentDBName = tokens.get(2);
 			CreateDBCmd createDBCmd = new CreateDBCmd(tokens.get(2));
@@ -194,7 +195,7 @@ public class Parser {
 
 	}
 
-	private void parseINSERT() throws parseException {
+	private void parseINSERT() throws DBException {
 		if (!tokens.get(1).toLowerCase().equals("into")){
 			execResult = "[ERROR], INSERT cmd should come with a INTO";
 //			throw new IllegalArgumentException("INSERT cmd should come with a INTO");
