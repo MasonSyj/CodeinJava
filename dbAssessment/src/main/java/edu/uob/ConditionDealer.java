@@ -4,7 +4,7 @@ import java.util.*;
 
 public class ConditionDealer {
 
-    static String[] operator = {"==" , ">" , "<" , ">=" , "<=" , "!=" , "LIKE", "like"};
+    static List<String> operator = Arrays.asList("==" , ">" , "<" , ">=" , "<=" , "!=" , "LIKE", "like");
 
     Stack<String> op;
 

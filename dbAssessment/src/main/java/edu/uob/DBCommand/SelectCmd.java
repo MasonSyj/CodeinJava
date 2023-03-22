@@ -20,9 +20,12 @@ public class SelectCmd extends Command {
         this.ConditionTokens = ConditionTokens;
     }
 
-    public List<String> getAttributeName(){
+    public List<String> getAttributeName() throws interpException {
         List<String> attributesNames = new ArrayList<String>();
         for (String[] list: attributeList){
+            if (!list[0].equals(getTableName())){
+                throw new interpException("In your case it's due to you cannot select attributes from other tables.");
+            }
             String attributeName = list[1];
             attributesNames.add(attributeName);
         }
@@ -55,7 +58,7 @@ public class SelectCmd extends Command {
             }
             return res;
         } catch (Exception e){
-            throw new interpException("[ERROR], failed to get items.\n");
+            throw new interpException("[ERROR], failed to get items. " + e.getMessage());
         }
     }
 

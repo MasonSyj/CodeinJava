@@ -51,7 +51,7 @@ public class Parser {
 
 	private void parseUPDATE() throws DBException {
 		if (!tokens.get(2).toLowerCase().equals("set")){
-
+			throw new parseException("[ERROR], Update operation needs to have a set");
 		}
 
 		int ConditionBeginIndex = -1;
@@ -66,7 +66,7 @@ public class Parser {
 			throw new parseException("[ERROR], Update operation needs to have a where");
 		}
 
-		if (ConditionBeginIndex == tokens.size()){
+		if (ConditionBeginIndex == tokens.size() - 1){
 			throw new parseException("[ERROR], Update operation must have condition(s)");
 		}
 
@@ -102,7 +102,7 @@ public class Parser {
 			}else if (tokens.get(3).toLowerCase().equals("drop")){
 				type = AlterationType.DROP;
 			}else{
-				throw new parseException("[ERROR], Alter operation doesn't do add or drop.");
+				throw new parseException("[ERROR], Alter operation doesn't know to do add or drop.");
 			}
 
 			AlterCmd alterCmd = new AlterCmd(currentDBName, tokens.get(2), type, tokens.get(4));
@@ -128,31 +128,26 @@ public class Parser {
 			if (tokens.get(i).toLowerCase().equals("where")){
 				parseConditions(i + 1);
 				conditionTokens = tokens.subList(i + 1, tokens.size());
+				break;
 			}
 		}
 
-		if (tokens.get(1).equals("*")){
-			if (!tokens.get(2).toLowerCase().equals("from")){
-				throw new parseException("[ERROR], Select Query needs to have word: 'from'\n");
+		int indexofFrom = -1;
+		for (int i = 0; i < tokens.size(); i++){
+			if (tokens.get(i).toLowerCase().equals("from")){
+				indexofFrom = i;
+				break;
 			}
-
-			SelectCmd selectCmd = new SelectCmd(currentDBName, tokens.get(3), null, conditionTokens);
-			execResult = selectCmd.execute();
-		}else{
-			// find the index of "from"
-			int indexofFrom = 2;
-			for (int i = 0; i < tokens.size(); i++){
-				if (tokens.get(i).toLowerCase().equals("from")){
-					indexofFrom = i;
-					break;
-				}
-			}
-			String tableName = tokens.get(indexofFrom + 1);
-			List<String[]> attributesList = parseAttributeList(tokens, tableName, 1);
-			SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList, conditionTokens);
-			execResult = selectCmd.execute();
-
 		}
+
+		if (indexofFrom == -1){
+			throw new parseException("[ERROR], Select Query needs to have FROM");
+		}
+
+		String tableName = tokens.get(indexofFrom + 1);
+		List<String[]> attributesList = parseAttributeList(tokens, tableName, 1);
+		SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList, conditionTokens);
+		execResult = selectCmd.execute();
 	}
 
 	private void parseUSE() throws DBException{
@@ -198,7 +193,6 @@ public class Parser {
 	private void parseINSERT() throws DBException {
 		if (!tokens.get(1).toLowerCase().equals("into")){
 			execResult = "[ERROR], INSERT cmd should come with a INTO";
-//			throw new IllegalArgumentException("INSERT cmd should come with a INTO");
 			throw new parseException("[ERROR], INSERT cmd should come with a INTO");
 		}
 		String tableName = tokens.get(2);
@@ -219,13 +213,11 @@ public class Parser {
 
 	public void parseConditions(int index){
 		for (int i = index; i < tokens.size() - 1; i++){
-			for (String specialChar: ConditionDealer.operator){
-				if (tokens.get(i).equals(specialChar)){
-					String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " " + tokens.get(i + 1);
-					tokens.remove(i);
-					tokens.remove(i);
-					tokens.set(i - 1, singleCondition);
-				}
+			if (ConditionDealer.operator.contains(tokens.get(i))){
+				String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " " + tokens.get(i + 1);
+				tokens.remove(i);
+				tokens.remove(i);
+				tokens.set(i - 1, singleCondition);
 			}
 		}
 		tokens.remove(tokens.size() - 1);
@@ -276,6 +268,10 @@ public class Parser {
 	}
 
 	private List<String[]> parseAttributeList(List<String> tokens, String defaultTableName, int index) throws parseException {
+		if (index == 1 && tokens.get(index).equals("*")){
+			return null;
+		}
+
 		List<String[]> ans = new ArrayList<>();
 		try{
 			while (!tokens.get(index).equals(")") && !tokens.get(index).toLowerCase().equals("from")){
@@ -287,22 +283,19 @@ public class Parser {
 
 				String[] curAttributeName = new String[2];
 				if (tokens.get(index).contains(".")){
-					curAttributeName[0] = tokens.get(index).split(".")[0];
-					curAttributeName[1] = tokens.get(index).split(".")[1];
-//					ans.add(Arrays.stream(tokens.get(index).split(".")).toList());
+					curAttributeName[0] = tokens.get(index).split("\\.")[0];
+					curAttributeName[1] = tokens.get(index).split("\\.")[1];
 				}else{
 					curAttributeName[0] = defaultTableName;
 					curAttributeName[1] = tokens.get(index);
-//					List<String> curAttribute = new ArrayList<String>();
-//					curAttribute.add(DefaultTableName);
-//					curAttribute.add(tokens.get(index));
+
 				}
 				ans.add(curAttributeName);
-//				}
+
 				index++;
 			}
 		}catch (Exception e){
-			throw new parseException("AttributeList didn't build correctly");
+			throw new parseException("[ERROR] AttributeList didn't build correctly.");
 		}
 
 		return ans;

@@ -273,8 +273,13 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        String response = sendCommandToServer("SELECT * FROM marks where Price > 6000;");
+        String response = "";
+        response = sendCommandToServer("SELECT marks.Brand, marks.Price FROM marks where Price > 6000;");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("SELECT marks.Brand, noname.Price FROM marks where Price > 6000;");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand != Huawei);");
         System.out.println(response);
         assertTrue(response.contains("[OK]"));
@@ -555,5 +560,49 @@ public class ExampleDBTests {
         sendCommandToServer("  Drop database delBeforeTest ;");
     }
 
+    @Test
+    public void testParserIssue(){
+        String response = "";
+        response = sendCommandToServer("Unknown operation here;");
+        assertTrue(response.contains("[ERROR], Don't know what operation you want to do;"));
+
+        String randomName = generateRandomName();
+        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        response = sendCommandToServer("update marks Price = 7000;");
+        assertTrue(response.contains("[ERROR], Update operation needs to have a set"));
+        response = sendCommandToServer("update marks set Price = 7000 Brand like Huawei;");
+        assertTrue(response.contains("[ERROR], Update operation needs to have a where"));
+        response = sendCommandToServer("update marks set Price = 7000 where;");
+        assertTrue(response.contains("[ERROR], Update operation must have condition(s)"));
+
+        response = sendCommandToServer("delete marks where Price > 7000;");
+        assertTrue(response.contains("[ERROR], DELETE operation must come with a FROM"));
+        response = sendCommandToServer("delete from marks Price > 7000;");
+        assertTrue(response.contains("[ERROR], DELETE operation must hava a WHERE"));
+
+        response = sendCommandToServer("alter marks add year;");
+        assertTrue(response.contains("[ERROR], ALTER operation must come with a TABLE"));
+        response = sendCommandToServer("alter table marks year;");
+        assertTrue(response.contains("[ERROR], Alter operation doesn't know to do add or drop."));
+
+        response = sendCommandToServer("drop marks;");
+        assertTrue(response.contains("[ERROR], Drop Query needs to know it's database or table"));
+
+        response = sendCommandToServer("select * marks;");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR], Select Query needs to have FROM"));
+
+        response = sendCommandToServer("select Brand, Price marks;");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR], Select Query needs to have FROM"));
+
+    }
 
 }

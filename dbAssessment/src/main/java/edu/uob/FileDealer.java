@@ -52,7 +52,7 @@ public class FileDealer {
 			}
 			reader.close();
 		} catch (IOException e) {
-			throw new interpException("Something is going when accessing the table.");
+			throw new interpException("Something is going wrong when accessing the table.");
 		}
 		// wrong direction, why write things back to a file?
 //		ans.write2File();
