@@ -42,7 +42,9 @@ public class ConditionDealer {
     }
 
     private static boolean opcmp(String op1, String op2){
-        if (op2.equals("and")){
+        if (op2.equals("(")){
+            return false;
+        } else if (op2.equals("and")){
             return true;
         }else {
             return op2.equals(op1);

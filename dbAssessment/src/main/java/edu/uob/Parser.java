@@ -213,7 +213,8 @@ public class Parser {
 	public void parseConditions(int index){
 		for (int i = index; i < tokens.size() - 1; i++){
 			if (ConditionDealer.operator.contains(tokens.get(i))){
-				String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " " + tokens.get(i + 1);
+				String singleCondition = tokens.get(i - 1) + " " + tokens.get(i) + " ";
+				singleCondition = singleCondition + tokens.get(i + 1).replaceAll("'(.*?)'", "$1");
 				tokens.remove(i);
 				tokens.remove(i);
 				tokens.set(i - 1, singleCondition);
@@ -227,7 +228,7 @@ public class Parser {
 		try{
 			while (!tokens.get(index).equals(")")){
 				if (!tokens.get(index).equals(",")){
-					ans.add(tokens.get(index));
+					ans.add(tokens.get(index).replaceAll("'(.*?)'", "$1"));
 				}
 				index++;
 			}
@@ -240,7 +241,6 @@ public class Parser {
 
 	public List<List<String>> parseNameValueList(List<String> tokens) throws parseException {
 		List<List<String>> res = new ArrayList<>();
-
 		int i = 3;
 		while (!tokens.get(i).toLowerCase().equals("where")){
 			List<String> curNameValuePair = new ArrayList<>();
@@ -249,11 +249,14 @@ public class Parser {
 					if (cnt == 1 && !tokens.get(i).equals("=")){
 						throw new parseException("In your case, Set Name Value List needs to have a equation including a '='");
 					}
-					curNameValuePair.add(tokens.get(i++));
-
+					if (cnt == 2){
+						curNameValuePair.add(tokens.get(i++).replaceAll("'(.*?)'", "$1"));
+					}else{
+						curNameValuePair.add(tokens.get(i++));
+					}
 				}
 				res.add(curNameValuePair);
-				// maybe improved here
+
 				if (tokens.get(i).equals(",")){
 					i++;
 				}
@@ -274,7 +277,6 @@ public class Parser {
 		List<String[]> ans = new ArrayList<>();
 		try{
 			while (!tokens.get(index).equals(")") && !tokens.get(index).toLowerCase().equals("from")){
-
 				if (tokens.get(index).equals(",")){
 					index++;
 					continue;
