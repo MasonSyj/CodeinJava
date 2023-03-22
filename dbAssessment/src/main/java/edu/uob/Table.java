@@ -68,18 +68,8 @@ public class Table implements Predicate<String>, Writeable{
 		return columns;
 	}
 
-	public Column getColumnbyNames(String name) {
-		for (Column col: columns){
-			if (col.getColumnName().equals(name)){
-				return col;
-			}
-		}
-		return null;
-	}
-
 	public List<String> getAllItems(){
 		List<String> ans = new ArrayList<>();
-
 		int row = getNumofItems();
 		int col = columns.size();
 
@@ -116,7 +106,6 @@ public class Table implements Predicate<String>, Writeable{
 			ans.add(FileDealer.transform2csvLine(currentItem));
 		}
 
-
 		return ans;
 	}
 
@@ -131,7 +120,7 @@ public class Table implements Predicate<String>, Writeable{
 		}
 	}
 
-	public boolean dropColumn(String attributeName){
+	public boolean dropColumn(String attributeName) throws interpException {
 		if (!getAttributesName().toString().contains(attributeName)){
 			return false;
 		}else{
@@ -143,9 +132,8 @@ public class Table implements Predicate<String>, Writeable{
 		}
 	}
 
-
 	@Override
-	public void write2File(){
+	public void write2File() throws interpException {
 		try {
 			File file = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
@@ -161,7 +149,7 @@ public class Table implements Predicate<String>, Writeable{
 			}
 			writer.close();
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new interpException("[ERROR] cannot save the current table." + e.getMessage());
 		}
 	}
 
@@ -205,10 +193,7 @@ public class Table implements Predicate<String>, Writeable{
 	}
 
 	public List<String> predicate(String t){
-
 		condition = new Condition(t);
-
-
 		return getAllItems().stream().filter(this).collect(Collectors.toList());
 	}
 

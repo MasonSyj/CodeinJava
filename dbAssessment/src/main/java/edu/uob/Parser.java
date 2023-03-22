@@ -55,7 +55,7 @@ public class Parser {
 		}
 
 		int ConditionBeginIndex = -1;
-		for (int i = 6; i < tokens.size(); i++){
+		for (int i = 0; i < tokens.size(); i++){
 			if (tokens.get(i).toLowerCase().equals("where")){
 				ConditionBeginIndex = i + 1;
 				break;
@@ -192,7 +192,6 @@ public class Parser {
 
 	private void parseINSERT() throws DBException {
 		if (!tokens.get(1).toLowerCase().equals("into")){
-			execResult = "[ERROR], INSERT cmd should come with a INTO";
 			throw new parseException("[ERROR], INSERT cmd should come with a INTO");
 		}
 		String tableName = tokens.get(2);
@@ -248,7 +247,7 @@ public class Parser {
 			try{
 				for (int cnt = 0; cnt < 3; cnt++){
 					if (cnt == 1 && !tokens.get(i).equals("=")){
-						throw new parseException("[ERROR], Set Name Value List needs to have a equation including a '='");
+						throw new parseException("In your case, Set Name Value List needs to have a equation including a '='");
 					}
 					curNameValuePair.add(tokens.get(i++));
 
@@ -259,7 +258,7 @@ public class Parser {
 					i++;
 				}
 			} catch (Exception e){
-				throw new parseException("[ERROR], NameValueList is incomplete");
+				throw new parseException("[ERROR], NameValueList is incomplete " + e.getMessage());
 			}
 
 		}

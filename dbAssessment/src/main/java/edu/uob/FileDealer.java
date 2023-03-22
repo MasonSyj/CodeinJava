@@ -26,7 +26,7 @@ public class FileDealer {
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (FileNotFoundException e) {
-			throw new interpException("[ERROR] this table doesn't exist;");
+			throw new interpException("[ERROR] table doesn't exist;");
 		}
 
 		String line = "";

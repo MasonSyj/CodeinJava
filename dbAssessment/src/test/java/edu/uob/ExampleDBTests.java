@@ -369,7 +369,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testTableUpdateClass(){
+    public void testTableUpdateClass() throws interpException {
         Table t = new Table("Electronics", "PhoneBrand");
         File directory = new File("databases" + File.separator + "Electronics");
         if (!directory.exists()){
@@ -569,7 +569,19 @@ public class ExampleDBTests {
         String randomName = generateRandomName();
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
+        response = sendCommandToServer("CREATE marks (Name, Brand, Price);");
+        assertTrue(response.contains("[ERROR], CREATE cmd should come with DATABASE or TABLE"));
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
+//        response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        response = sendCommandToServer("INSERT marks VALUES ('Pixel 7', Google, 7000);");
+        assertTrue(response.contains("[ERROR], INSERT cmd should come with a INTO"));
+        response = sendCommandToServer("INSERT INTO marks ('Pixel 7', Google, 7000);");
+        assertTrue(response.contains("[ERROR], INSERT cmd should come with a VALUES"));
+        response = sendCommandToServer("INSERT INTO marks VALUES 'Pixel 7', Google, 7000);");
+        assertTrue(response.contains("[ERROR], INSERT cmd should come with a ( after VALUES)"));
+        response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000;");
+        assertTrue(response.contains("[ERROR], ValueList didn't end correctly"));
+
         sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
@@ -581,6 +593,11 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR], Update operation needs to have a where"));
         response = sendCommandToServer("update marks set Price = 7000 where;");
         assertTrue(response.contains("[ERROR], Update operation must have condition(s)"));
+        response = sendCommandToServer("update marks set Price 7000 where Brand like Huawei;");
+        System.out.println(response);
+        assertTrue(response.contains("Set Name Value List needs to have a equation including a '='"));
+        response = sendCommandToServer("update marks set Price = where Brand like Huawei;");
+        assertTrue(response.contains("[ERROR], NameValueList is incomplete"));
 
         response = sendCommandToServer("delete marks where Price > 7000;");
         assertTrue(response.contains("[ERROR], DELETE operation must come with a FROM"));
@@ -603,6 +620,23 @@ public class ExampleDBTests {
         System.out.println(response);
         assertTrue(response.contains("[ERROR], Select Query needs to have FROM"));
 
+        response = sendCommandToServer("CREATE TABLE markii (id, year, level);");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("join marks and markii on Price and level;");
+        System.out.println(response);
+        assertTrue(response.contains("[OK]"));
+
+        response = sendCommandToServer("join marks markii on Price and level;");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR], Join operation needs an AND after first tablename"));
+
+        response = sendCommandToServer("join marks and markii Price and level;");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR], Join operation needs an ON after second tablename"));
+
+        response = sendCommandToServer("join marks and markii on Price level;");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR], Join operation needs an AND after first Attribute name"));
     }
 
 }
