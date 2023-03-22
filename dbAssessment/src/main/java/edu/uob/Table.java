@@ -1,6 +1,8 @@
 package edu.uob;
 
 import edu.uob.Enums.ItemType;
+import edu.uob.Exceptions.DBException;
+import edu.uob.Exceptions.interpException;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -218,8 +220,19 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 
 		if (operator.equals("==")){
 			return t.split("\t")[attributeIndex].equals(value);
-//			return Double.valueOf(t.split("\t")[attributeIndex]) == Double.valueOf(value);
-		}else if (operator.equals(">")){
+		}else if (operator.equals("!=")){
+			return !t.split("\t")[attributeIndex].equals(value);
+		}else if (operator.toUpperCase().equals("LIKE")){
+			return t.split("\t")[attributeIndex].contains(value);
+		}
+
+		try {
+			double val = Double.parseDouble(value);
+		}catch (NumberFormatException e){
+			return false;
+		}
+
+		if (operator.equals(">")){
 			return Double.valueOf(t.split("\t")[attributeIndex]) > Double.valueOf(value);
 		}else if (operator.equals("<")){
 			return Double.valueOf(t.split("\t")[attributeIndex]) < Double.valueOf(value);
@@ -227,13 +240,10 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 			return Double.valueOf(t.split("\t")[attributeIndex]) >= Double.valueOf(value);
 		}else if (operator.equals("<=")){
 			return Double.valueOf(t.split("\t")[attributeIndex]) <= Double.valueOf(value);
-		}else if (operator.equals("!=")){
-			return !t.split("\t")[attributeIndex].equals(value);
-		}else if (operator.toUpperCase().equals("LIKE")){
-			return t.split("\t")[attributeIndex].contains(value);
-		}else{
-			return false;
 		}
+
+		return false;
+
 	}
 
 	@Override

@@ -54,19 +54,27 @@ public class JoinCmd extends Command {
         }
     }
 
-    private int numofindexs(int numofAttributesA, int numofAttributesB, int indexofAttributeB){
+    private int numofindexs(int numofAttributesA, int numofAttributesB, int indexFirstTable, int indexofAttributeB){
         int ans = numofAttributesA + numofAttributesB - 2;
+
+        if (indexFirstTable != 0){
+            ans--;
+        }
+
         if (indexofAttributeB != 0){
             ans--;
         }
         return ans;
     }
 
-    private String buildIndexArrAndAttributeLine(int[] indexs, Table firstTable, Table secondTable, int indexSecondTable){
+    private String buildIndexArrAndAttributeLine(int[] indexs, Table firstTable, Table secondTable, int indexFirstTable, int indexSecondTable){
         int cnt = 0;
         String attributeLine = "id\t";
 
         for (int i = 1; i < firstTable.getNumofAttributes(); i++) {
+            if (i == indexFirstTable){
+                continue;
+            }
             indexs[cnt++] = i;
             attributeLine = attributeLine + firstTable.getTableName() + "." + firstTable.getAttributesName().get(i) + "\t";
         }
@@ -109,10 +117,10 @@ public class JoinCmd extends Command {
         }
         temp.updateClass(rawJoin);
 
-        int numofColumns = numofindexs(firstTable.getNumofAttributes(), secondTable.getNumofAttributes(), indexSecondTable);
+        int numofColumns = numofindexs(firstTable.getNumofAttributes(), secondTable.getNumofAttributes(), indexFirstTable, indexSecondTable);
 
         int[] indexs = new int[numofColumns];
-        String attributeLine = buildIndexArrAndAttributeLine(indexs, firstTable, secondTable, indexSecondTable);
+        String attributeLine = buildIndexArrAndAttributeLine(indexs, firstTable, secondTable, indexFirstTable, indexSecondTable);
 
         List<String> trimmedRes = new ArrayList<>();
         for (int j = 0; j < rawJoin.size(); j++){

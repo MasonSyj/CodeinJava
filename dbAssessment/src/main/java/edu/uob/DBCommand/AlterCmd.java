@@ -40,6 +40,9 @@ public class AlterCmd extends Command {
     }
 
     public String dropAttribute() throws interpException {
+        if (attributeName.equals("id")){
+            throw new interpException("[ERROR], you can not drop auto id column");
+        }
         FileDealer fd = new FileDealer(getDBName(), getTableName());
         Table table = fd.file2Table();
         if (table.dropColumn(attributeName)){

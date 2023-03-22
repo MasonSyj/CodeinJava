@@ -28,6 +28,6 @@ public class SQLKeywords {
             "ON",
             "INTO",
             "VALUES",
-            "NULL"
+            "id"
             );
 }

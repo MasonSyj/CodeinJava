@@ -132,16 +132,23 @@ public class ExampleDBTests {
     @Test
     public void testCreate(){
         String randomName = generateRandomName();
-        sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        String reponse = sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        assertTrue(reponse.contains("[OK]"));
+        reponse = sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        assertTrue(reponse.contains("[ERROR]"));
+
         sendCommandToServer("USE " + randomName + ";");
-        sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        reponse = sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        assertTrue(reponse.contains("[OK]"));
+        reponse = sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        assertTrue(reponse.contains("[ERROR]"));
+
         sendCommandToServer("CREATE TABLE unit (name, points, number);");
         String randomName2 = generateRandomName();
         sendCommandToServer("CREATE DATABASE " + randomName2 + ";");
         sendCommandToServer("USE " + randomName2 + ";");
         sendCommandToServer("CREATE TABLE phone (name, brand, price);");
         sendCommandToServer("CREATE TABLE laptop (name, brand, usage, function);");
-
     }
     @Test
     public void testUse(){
@@ -310,14 +317,20 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
 
-        FileDealer fd = new FileDealer(randomName, "marks");
-        Table table = fd.file2Table();
-        assertTrue(table.getNumofItems() == 5);
+        String response = sendCommandToServer("select * from marks;");
+        System.out.println(response);
+        assertTrue(response.contains("Mate40"));
 
-        String response = sendCommandToServer("DELETE FROM marks Where Price<5500;");
-        assertTrue(response.contains("[OK]"));
-        table = fd.file2Table();
-        assertTrue(table.getNumofItems() == 4);
+        sendCommandToServer("DELETE FROM marks Where Price<5500;");
+        response = sendCommandToServer("select * from marks");
+        assertFalse(response.contains("Mate40"));
+
+        response = sendCommandToServer("select * from marks where Brand>Unknown;");
+        System.out.println(response);
+        assertFalse(response.contains("Mate40"));
+        assertFalse(response.contains("Google"));
+        assertFalse(response.contains("Apple"));
+
     }
 
     @Test
@@ -413,7 +426,7 @@ public class ExampleDBTests {
 
     @Test
     public void testEdgeCasesQuery(){
-        List<String> tokens = Token.setup("pass==False id=>7 num=<5 mark > = 45 height > = 180 height >= 180 height> =160");
+        List<String> tokens = Token.setup("pass==False id=>7 num=<5 mark > = 45 height > = 180 'height >= 180 height> =160 name == 'steve' name=='steve' name=='sam");
         for (String token: tokens){
             System.out.println(token);
         }
@@ -489,24 +502,26 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void compuondTestOne(){
-        sendCommandToServer("  Create database delBeforeTest ; ");
-        sendCommandToServer("  Use delBeforeTest ; ");
-        sendCommandToServer("  Create table testTb1 (name ,age); ");
-        sendCommandToServer("   Insert into testTb1 VALUES ('London', 25);");
-        sendCommandToServer("   Insert into testTb1 VALUES ('Paris', 46);");
-        sendCommandToServer("   Insert into testTb1 VALUES ('Bristol', 12);");
-        sendCommandToServer("   Insert into testTb1 VALUES ('York', 10);");
+    public void testJoin2(){
+        String randomName = generateRandomName();
+        sendCommandToServer("Create database " + randomName + " ;");
+        sendCommandToServer("Use " + randomName + " ;");
+        sendCommandToServer("Create table grade (name ,mark, resit);");
+        sendCommandToServer("Insert into grade VALUES ('sam', 75, false);");
+        sendCommandToServer("Insert into grade VALUES ('tom', 86, false);");
+        sendCommandToServer("Insert into grade VALUES ('marry', 62, true);");
+        sendCommandToServer("Insert into grade VALUES ('lucy', 60, true);");
+        String response = sendCommandToServer("select * from grade;");
+        assertTrue(response.contains("resit"));
 
-        sendCommandToServer("  Create table testTb2 (age ,address); ");
-        sendCommandToServer("   Insert into testTb2 VALUES (25, 'IH');");
-        sendCommandToServer("   Insert into testTb2 VALUES (25, 'BQ');");
-        sendCommandToServer("   Insert into testTb2 VALUES (46, 'YK');");
-        sendCommandToServer("   Insert into testTb2 VALUES (25, 'SD');");
-        sendCommandToServer("   Insert into testTb2 VALUES (46, 'LK');");
-        sendCommandToServer("   Insert into testTb2 VALUES (12, 'PO');");
-        System.out.println(sendCommandToServer(" JOIN testTb1 and testTb2 on age and age; "));
-
+        sendCommandToServer("Create table ref (mark ,subject, category);");
+        sendCommandToServer("Insert into ref VALUES (25, 'EN', 1);");
+        sendCommandToServer("Insert into ref VALUES (75, 'CN', 2);");
+        sendCommandToServer("Insert into ref VALUES (86, 'MH', 3);");
+        sendCommandToServer("Insert into ref VALUES (65, 'CS', 4);");
+        sendCommandToServer("Insert into ref VALUES (62, 'EE', 3);");
+        sendCommandToServer("Insert into ref VALUES (12, 'HR', 1);");
+        System.out.println(sendCommandToServer(" JOIN grade and ref on mark and mark;"));
         sendCommandToServer("  Drop database delBeforeTest ;");
     }
 

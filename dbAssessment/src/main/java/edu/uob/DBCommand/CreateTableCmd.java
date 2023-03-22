@@ -34,7 +34,7 @@ public class CreateTableCmd extends Command {
                 String attributeLine = setUpAttributeLine();
                 if (attributeLine == null){
                     fileContainTable.delete();
-                    throw new interpException("[ERROR], AttributeName cannot be keywords.");
+                    throw new interpException("[ERROR], can not be none attribute");
                 }
                 BufferedWriter writer = new BufferedWriter(new FileWriter(fileContainTable));
                 writer.write(attributeLine);
@@ -49,8 +49,16 @@ public class CreateTableCmd extends Command {
         }
     }
 
-    public String setUpAttributeLine(){
+    public String setUpAttributeLine() throws interpException {
         String ans = "id\t";
+        for (int i = 0; i < attributeList.size(); i++){
+            for (int j = i + 1; j < attributeList.size(); j++){
+                if (attributeList.get(i)[1].equals(attributeList.get(j)[1])){
+                    throw new interpException("[ERROR] one table cannot have two same attribute name");
+                }
+            }
+        }
+
         for (String[] attributeName: attributeList){
             // attributeName consists of 0.tablename 1.attribute
             if (SQLKeywords.SQLKeyWords.contains(attributeName[1].toUpperCase())){
