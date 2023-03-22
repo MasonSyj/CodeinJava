@@ -273,9 +273,19 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        sendCommandToServer("SELECT * FROM marks where Price > 6000;");
-        System.out.println("-----------Separate Line-----------");
-        sendCommandToServer("SELECT * FROM marks where Brand like Huawei;");
+        String response = sendCommandToServer("SELECT * FROM marks where Price > 6000;");
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand != Huawei);");
+        System.out.println(response);
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 and (Brand like Google or Brand like Apple);");
+        System.out.println(response);
+        assertTrue(response.contains("[OK]"));
+
+        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand ! = Huawei);");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR]"));
+
     }
     @Test
     public void testSelectWildWithConditions() {

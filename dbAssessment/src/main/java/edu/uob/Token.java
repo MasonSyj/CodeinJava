@@ -48,6 +48,7 @@ public class Token {
 		while (input.contains("> =")) input = input.replaceAll("> =", " " + wrongComparator + " ");
 		while (input.contains("< =")) input = input.replaceAll("< =", " " + wrongComparator + " ");
 		while (input.contains("= =")) input = input.replaceAll("= =", " " + wrongComparator + " ");
+		while (input.contains("! =")) input = input.replaceAll("! =", " " + wrongComparator + " ");
 		// Add in some extra padding spaces around the "special characters"
 		// so we can be sure that they are separated by AT LEAST one space (possibly more)
 		for(int i=0; i<specialCharacters.length;i++) {
@@ -59,14 +60,6 @@ public class Token {
 		while (input.contains("  ")) input = input.replaceAll("  ", " ");
 		// Again, remove any whitespace from the beginning and end that might have been introduced
 		input = input.trim();
-
-		if (input.contains("=>")){
-			input = input.replaceAll("=>", ">=");
-		}
-
-		if (input.contains("=<")){
-			input = input.replaceAll("=<", "<=");
-		}
 
 		while (input.contains("> =")){
 			input = input.replaceAll("> =", ">=");
@@ -90,6 +83,14 @@ public class Token {
 
 		while (input.contains("= >")){
 			input = input.replaceAll("= >", ">=");
+		}
+
+		while (input.contains("! =")){
+			input = input.replaceAll("! =", "!=");
+		}
+
+		while (input.contains("= !")){
+			input = input.replaceAll("= !", "!=");
 		}
 
 

@@ -25,10 +25,6 @@ public class Column {
 		columnBody.add(value);
 	}
 
-	public void set(int index, String t){
-		columnBody.set(index, t);
-	}
-
 	public void clean(){
 		while (columnBody.size() != 0){
 			columnBody.remove(0);

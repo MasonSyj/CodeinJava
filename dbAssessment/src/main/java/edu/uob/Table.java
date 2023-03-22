@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class Table implements Predicate<String>, Cloneable, Writeable{
+public class Table implements Predicate<String>, Writeable{
 	private String DBName;
 	private String tableName;
 
@@ -244,10 +244,5 @@ public class Table implements Predicate<String>, Cloneable, Writeable{
 
 		return false;
 
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
 	}
 }
