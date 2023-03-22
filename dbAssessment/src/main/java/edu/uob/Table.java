@@ -88,14 +88,12 @@ public class Table implements Predicate<String>, Writeable{
 	public List<String> getParialColumn(List<String> attributesNameList){
 		List<String> ans = new ArrayList<>();
 
-//		ans.add(FileDealer.transform2csvLine(attributesNameList));
-
 		int row = getNumofItems();
 
 		int[] index = new int[attributesNameList.size()];
 		int cnt = 0;
 		for (String attribute: attributesNameList){
-			index[cnt++] = getAttributesName().indexOf(attribute);
+			index[cnt++] = indexofAttribute(attribute);
 		}
 
 		for (int j = 0; j < row; j++){
@@ -121,7 +119,8 @@ public class Table implements Predicate<String>, Writeable{
 	}
 
 	public boolean dropColumn(String attributeName) throws interpException {
-		if (!getAttributesName().toString().contains(attributeName)){
+		if (indexofAttribute(attributeName) == -1){
+//		if (!getAttributesName().toString().contains(attributeName)){
 			return false;
 		}else{
 			int index = attributesName.indexOf(attributeName);
@@ -201,7 +200,7 @@ public class Table implements Predicate<String>, Writeable{
 	public boolean test(String t) {
 		String operator = condition.getOperator();
 		String value = condition.getValue();
-		int attributeIndex = attributesName.indexOf(condition.getAttribute());
+		int attributeIndex = indexofAttribute(condition.getAttribute());
 
 		if (operator.equals("==")){
 			return t.split("\t")[attributeIndex].equals(value);
@@ -228,6 +227,15 @@ public class Table implements Predicate<String>, Writeable{
 		}
 
 		return false;
+	}
 
+	public int indexofAttribute(String attribute){
+		List<String> ref = getAttributesName();
+		for (int i = 0; i < ref.size(); i++){
+			if (ref.get(i).toLowerCase().equals(attribute.toLowerCase())){
+				return i;
+			}
+		}
+		return -1;
 	}
 }

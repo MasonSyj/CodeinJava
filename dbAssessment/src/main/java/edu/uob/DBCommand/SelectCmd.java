@@ -26,7 +26,7 @@ public class SelectCmd extends ComplexCommand {
             if (!list[0].equals(getTableName())){
                 throw new interpException("In your case it's due to you cannot select attributes from other tables.");
             }
-            String attributeName = list[1];
+            String attributeName = table.getAttributesName().get(table.indexofAttribute(list[1]));
             attributesNames.add(attributeName);
         }
         return attributesNames;

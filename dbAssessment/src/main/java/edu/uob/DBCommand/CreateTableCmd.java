@@ -19,7 +19,7 @@ public class CreateTableCmd extends BasicCommand {
     public CreateTableCmd(String DBName, String tableName, List<String[]> attributeList){
         super(DBName, tableName);
         this.attributeList = attributeList;
-        fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
+        fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName().toLowerCase());
     }
 
     @Override

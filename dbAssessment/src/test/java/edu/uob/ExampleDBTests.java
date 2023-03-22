@@ -183,6 +183,10 @@ public class ExampleDBTests {
         response = sendCommandToServer("DROP table marks;");
         assertTrue(response.contains("[OK]"));
 
+        sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        response = sendCommandToServer("DROP table marks;");
+        assertTrue(response.contains("[OK]"));
+
         response = sendCommandToServer("DROP table marks;");
         assertTrue(response.contains("[ERROR]"));
 
@@ -201,17 +205,22 @@ public class ExampleDBTests {
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
-        String response = sendCommandToServer("ALTER TABLE marks add rank;");
+        String response = sendCommandToServer("ALTER TABLE MARKS add rank;");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("ALTER TABLE marks add Rank;");
+        assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks add rank;");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks add select;");
         assertTrue(response.contains("[ERROR]"));
         assertTrue(response.contains("attribute Name cannot be SQL Keywords."));
 
-        response = sendCommandToServer("ALTER TABLE marks drop pass;");
+        response = sendCommandToServer("ALTER TABLE MARKS drop pass;");
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("ALTER TABLE marks drop pass;");
+        assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("ALTER TABLE marks drop Pass;");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks drop UnknownName;");
         assertTrue(response.contains("[ERROR]"));
@@ -249,8 +258,9 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        String response = sendCommandToServer("update marks set Price =10000, Brand= HW where Brand like Huawei;");
-        response = sendCommandToServer("select * from marks;");
+        sendCommandToServer("update marks set price =10000, brand= HW where brand like Huawei;");
+        String response = sendCommandToServer("select * from marks;");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
         assertTrue(response.contains("HW"));
         assertFalse(response.contains("Huawei"));
@@ -268,10 +278,10 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
         String response = "";
-        response = sendCommandToServer("SELECT marks.Brand, marks.Price FROM marks where Price > 6000;");
+        response = sendCommandToServer("SELECT marks.brand, marks.price FROM marks where Price > 6000;");
         System.out.println(response);
         assertTrue(response.contains("[OK]"));
-        response = sendCommandToServer("SELECT marks.Brand, noname.Price FROM marks where Price > 6000;");
+        response = sendCommandToServer("SELECT marks.brand, noname.price FROM marks where Price > 6000;");
         System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand != Huawei);");
@@ -326,7 +336,8 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO orders VALUES (21, '2022-01-01', 100);");
         sendCommandToServer("INSERT INTO orders VALUES (23, '2022-02-15', 75);");
         response = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND customers.Customid;");
-        String response2 = sendCommandToServer("JOIN customers AND orders ON Orderid AND customers.Customid;");
+        String response2 = sendCommandToServer("JOIN customers AND orders ON ORDERID AND customers.CUSTOMID;");
+        System.out.println(response2);
         String response3 = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND Customid;");
         assertTrue(response.equals(response2));
         assertTrue(response2.equals(response3));

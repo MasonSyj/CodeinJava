@@ -28,7 +28,8 @@ public class AlterCmd extends ComplexCommand {
             throw new interpException("[ERROR], attribute Name cannot be SQL Keywords.");
         }
 
-        if (table.getAttributesName().contains(attributeName)){
+        if (table.indexofAttribute(attributeName) >= 0){
+//        if (table.getAttributesName().contains(attributeName)){
             throw new interpException("[ERROR] attribute already exists");
         }else{
             table.addNewColumn(attributeName);

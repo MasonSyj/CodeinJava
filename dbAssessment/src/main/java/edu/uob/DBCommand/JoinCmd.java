@@ -54,11 +54,13 @@ public class JoinCmd extends ComplexCommand {
         }
     }
 
-    private int getTableIndex(Table table, String Attributes) {
-        if (Attributes.split("\\.").length != 1){
-            return table.getAttributesName().indexOf(Attributes.split("\\.")[1]);
+    private int getTableIndex(Table table, String attribute) {
+        if (attribute.split("\\.").length != 1){
+            return table.indexofAttribute(attribute.split("\\.")[1]);
+//            return table.getAttributesName().indexOf(Attributes.split("\\.")[1]);
         }else{
-            return table.getAttributesName().indexOf(Attributes);
+            return table.indexofAttribute(attribute);
+//            return table.getAttributesName().indexOf(Attributes);
         }
     }
 

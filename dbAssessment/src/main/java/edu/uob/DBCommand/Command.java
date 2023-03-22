@@ -8,7 +8,12 @@ public abstract class Command {
 
     public Command(String DBName, String tableName){
         this.DBName = DBName;
-        this.tableName = tableName;
+        if (tableName != null){
+            this.tableName = tableName.toLowerCase();
+        }else{
+            this.tableName = null;
+        }
+
     }
 
     public String getDBName() {

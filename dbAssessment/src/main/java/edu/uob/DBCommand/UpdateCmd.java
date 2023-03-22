@@ -16,7 +16,7 @@ public class UpdateCmd extends ComplexCommand {
     private List<String> ConditionTokens;
 
     private static final int indexofATTRIBUTE = 0;
-    private static final int indexofVALUE = 2;
+    private static final int indexofVALUE = 1;
 
 
     public UpdateCmd(String DBName, String tableName, List<List<String>> nameValueList, List<String> ConditionTokens) throws interpException {
@@ -34,7 +34,7 @@ public class UpdateCmd extends ComplexCommand {
 
             for (List<String> nameValuePair: nameValueList){
                 String attribute = nameValuePair.get(indexofATTRIBUTE);
-                int attributeIndex = table.getAttributesName().indexOf(attribute);
+                int attributeIndex = table.indexofAttribute(attribute);
                 String newValue = nameValuePair.get(indexofVALUE);
                 for (int i = 0; i < qualifiedItems.size(); i++){
                     String[] toarray = qualifiedItems.get(i).split("\t");
