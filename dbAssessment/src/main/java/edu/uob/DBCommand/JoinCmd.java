@@ -28,29 +28,25 @@ public class JoinCmd extends Command {
         secondAttributeName = temp;
     }
 
-    public int getFirstTableIndex(Table firstTable){
+    public void swapControl(Table firstTable){
         int indexFirstTable = -1;
-        if (!firstAttributeName.contains(".")){
-            if (!firstTable.getAttributesName().contains(firstAttributeName)){
-                swapAttribute();
-            }
-            indexFirstTable = firstTable.getAttributesName().indexOf(firstAttributeName);
-        }else{
+        if (firstAttributeName.contains(".")){
             String tableNameFirstName = firstAttributeName.split("\\.")[0];
-            String name = firstAttributeName.split("\\.")[1];
             if (!tableNameFirstName.equals(getTableName())){
                 swapAttribute();
             }
-            indexFirstTable = firstTable.getAttributesName().indexOf(firstAttributeName.split("\\.")[1]);
+        }else{
+            if (!firstTable.getAttributesName().contains(firstAttributeName)){
+                swapAttribute();
+            }
         }
-        return indexFirstTable;
     }
 
-    private int getSecondTableIndex(Table secondTable) {
-        if (secondAttributeName.split("\\.").length != 1){
-            return secondTable.getAttributesName().indexOf(secondAttributeName.split("\\.")[1]);
+    private int getTableIndex(Table table, String Attributes) {
+        if (Attributes.split("\\.").length != 1){
+            return table.getAttributesName().indexOf(Attributes.split("\\.")[1]);
         }else{
-            return secondTable.getAttributesName().indexOf(secondAttributeName);
+            return table.getAttributesName().indexOf(Attributes);
         }
     }
 
@@ -99,12 +95,13 @@ public class JoinCmd extends Command {
 
         List<String> itemsFirstTable = firstTable.getAllItems();
         List<String> itemsSecondTable = secondTable.getAllItems();
+        swapControl(firstTable);
 
-        int indexFirstTable = getFirstTableIndex(firstTable);
-        int indexSecondTable = getSecondTableIndex(secondTable);
+        int indexFirstTable = getTableIndex(firstTable, firstAttributeName);
+        int indexSecondTable = getTableIndex(secondTable, secondAttributeName);
 
         if (indexSecondTable == -1 || indexFirstTable == -1){
-            throw new interpException("Join command can't find common thing to join");
+            throw new interpException("[ERROR] Join command can't find common thing to join");
         }
 
         List<String> rawJoin = BoolOperation.join(itemsFirstTable, itemsSecondTable, indexFirstTable, indexSecondTable);

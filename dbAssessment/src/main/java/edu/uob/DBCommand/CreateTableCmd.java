@@ -12,19 +12,18 @@ import java.util.List;
 
 public class CreateTableCmd extends Command {
 
-    //maybe List<String> will be just fine
+
     private List<String[]> attributeList;
-    // needed? for interface
-//    private String attributeNames;
+    File fileContainTable;
 
     public CreateTableCmd(String DBName, String tableName, List<String[]> attributeList){
         super(DBName, tableName);
         this.attributeList = attributeList;
+        fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
     }
 
     @Override
     public String execute() throws interpException {
-        File fileContainTable = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
         if (SQLKeywords.SQLKeyWords.contains(getTableName().toUpperCase())){
             throw new interpException("[ERROR], TableName Name cannot be SQL Keywords.");
         }
@@ -32,10 +31,6 @@ public class CreateTableCmd extends Command {
         try {
             if (fileContainTable.createNewFile()) {
                 String attributeLine = setUpAttributeLine();
-                if (attributeLine == null){
-                    fileContainTable.delete();
-                    throw new interpException("[ERROR], can not be none attribute");
-                }
                 BufferedWriter writer = new BufferedWriter(new FileWriter(fileContainTable));
                 writer.write(attributeLine);
                 writer.flush();
@@ -44,6 +39,7 @@ public class CreateTableCmd extends Command {
                 return "[ERROR]. Table already exists";
             }
         } catch (IOException e) {
+            fileContainTable.delete();
             throw new interpException("[ERROR], Failed to create Table");
 
         }
@@ -54,6 +50,7 @@ public class CreateTableCmd extends Command {
         for (int i = 0; i < attributeList.size(); i++){
             for (int j = i + 1; j < attributeList.size(); j++){
                 if (attributeList.get(i)[1].equals(attributeList.get(j)[1])){
+                    fileContainTable.delete();
                     throw new interpException("[ERROR] one table cannot have two same attribute name");
                 }
             }
@@ -62,7 +59,8 @@ public class CreateTableCmd extends Command {
         for (String[] attributeName: attributeList){
             // attributeName consists of 0.tablename 1.attribute
             if (SQLKeywords.SQLKeyWords.contains(attributeName[1].toUpperCase())){
-                return null;
+                fileContainTable.delete();
+                throw new interpException("[ERROR] table attribute cannot be SQL Keywords");
             }
             ans = ans + attributeName[1]+ "\t";
         }

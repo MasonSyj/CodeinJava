@@ -132,12 +132,20 @@ public class ExampleDBTests {
     @Test
     public void testCreate(){
         String randomName = generateRandomName();
-        String reponse = sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        String reponse = sendCommandToServer("CREATE DATABASE . ;");
+        assertTrue(reponse.contains("[ERROR]"));
+        reponse = sendCommandToServer("CREATE DATABASE " + randomName + ";");
         assertTrue(reponse.contains("[OK]"));
         reponse = sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        System.out.println(reponse);
         assertTrue(reponse.contains("[ERROR]"));
 
         sendCommandToServer("USE " + randomName + ";");
+        reponse = sendCommandToServer("CREATE TABLE empty ();");
+        System.out.println(reponse);
+        assertTrue(reponse.contains("[OK]"));
+        reponse = sendCommandToServer("CREATE TABLE marks (name, mark, pass, pass);");
+        assertTrue(reponse.contains("[ERROR] one table cannot have two same attribute name"));
         reponse = sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         assertTrue(reponse.contains("[OK]"));
         reponse = sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
@@ -148,7 +156,8 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName2 + ";");
         sendCommandToServer("USE " + randomName2 + ";");
         sendCommandToServer("CREATE TABLE phone (name, brand, price);");
-        sendCommandToServer("CREATE TABLE laptop (name, brand, usage, function);");
+        reponse = sendCommandToServer("CREATE TABLE laptop (name, brand, usage, function, select);");
+        assertTrue(reponse.contains("[ERROR] table attribute cannot be SQL Keywords"));
     }
     @Test
     public void testUse(){
@@ -164,6 +173,10 @@ public class ExampleDBTests {
 
         sendCommandToServer("USE " + randomName + ";");
         assertTrue(Parser.getCurrentDBName().equals(randomName));
+
+        String response = sendCommandToServer("use " + generateRandomName() + ";");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR]"));
     }
 
     @Test
@@ -201,8 +214,10 @@ public class ExampleDBTests {
         String response = sendCommandToServer("ALTER TABLE marks add rank;");
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("ALTER TABLE marks add rank;");
-        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("ALTER TABLE marks add select;");
+        assertTrue(response.contains("[ERROR]"));
+        assertTrue(response.contains("attribute Name cannot be SQL Keywords."));
 
         response = sendCommandToServer("ALTER TABLE marks drop pass;");
         assertTrue(response.contains("[OK]"));
@@ -210,6 +225,8 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks drop UnknownName;");
         assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("ALTER TABLE marks drop id;");
+        assertTrue(response.contains("[ERROR], you can not drop auto id column"));
     }
 
     @Test
@@ -295,12 +312,15 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO customers VALUES (21, 'John Doe', 'johndoe@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (22, 'Jane Smith', 'janesmith@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (23, 'Bob Johnson', 'bjohnson@example.com');");
-        response = sendCommandToServer("Select * from customers;");
-        System.out.println(response);
 
         sendCommandToServer("INSERT INTO orders VALUES (21, '2022-01-01', 100);");
         sendCommandToServer("INSERT INTO orders VALUES (23, '2022-02-15', 75);");
         response = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND customers.Customid;");
+        System.out.println(response);
+        response = sendCommandToServer("JOIN customers AND orders ON Orderid AND customers.Customid;");
+        System.out.println(response);
+
+        response = sendCommandToServer("JOIN customers AND orders ON tom AND jerry;");
         System.out.println(response);
     }
 

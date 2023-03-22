@@ -48,19 +48,5 @@ public class DropDBCmd extends Command {
 		}else{
 			return "[OK] ， Database droped succesfully";
 		}
-
-//		Path path = Paths.get("databases" + File.separator + getDBName());
-//		try {
-//			Files.walk(path)
-//					.sorted(java.util.Comparator.reverseOrder())
-//					.map(Path::toFile)
-//					.forEach(File::delete);
-//					Files.delete(path);
-//			return "[OK] ， Database drop successfully";
-//		} catch (Exception e) {
-//			return "[ERROR] , Database failed to drop: " + e.getMessage();
-//		}
-
-
 	}
 }
