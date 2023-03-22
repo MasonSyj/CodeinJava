@@ -4,10 +4,11 @@ import edu.uob.*;
 import edu.uob.Enums.AlterationType;
 import edu.uob.Exceptions.interpException;
 
-public class AlterCmd extends Command {
+public class AlterCmd extends ComplexCommand {
     AlterationType alterationType;
     String attributeName;
-    public AlterCmd(String DBName, String tableName, AlterationType type, String attributeName) {
+
+    public AlterCmd(String DBName, String tableName, AlterationType type, String attributeName) throws interpException {
         super(DBName, tableName);
         this.alterationType = type;
         this.attributeName = attributeName;
@@ -27,9 +28,6 @@ public class AlterCmd extends Command {
             throw new interpException("[ERROR], attribute Name cannot be SQL Keywords.");
         }
 
-        // this two line appeared many times, may add to the Parent Class: Command
-        FileDealer fd = new FileDealer(getDBName(), getTableName());
-        Table table = fd.file2Table();
         if (table.getAttributesName().contains(attributeName)){
             throw new interpException("[ERROR] attribute already exists");
         }else{
@@ -43,8 +41,6 @@ public class AlterCmd extends Command {
         if (attributeName.equals("id")){
             throw new interpException("[ERROR], you can not drop auto id column");
         }
-        FileDealer fd = new FileDealer(getDBName(), getTableName());
-        Table table = fd.file2Table();
         if (table.dropColumn(attributeName)){
             return "[OK], drop attribute " + attributeName + " successfully";
         }else{

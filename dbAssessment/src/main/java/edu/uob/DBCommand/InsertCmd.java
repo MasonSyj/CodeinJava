@@ -7,10 +7,10 @@ import edu.uob.Table;
 
 import java.util.List;
 
-public class InsertCmd extends Command {
+public class InsertCmd extends ComplexCommand {
 	private List<String> valueList;
 
-	public InsertCmd(String DBName, String tableName, List<String> valueList){
+	public InsertCmd(String DBName, String tableName, List<String> valueList) throws interpException {
 		super(DBName, tableName);
 		this.valueList = valueList;
 
@@ -19,9 +19,6 @@ public class InsertCmd extends Command {
 	@Override
 	public String execute() throws interpException {
 		try{
-			FileDealer fileContaningTable = new FileDealer(getDBName(), getTableName());
-			Table table = fileContaningTable.file2Table();
-
 			if (table.getNumofAttributes() != valueList.size() + 1){
 				throw new interpException("[ERROR], A table will n attribute must insert into n values.");
 			}

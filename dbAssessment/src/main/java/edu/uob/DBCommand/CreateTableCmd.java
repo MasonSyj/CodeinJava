@@ -10,7 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class CreateTableCmd extends Command {
+public class CreateTableCmd extends BasicCommand {
 
 
     private List<String[]> attributeList;

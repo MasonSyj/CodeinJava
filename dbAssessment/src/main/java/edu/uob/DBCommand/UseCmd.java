@@ -5,7 +5,7 @@ import edu.uob.Exceptions.interpException;
 
 import java.io.File;
 
-public class UseCmd extends Command {
+public class UseCmd extends BasicCommand {
 
     public UseCmd(String DBname){
         super(DBname, null);

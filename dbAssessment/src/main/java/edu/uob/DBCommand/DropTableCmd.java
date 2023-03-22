@@ -5,7 +5,7 @@ import edu.uob.Exceptions.interpException;
 
 import java.io.File;
 
-public class DropTableCmd extends Command {
+public class DropTableCmd extends BasicCommand {
 	public DropTableCmd(String DBName, String tableName) {
 		super(DBName, tableName);
 	}

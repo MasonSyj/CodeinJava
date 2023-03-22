@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class UpdateCmd extends Command {
+public class UpdateCmd extends ComplexCommand {
     private List<List<String>> nameValueList;
     private List<String> ConditionTokens;
 
@@ -19,7 +19,7 @@ public class UpdateCmd extends Command {
     private static final int indexofVALUE = 2;
 
 
-    public UpdateCmd(String DBName, String tableName, List<List<String>> nameValueList, List<String> ConditionTokens) {
+    public UpdateCmd(String DBName, String tableName, List<List<String>> nameValueList, List<String> ConditionTokens) throws interpException {
         super(DBName, tableName);
         this.nameValueList = nameValueList;
         this.ConditionTokens = ConditionTokens;
@@ -27,10 +27,8 @@ public class UpdateCmd extends Command {
 
 
     @Override
-    public String execute()  throws interpException{
+    public String execute() throws interpException{
         try{
-            FileDealer fd = new FileDealer(getDBName(), getTableName());
-            Table table = fd.file2Table();
             List<String> qualifiedItems = ConditionDealer.conditionExecute(ConditionTokens, table);
             List<String> others = BoolOperation.AMinusB(table.getAllItems(), qualifiedItems);
 

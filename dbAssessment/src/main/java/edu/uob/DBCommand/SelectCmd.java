@@ -9,12 +9,12 @@ import edu.uob.Table;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectCmd extends Command {
+public class SelectCmd extends ComplexCommand {
 
     List<String[]> attributeList;
     List<String> ConditionTokens;
 
-    public SelectCmd(String DBName, String tableName, List<String[]> attributeList, List<String> ConditionTokens) {
+    public SelectCmd(String DBName, String tableName, List<String[]> attributeList, List<String> ConditionTokens) throws interpException {
         super(DBName, tableName);
         this.attributeList = attributeList;
         this.ConditionTokens = ConditionTokens;
@@ -34,9 +34,6 @@ public class SelectCmd extends Command {
     @Override
     public String execute() throws interpException {
         try{
-            FileDealer fd = new FileDealer(getDBName(), getTableName());
-            Table table = fd.file2Table();
-
             List<String> items;
             if (ConditionTokens == null){
                 items = table.getAllItems();

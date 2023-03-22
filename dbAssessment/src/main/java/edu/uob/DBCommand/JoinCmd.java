@@ -8,17 +8,30 @@ import edu.uob.Table;
 
 import java.util.*;
 
-public class JoinCmd extends Command {
+public class JoinCmd extends ComplexCommand {
     private String secondTableName;
     private String firstAttributeName;
     private String secondAttributeName;
+    FileDealer fileDealer2;
+    Table secondTable;
+
+    int indexFirstTable;
+    int indexSecondTable;
 
 
-    public JoinCmd(String DBname, String firstTableName, String secondTableName, String firstAttributeName, String secondAttributeName){
+    public JoinCmd(String DBname, String firstTableName, String secondTableName, String firstAttributeName, String secondAttributeName) throws interpException {
         super(DBname, firstTableName);
         this.secondTableName = secondTableName;
         this.firstAttributeName = firstAttributeName;
         this.secondAttributeName = secondAttributeName;
+        fileDealer2 = new FileDealer(getDBName(), secondTableName);
+        secondTable = fileDealer2.file2Table();
+        swapControl();
+        indexFirstTable = getTableIndex(table, this.firstAttributeName);
+        indexSecondTable = getTableIndex(secondTable, this.secondAttributeName);
+        if (indexSecondTable == -1 || indexFirstTable == -1){
+            throw new interpException("[ERROR] Join command can't find common thing to join");
+        }
     }
 
     // swap if firstAttributeName belongs to the secondTable
@@ -28,15 +41,14 @@ public class JoinCmd extends Command {
         secondAttributeName = temp;
     }
 
-    public void swapControl(Table firstTable){
-        int indexFirstTable = -1;
+    public void swapControl(){
         if (firstAttributeName.contains(".")){
-            String tableNameFirstName = firstAttributeName.split("\\.")[0];
-            if (!tableNameFirstName.equals(getTableName())){
+            String tableNameFirstAttribute = firstAttributeName.split("\\.")[0];
+            if (!tableNameFirstAttribute.equals(getTableName())){
                 swapAttribute();
             }
         }else{
-            if (!firstTable.getAttributesName().contains(firstAttributeName)){
+            if (!table.getAttributesName().contains(firstAttributeName)){
                 swapAttribute();
             }
         }
@@ -50,36 +62,36 @@ public class JoinCmd extends Command {
         }
     }
 
-    private int numofindexs(int numofAttributesA, int numofAttributesB, int indexFirstTable, int indexofAttributeB){
+    private int numofindexs(int numofAttributesA, int numofAttributesB){
         int ans = numofAttributesA + numofAttributesB - 2;
 
         if (indexFirstTable != 0){
             ans--;
         }
 
-        if (indexofAttributeB != 0){
+        if (indexSecondTable != 0){
             ans--;
         }
         return ans;
     }
 
-    private String buildIndexArrAndAttributeLine(int[] indexs, Table firstTable, Table secondTable, int indexFirstTable, int indexSecondTable){
+    private String buildIndexArrAndAttributeLine(int[] indexs, int indexFirstTable, int indexSecondTable){
         int cnt = 0;
         String attributeLine = "id\t";
 
-        for (int i = 1; i < firstTable.getNumofAttributes(); i++) {
+        for (int i = 1; i < table.getNumofAttributes(); i++) {
             if (i == indexFirstTable){
                 continue;
             }
             indexs[cnt++] = i;
-            attributeLine = attributeLine + firstTable.getTableName() + "." + firstTable.getAttributesName().get(i) + "\t";
+            attributeLine = attributeLine + table.getTableName() + "." + table.getAttributesName().get(i) + "\t";
         }
 
         for (int i = 1; i < secondTable.getNumofAttributes(); i++){
             if (i == indexSecondTable){
                 continue;
             }
-            indexs[cnt++] = firstTable.getNumofAttributes() + i;
+            indexs[cnt++] = table.getNumofAttributes() + i;
             attributeLine = attributeLine + secondTable.getTableName() + "." + secondTable.getAttributesName().get(i) + "\t";
         }
         return attributeLine;
@@ -87,37 +99,18 @@ public class JoinCmd extends Command {
 
     @Override
     public String execute() throws interpException {
-        FileDealer fd1 = new FileDealer(getDBName(), getTableName());
-        FileDealer fd2 = new FileDealer(getDBName(), secondTableName);
-
-        Table firstTable = fd1.file2Table();
-        Table secondTable = fd2.file2Table();
-
-        List<String> itemsFirstTable = firstTable.getAllItems();
-        List<String> itemsSecondTable = secondTable.getAllItems();
-        swapControl(firstTable);
-
-        int indexFirstTable = getTableIndex(firstTable, firstAttributeName);
-        int indexSecondTable = getTableIndex(secondTable, secondAttributeName);
-
-        if (indexSecondTable == -1 || indexFirstTable == -1){
-            throw new interpException("[ERROR] Join command can't find common thing to join");
-        }
-
-        List<String> rawJoin = BoolOperation.join(itemsFirstTable, itemsSecondTable, indexFirstTable, indexSecondTable);
+        List<String> rawJoin = BoolOperation.join(table.getAllItems(), secondTable.getAllItems(), indexFirstTable, indexSecondTable);
 
         Table temp = new Table(getDBName(), "temp" + (int) (Math.random() * 1000));
 
-        int totalLength = firstTable.getNumofAttributes() + secondTable.getNumofAttributes();
-        for (int i = 0; i < totalLength; i++){
+        for (int i = 0; i < table.getNumofAttributes() + secondTable.getNumofAttributes(); i++){
             temp.addNewColumn("null");
         }
         temp.updateClass(rawJoin);
 
-        int numofColumns = numofindexs(firstTable.getNumofAttributes(), secondTable.getNumofAttributes(), indexFirstTable, indexSecondTable);
-
+        int numofColumns = numofindexs(table.getNumofAttributes(), secondTable.getNumofAttributes());
         int[] indexs = new int[numofColumns];
-        String attributeLine = buildIndexArrAndAttributeLine(indexs, firstTable, secondTable, indexFirstTable, indexSecondTable);
+        String attributeLine = buildIndexArrAndAttributeLine(indexs, indexFirstTable, indexSecondTable);
 
         List<String> trimmedRes = new ArrayList<>();
         for (int j = 0; j < rawJoin.size(); j++){
@@ -128,15 +121,10 @@ public class JoinCmd extends Command {
             trimmedRes.add(FileDealer.transform2csvLine(currentItem));
         }
 
-        int cnt = 1;
         String ans = "[OK]\n" + attributeLine + "\n";
-        for (String item: trimmedRes){
-            ans = ans + cnt++ + "\t" + item + "\n";
+        for (int i = 0; i < trimmedRes.size(); i++){
+            ans = ans + (i + 1) + "\t" + trimmedRes.get(i) + "\n";
         }
-
         return ans;
-
     }
-
-
 }

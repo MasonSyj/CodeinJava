@@ -8,11 +8,11 @@ import edu.uob.Table;
 
 import java.util.*;
 
-public class DeleteCmd extends Command {
+public class DeleteCmd extends ComplexCommand {
 
     List<String> conditionTokens;
 
-    public DeleteCmd(String DBName, String tableName, List<String> ConditionTokens) {
+    public DeleteCmd(String DBName, String tableName, List<String> ConditionTokens) throws interpException {
         super(DBName, tableName);
         this.conditionTokens = ConditionTokens;
     }
@@ -20,8 +20,6 @@ public class DeleteCmd extends Command {
     @Override
     public String execute() throws interpException {
         try {
-            FileDealer fd = new FileDealer(getDBName(), getTableName());
-            Table table = fd.file2Table();
             List<String> deletedItem = ConditionDealer.conditionExecute(conditionTokens, table);
             List<String> all = table.getAllItems();
             for (String deleted: deletedItem){

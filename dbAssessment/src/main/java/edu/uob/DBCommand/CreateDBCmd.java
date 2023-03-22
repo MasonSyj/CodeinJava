@@ -6,7 +6,7 @@ import edu.uob.SQLKeywords;
 
 import java.io.File;
 
-public class CreateDBCmd extends Command {
+public class CreateDBCmd extends BasicCommand {
     public CreateDBCmd(String DBname){
         super(DBname, null);
     }
