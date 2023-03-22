@@ -15,6 +15,7 @@ public class DropTableCmd extends BasicCommand {
 		File file = new File( "databases" + File.separator + getDBName() + File.separator + getTableName());
 
 		if (file.delete()) {
+
 			return "[OK]， Table " + getTableName() + " droped successfully";
 		} else {
 			throw new interpException("[ERROR]， Table " + getTableName() + "failed to drop");

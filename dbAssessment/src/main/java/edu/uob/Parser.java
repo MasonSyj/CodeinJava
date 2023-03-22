@@ -5,6 +5,7 @@ import edu.uob.Enums.AlterationType;
 import edu.uob.Exceptions.DBException;
 import edu.uob.Exceptions.parseException;
 
+import java.io.File;
 import java.util.*;
 
 public class Parser {
@@ -114,6 +115,8 @@ public class Parser {
 		if (tokens.get(1).toLowerCase().equals("database")){
 			DropDBCmd dropDBCmd = new DropDBCmd(tokens.get(2), null);
 			execResult = dropDBCmd.execute();
+			File dir = new File("databases" + File.separator + tokens.get(2));
+			dir.delete();
 		}else if (tokens.get(1).toLowerCase().equals("table")){
 			DropTableCmd dropTableCmd = new DropTableCmd(currentDBName, tokens.get(2));
 			execResult = dropTableCmd.execute();

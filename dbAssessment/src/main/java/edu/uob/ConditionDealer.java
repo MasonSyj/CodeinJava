@@ -10,7 +10,6 @@ public class ConditionDealer {
 
     public static List<String> convertToSuffix(List<String> tokens) {
         String suffix = "";
-
         Deque<String> stack = new ArrayDeque<>();
 
         for (String token : tokens) {
@@ -27,32 +26,41 @@ public class ConditionDealer {
                     stack.pop();
                 }
             } else {
-                while (!stack.isEmpty() && opcmp(token.toLowerCase(), stack.peek().toLowerCase())) {
-                    suffix = suffix + stack.pop() + "\t";
+                if (stack.isEmpty()){
+                    stack.push(token);
+                }else{
+                    String temp = "";
+                    while (!stack.isEmpty() && opPrecedence(token) <= opPrecedence(stack.peek())) {
+                        temp = stack.pop();
+                        suffix = suffix + temp + "\t";
+                    }
+                    if (temp.equals("(")){
+                        stack.push(temp);
+                    }
+                    stack.push(token);
                 }
-                stack.push(token);
             }
         }
 
         while (!stack.isEmpty()) {
-            suffix = suffix + stack.pop() + " ";
+            suffix = suffix + stack.pop() + "\t";
         }
 
         return Arrays.stream(suffix.toString().trim().split("\t")).toList();
     }
 
-    private static boolean opcmp(String op1, String op2){
-        if (op2.equals("(")){
-            return false;
-        } else if (op2.equals("and")){
-            return true;
-        }else {
-            return op2.equals(op1);
+    private static int opPrecedence(String operator) {
+        if (operator.toLowerCase().equals("and")) {
+            return 2;
+        } else if (operator.toLowerCase().equals("or")) {
+            return 1;
+        } else {
+            return 0;
         }
     }
 
     private static boolean isOperand(String token) {
-        return !token.equals("and") && !token.equals("or") && !token.equals("(") && !token.equals(")");
+        return !token.toLowerCase().equals("and") && !token.toLowerCase().equals("or") && !token.equals("(") && !token.equals(")");
     }
 
     public static List<String> conditionExecute(List<String> conditions, Table t){

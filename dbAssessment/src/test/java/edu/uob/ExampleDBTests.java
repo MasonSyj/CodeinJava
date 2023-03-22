@@ -173,18 +173,21 @@ public class ExampleDBTests {
     @Test
     public void testDropCommand(){
         String randomName = generateRandomName();
+        String response = "";
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
+
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("CREATE TABLE units (name, points, category);");
 
-        String response = sendCommandToServer("DROP table marks;");
+        response = sendCommandToServer("DROP table marks;");
         assertTrue(response.contains("[OK]"));
 
         response = sendCommandToServer("DROP table marks;");
         assertTrue(response.contains("[ERROR]"));
 
         response = sendCommandToServer("DROP DATABASE " + randomName + ";");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
 
         response = sendCommandToServer("DROP DATABASE " + randomName + ";");
@@ -265,26 +268,27 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
         String response = "";
-//        response = sendCommandToServer("SELECT marks.Brand, marks.Price FROM marks where Price > 6000;");
-//        System.out.println(response);
-//        assertTrue(response.contains("[OK]"));
-//        response = sendCommandToServer("SELECT marks.Brand, noname.Price FROM marks where Price > 6000;");
-//        System.out.println(response);
-//        assertTrue(response.contains("[ERROR]"));
-//        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand != Huawei);");
-//        System.out.println(response);
-//        assertTrue(response.contains("[OK]"));
-//        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 and (Brand like Google or Brand like Apple);");
-//        System.out.println(response);
-//        assertTrue(response.contains("[OK]"));
-//
-//        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand ! = Huawei);");
-//        System.out.println(response);
-//        assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("SELECT marks.Brand, marks.Price FROM marks where Price > 6000;");
+        System.out.println(response);
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("SELECT marks.Brand, noname.Price FROM marks where Price > 6000;");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand != Huawei);");
+        System.out.println(response);
+        assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 and (Brand like Google or Brand like Apple);");
+        System.out.println(response);
+        assertTrue(response.contains("[OK]"));
+
+        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand ! = Huawei);");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR]"));
 
         response = sendCommandToServer("SELECT * FROM marks where Price > 5500 or Brand like Google and Brand like Apple;");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
-        assertFalse(response.contains("Apple"));
+        assertTrue(response.contains("Apple"));
         assertFalse(response.contains("Huawei"));
 
     }
