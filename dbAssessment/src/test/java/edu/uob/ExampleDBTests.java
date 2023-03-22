@@ -133,6 +133,8 @@ public class ExampleDBTests {
         assertTrue(reponse.contains("[ERROR]"));
 
         sendCommandToServer("USE " + randomName + ";");
+        reponse = sendCommandToServer("CREATE TABLE blank;");
+        assertTrue(reponse.contains("[OK]"));
         reponse = sendCommandToServer("CREATE TABLE empty ();");
         assertTrue(reponse.contains("[OK]"));
         reponse = sendCommandToServer("CREATE TABLE marks (name, mark, pass, pass);");
@@ -568,13 +570,14 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR], CREATE cmd should come with DATABASE or TABLE"));
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
         response = sendCommandToServer("INSERT marks VALUES ('Pixel 7', Google, 7000);");
-        assertTrue(response.contains("[ERROR], INSERT cmd should come with a INTO"));
+        System.out.println(response);
+        assertTrue(response.contains("INSERT cmd should come with a INTO"));
         response = sendCommandToServer("INSERT INTO marks ('Pixel 7', Google, 7000);");
-        assertTrue(response.contains("[ERROR], INSERT cmd should come with a VALUES"));
+        assertTrue(response.contains("INSERT cmd should come with a VALUES"));
         response = sendCommandToServer("INSERT INTO marks VALUES 'Pixel 7', Google, 7000);");
-        assertTrue(response.contains("[ERROR], INSERT cmd should come with a ( after VALUES)"));
+        assertTrue(response.contains("INSERT cmd should come with a ( after VALUES)"));
         response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000;");
-        assertTrue(response.contains("[ERROR], ValueList didn't end correctly"));
+        assertTrue(response.contains("ValueList didn't end correctly"));
 
         sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
@@ -582,7 +585,7 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
         response = sendCommandToServer("update marks Price = 7000;");
-        assertTrue(response.contains("[ERROR], Update operation needs to have a set"));
+        assertTrue(response.contains("Update operation needs to have a set"));
         response = sendCommandToServer("update marks set Price = 7000 Brand like Huawei;");
         assertTrue(response.contains("[ERROR], Update operation needs to have a where"));
         response = sendCommandToServer("update marks set Price = 7000 where;");

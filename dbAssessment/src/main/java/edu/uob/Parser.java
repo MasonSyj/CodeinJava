@@ -162,31 +162,41 @@ public class Parser {
 	}
 
 	private void parseJOIN() throws DBException {
-		if (!tokens.get(2).toLowerCase().equals("and")){
-			throw new parseException("[ERROR], Join operation needs an AND after first tablename");
-		}else if (!tokens.get(4).toLowerCase().equals("on")){
-			throw new parseException("[ERROR], Join operation needs an ON after second tablename");
-		}else if (!tokens.get(6).toLowerCase().equals("and")){
-			throw new parseException("[ERROR], Join operation needs an AND after first Attribute name");
+		try{
+			if (!tokens.get(2).toLowerCase().equals("and")){
+				throw new parseException("Join operation needs an AND after first tablename");
+			}else if (!tokens.get(4).toLowerCase().equals("on")){
+				throw new parseException("Join operation needs an ON after second tablename");
+			}else if (!tokens.get(6).toLowerCase().equals("and")){
+				throw new parseException("Join operation needs an AND after first Attribute name");
+			}
+
+			JoinCmd joinCmd = new JoinCmd(currentDBName, tokens.get(1), tokens.get(3), tokens.get(5), tokens.get(7));
+			execResult = joinCmd.execute();
+		}catch (Exception e){
+			throw new parseException("[ERROR], Join operation is incomplete. " + e.getMessage());
 		}
-
-		JoinCmd joinCmd = new JoinCmd(currentDBName, tokens.get(1), tokens.get(3), tokens.get(5), tokens.get(7));
-		execResult = joinCmd.execute();
-
 	}
 
 	private void parseCREATE() throws DBException {
 		if (tokens.get(1).toLowerCase().equals("database")){
-//			currentDBName = tokens.get(2);
+			if (tokens.get(2).equals(";")){
+				throw new parseException("[ERROR], create database without giving name.");
+			}
 			CreateDBCmd createDBCmd = new CreateDBCmd(tokens.get(2));
 			execResult = createDBCmd.execute();
-		} else if (tokens.get(1).toLowerCase().equals("table")){
-			if (tokens.get(3).equals("(")){
+		} else if (tokens.get(1).toLowerCase().equals("table")) {
+			if (tokens.get(2).equals(";")){
+				throw new parseException("[ERROR], create table without giving name.");
+			}
+			if (!tokens.get(3).equals("(")){
+				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), null);
+				execResult = createTableCmd.execute();
+			}else if (tokens.get(3).equals("(")){
 				List<String[]> attributeList = parseAttributeList(tokens, tokens.get(2), 4);
 				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), attributeList);
 				execResult = createTableCmd.execute();
 			}
-
 		} else{
 			throw new parseException("[ERROR], CREATE cmd should come with DATABASE or TABLE");
 		}
@@ -194,23 +204,28 @@ public class Parser {
 	}
 
 	private void parseINSERT() throws DBException {
-		if (!tokens.get(1).toLowerCase().equals("into")){
-			throw new parseException("[ERROR], INSERT cmd should come with a INTO");
+		try {
+			if (!tokens.get(1).toLowerCase().equals("into")){
+				throw new parseException("INSERT cmd should come with a INTO");
+			}
+			String tableName = tokens.get(2);
+
+			if (!tokens.get(3).toLowerCase().equals("values")){
+				throw new parseException("INSERT cmd should come with a VALUES");
+			}
+
+			if (!tokens.get(4).equals("(")){
+				throw new parseException("INSERT cmd should come with a ( after VALUES)");
+			}
+
+			List<String> valueList = parseValueList(tokens, 5);
+
+			InsertCmd insertCmd = new InsertCmd(currentDBName, tableName, valueList);
+			execResult = insertCmd.execute();
+		} catch (Exception e){
+			throw new parseException("[ERROR] INSERT operation is incomplete." + e.getMessage());
 		}
-		String tableName = tokens.get(2);
 
-		if (!tokens.get(3).toLowerCase().equals("values")){
-			throw new parseException("[ERROR], INSERT cmd should come with a VALUES");
-		}
-
-		if (!tokens.get(4).equals("(")){
-			throw new parseException("[ERROR], INSERT cmd should come with a ( after VALUES)");
-		}
-
-		List<String> valueList = parseValueList(tokens, 5);
-
-		InsertCmd insertCmd = new InsertCmd(currentDBName, tableName, valueList);
-		execResult = insertCmd.execute();
 	}
 
 	public void parseConditions(int index){

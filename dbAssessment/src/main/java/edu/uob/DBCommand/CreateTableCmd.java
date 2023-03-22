@@ -12,7 +12,6 @@ import java.util.List;
 
 public class CreateTableCmd extends BasicCommand {
 
-
     private List<String[]> attributeList;
     File fileContainTable;
 
@@ -47,6 +46,9 @@ public class CreateTableCmd extends BasicCommand {
 
     public String setUpAttributeLine() throws interpException {
         String ans = "id\t";
+        if (attributeList == null){
+            return ans;
+        }
         for (int i = 0; i < attributeList.size(); i++){
             for (int j = i + 1; j < attributeList.size(); j++){
                 if (attributeList.get(i)[1].equals(attributeList.get(j)[1])){

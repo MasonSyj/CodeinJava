@@ -19,7 +19,7 @@ public class InsertCmd extends ComplexCommand {
 	@Override
 	public String execute() throws interpException {
 		try{
-			if (table.getNumofAttributes() != valueList.size() + 1){
+			if (table.getNumofAttributes() != valueList.size() + 1 || valueList.size() == 0){
 				throw new interpException("[ERROR], A table will n attribute must insert into n values.");
 			}
 
