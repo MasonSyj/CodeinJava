@@ -1,10 +1,8 @@
 package edu.uob.DBCommand;
 
 import edu.uob.ConditionDealer;
-import edu.uob.DBCommand.Command;
 import edu.uob.Exceptions.interpException;
 import edu.uob.FileDealer;
-import edu.uob.Table;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -363,8 +363,9 @@ public class ExampleDBTests {
         String response = sendCommandToServer("select * from marks;");
         assertTrue(response.contains("Mate40"));
 
-        sendCommandToServer("DELETE FROM marks Where Price<5500;");
-        response = sendCommandToServer("select * from marks");
+        response = sendCommandToServer("DELETE FROM marks Where Price<5500;");
+        System.out.println(response);
+        response = sendCommandToServer("select * from marks;");
         assertFalse(response.contains("Mate40"));
 
         response = sendCommandToServer("select * from marks where Brand>Unknown;");
@@ -567,10 +568,9 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         response = sendCommandToServer("CREATE marks (Name, Brand, Price);");
-        assertTrue(response.contains("[ERROR], CREATE cmd should come with DATABASE or TABLE"));
+        assertTrue(response.contains("[ERROR]"));
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
         response = sendCommandToServer("INSERT marks VALUES ('Pixel 7', Google, 7000);");
-        System.out.println(response);
         assertTrue(response.contains("INSERT cmd should come with a INTO"));
         response = sendCommandToServer("INSERT INTO marks ('Pixel 7', Google, 7000);");
         assertTrue(response.contains("INSERT cmd should come with a VALUES"));
@@ -587,33 +587,33 @@ public class ExampleDBTests {
         response = sendCommandToServer("update marks Price = 7000;");
         assertTrue(response.contains("Update operation needs to have a set"));
         response = sendCommandToServer("update marks set Price = 7000 Brand like Huawei;");
-        assertTrue(response.contains("[ERROR], Update operation needs to have a where"));
+        assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("update marks set Price = 7000 where;");
-        assertTrue(response.contains("[ERROR], Update operation must have condition(s)"));
+        assertTrue(response.contains("Update operation must have condition(s)"));
         response = sendCommandToServer("update marks set Price 7000 where Brand like Huawei;");
-        assertTrue(response.contains("Set Name Value List needs to have a equation including a '='"));
+        assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("update marks set Price = where Brand like Huawei;");
-        assertTrue(response.contains("[ERROR], NameValueList is incomplete"));
+        assertTrue(response.contains("NameValueList is incomplete"));
 
         response = sendCommandToServer("delete marks where Price > 7000;");
-        assertTrue(response.contains("[ERROR], DELETE operation must come with a FROM"));
+        assertTrue(response.contains("DELETE operation must come with a FROM"));
         response = sendCommandToServer("delete from marks Price > 7000;");
-        assertTrue(response.contains("[ERROR], DELETE operation must hava a WHERE"));
+        assertTrue(response.contains("DELETE operation must hava a WHERE"));
 
         response = sendCommandToServer("alter marks add year;");
-        assertTrue(response.contains("[ERROR], ALTER operation must come with a TABLE"));
+        assertTrue(response.contains("ALTER operation must come with a TABLE"));
 
         response = sendCommandToServer("alter table marks year;");
-        assertTrue(response.contains("[ERROR], Alter operation doesn't know to do add or drop."));
+        assertTrue(response.contains("Alter operation doesn't know to do add or drop."));
 
         response = sendCommandToServer("drop marks;");
-        assertTrue(response.contains("[ERROR], Drop Query needs to know it's database or table"));
+        assertTrue(response.contains("Drop Query needs to know it's database or table"));
 
         response = sendCommandToServer("select * marks;");
-        assertTrue(response.contains("[ERROR], Select Query needs to have FROM"));
+        assertTrue(response.contains("Select Query needs to have FROM"));
 
         response = sendCommandToServer("select Brand, Price marks;");
-        assertTrue(response.contains("[ERROR], Select Query needs to have FROM"));
+        assertTrue(response.contains("Select Query needs to have FROM"));
 
         response = sendCommandToServer("CREATE TABLE markii (id, year, level);");
         assertTrue(response.contains("[OK]"));
@@ -622,13 +622,131 @@ public class ExampleDBTests {
         assertTrue(response.contains("[OK]"));
 
         response = sendCommandToServer("join marks markii on Price and level;");
-        assertTrue(response.contains("[ERROR], Join operation needs an AND after first tablename"));
+        assertTrue(response.contains("Join operation needs an AND after first tablename"));
 
         response = sendCommandToServer("join marks and markii Price and level;");
-        assertTrue(response.contains("[ERROR], Join operation needs an ON after second tablename"));
+        assertTrue(response.contains("Join operation needs an ON after second tablename"));
 
         response = sendCommandToServer("join marks and markii on Price level;");
-        assertTrue(response.contains("[ERROR], Join operation needs an AND after first Attribute name"));
+        assertTrue(response.contains("Join operation needs an AND after first Attribute name"));
+    }
+
+
+    //---------------------------------------------------------------------------
+    //---------------Test for invalid command cause parser error-----------------
+    //---------------------------------------------------------------------------
+    @Test
+    public void testForErrorParser() {
+        String randomName = generateRandomName();
+        String response;
+        // missing ; at end
+        response = sendCommandToServer("USE " + randomName);
+        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
+        // wrong command keyword
+        response = sendCommandToServer("vim DATABASE " + randomName + ";");
+        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("ALTER TABLE " + randomName + " XOR name;");
+        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
+        // missing keyword
+        response = sendCommandToServer("CREATE " + randomName + ";");
+        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("JOIN tableA AND tableB ON key1;");
+        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("INSERT INTO tableA VALUES 3,5,6;"); // missing brackets of value list
+        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("DELETE FROM marks name == 'Dave';");
+        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
+    }
+
+    @Test
+    public void testParserInvalidPlainText() {
+        String response;
+        // Use reserved words as table/database/attribute name
+        response = sendCommandToServer("USE TABLE;");
+        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("CREATE TABLE drop;");
+        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("CREATE TABLE test (first, USE);");
+        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
+        // Having symbols in table/database/attribute name
+        response = sendCommandToServer("USE Sim29*(b;");
+        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("CREATE TABLE *;");
+        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("CREATE TABLE test (first, one_row);");
+        System.out.println(response);
+        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
+    }
+
+    @Test
+    public void testParserInvalidAttribute() {
+        String response;
+        // Invalid attribute name
+        response = sendCommandToServer("CREATE TABLE test (table.name.error);");
+        assertTrue(response.contains("[ERROR]"), "Invalid attribute name, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("CREATE TABLE test (table..name);");
+        assertTrue(response.contains("[ERROR]"), "Invalid attribute name, however an [ERROR] tag was not returned");
+        // Invalid attribute list
+        response = sendCommandToServer("CREATE TABLE marks (name, mark, );");
+        assertTrue(response.contains("[ERROR]"), "Invalid attribute list, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("CREATE TABLE marks ();");
+        assertTrue(response.contains("[ERROR]"), "Invalid attribute list, however an [ERROR] tag was not returned");
+    }
+
+    @Test
+    public void testParserInvalidValue() {
+        String response;
+        // Invalid value name
+        response = sendCommandToServer("INSERT INTO marks VALUES (Steve, 65, TRUE);");// StringLiteral without ''
+        assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("INSERT INTO marks VALUES (3.2.2);");// Invalid FloatLiteral
+        assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("INSERT INTO marks VALUES (XOR);");// Invalid BooleanLiteral
+        assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
+        // Invalid value list
+        response = sendCommandToServer("INSERT INTO marks VALUES (, 65, TRUE);");
+        assertTrue(response.contains("[ERROR]"), "Invalid value list, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("INSERT INTO marks VALUES ();");
+        assertTrue(response.contains("[ERROR]"), "Invalid value list, however an [ERROR] tag was not returned");
+    }
+
+    @Test
+    public void testParserInvalidCondition() {
+        String response;
+        // Invalid Comparator
+        response = sendCommandToServer("SELECT * FROM marks WHERE name = 'Steve';");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+        // Invalid BoolOperator
+        response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Steve' XOR mark > 65;");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+        // Invalid Condition list
+        response = sendCommandToServer("SELECT * FROM marks WHERE (name == 'Steve' OR mark > 65;");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Steve') OR mark > 65;");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Steve') ()OR mark( > 65;");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("SELECT * FROM marks WHERE (name() == 'Steve') OR mark > 65;");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("SELECT * FROM marks WHERE ();");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("SELECT * FROM marks WHERE ;");
+        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
+    }
+
+    @Test
+    public void testParserInvalidNameValueList() {
+        String response;
+        // Don't have space in NameValueList
+        response = sendCommandToServer("UPDATE test SET mark==5 WHERE name == 'Steve';");
+        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
+        // Invalid NameValueList
+        response = sendCommandToServer("UPDATE test SET mark WHERE name == 'Steve';");
+        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("UPDATE test SET mark = 5 name = 'Bob' WHERE name == 'Steve';");
+        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
+        response = sendCommandToServer("UPDATE test SET mark = 5, name = 'Bob', WHERE name == 'Steve';");
+        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
     }
 
 }

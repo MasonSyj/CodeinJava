@@ -1,10 +1,7 @@
 package edu.uob.DBCommand;
 
 import edu.uob.ConditionDealer;
-import edu.uob.DBCommand.Command;
 import edu.uob.Exceptions.interpException;
-import edu.uob.FileDealer;
-import edu.uob.Table;
 
 import java.util.*;
 
@@ -27,7 +24,7 @@ public class DeleteCmd extends ComplexCommand {
             }
             table.updateClass(all);
             table.write2File();
-            return "[OK], items deleted successfully";
+            return "[OK]";
         } catch (Exception e) {
             throw new interpException("[ERROR], failed to delete items");
 

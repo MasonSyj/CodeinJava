@@ -1,7 +1,6 @@
 package edu.uob;
 
 import edu.uob.Exceptions.DBException;
-import edu.uob.Exceptions.parseException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

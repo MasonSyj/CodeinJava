@@ -2,7 +2,6 @@ package edu.uob;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 public class Column {
 	private String columnName;

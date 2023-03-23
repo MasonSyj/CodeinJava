@@ -1,6 +1,5 @@
 package edu.uob.DBCommand;
 
-import edu.uob.DBCommand.Command;
 import edu.uob.Exceptions.interpException;
 import java.io.File;
 import java.io.IOException;

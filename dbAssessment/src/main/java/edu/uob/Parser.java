@@ -51,109 +51,136 @@ public class Parser {
 	}
 
 	private void parseUPDATE() throws DBException {
-		if (!tokens.get(2).toLowerCase().equals("set")){
-			throw new parseException("[ERROR], Update operation needs to have a set");
-		}
-
-		int ConditionBeginIndex = -1;
-		for (int i = 0; i < tokens.size(); i++){
-			if (tokens.get(i).toLowerCase().equals("where")){
-				ConditionBeginIndex = i + 1;
-				break;
+		try{
+			if (!tokens.get(2).toLowerCase().equals("set")){
+				throw new parseException("Update operation needs to have a set");
 			}
+
+			int ConditionBeginIndex = -1;
+			for (int i = 0; i < tokens.size(); i++){
+				if (tokens.get(i).toLowerCase().equals("where")){
+					ConditionBeginIndex = i + 1;
+					break;
+				}
+			}
+
+			if (ConditionBeginIndex == -1){
+				throw new parseException("Update operation needs to have a where");
+			}
+
+			if (ConditionBeginIndex == tokens.size() - 1){
+				throw new parseException("Update operation must have condition(s)");
+			}
+
+			parseConditions(ConditionBeginIndex);
+			List<String> conditionTokens = tokens.subList(ConditionBeginIndex, tokens.size());
+			UpdateCmd updateCmd = new UpdateCmd(currentDBName, tokens.get(1), parseNameValueList(tokens), conditionTokens);
+			execResult = updateCmd.execute();
+		} catch (Exception e){
+			throw new parseException("[ERROR] Update cmd is incomplete. " + e.getMessage());
 		}
 
-		if (ConditionBeginIndex == -1){
-			throw new parseException("[ERROR], Update operation needs to have a where");
-		}
-
-		if (ConditionBeginIndex == tokens.size() - 1){
-			throw new parseException("[ERROR], Update operation must have condition(s)");
-		}
-
-		parseConditions(ConditionBeginIndex);
-		List<String> conditionTokens = tokens.subList(ConditionBeginIndex, tokens.size());
-		UpdateCmd updateCmd = new UpdateCmd(currentDBName, tokens.get(1), parseNameValueList(tokens), conditionTokens);
-		execResult = updateCmd.execute();
 
 	}
 
 	private void parseDELETE() throws DBException {
-		if (!tokens.get(1).toLowerCase().equals("from")){
-			throw new parseException("[ERROR], DELETE operation must come with a FROM");
+		try{
+			if (!tokens.get(1).toLowerCase().equals("from")){
+				throw new parseException("DELETE operation must come with a FROM");
+			}
+
+			if (!tokens.get(3).toLowerCase().equals("where")){
+				throw new parseException("DELETE operation must hava a WHERE");
+			}
+
+			parseConditions(4);
+			List<String> conditionTokens = tokens.subList(4, tokens.size());
+			DeleteCmd deleteCmd = new DeleteCmd(currentDBName, tokens.get(2), conditionTokens);
+			execResult = deleteCmd.execute();
+		} catch (Exception e){
+			throw new parseException("[ERROR] Delete cmd is incomplete. " + e.getMessage());
 		}
 
-		if (!tokens.get(3).toLowerCase().equals("where")){
-			throw new parseException("[ERROR], DELETE operation must hava a WHERE");
-		}
-
-		parseConditions(4);
-		List<String> conditionTokens = tokens.subList(4, tokens.size());
-		DeleteCmd deleteCmd = new DeleteCmd(currentDBName, tokens.get(2), conditionTokens);
-		execResult = deleteCmd.execute();
 	}
 
 	private void parseALTER() throws DBException {
-		if (!tokens.get(1).toLowerCase().equals("table")){
-			throw new parseException("[ERROR], ALTER operation must come with a TABLE");
-		}else{
-			AlterationType type;
-			if (tokens.get(3).toLowerCase().equals("add")){
-				type = AlterationType.ADD;
-			}else if (tokens.get(3).toLowerCase().equals("drop")){
-				type = AlterationType.DROP;
+		try{
+			if (!tokens.get(1).toLowerCase().equals("table")){
+				throw new parseException("ALTER operation must come with a TABLE");
 			}else{
-				throw new parseException("[ERROR], Alter operation doesn't know to do add or drop.");
-			}
+				AlterationType type;
+				if (tokens.get(3).toLowerCase().equals("add")){
+					type = AlterationType.ADD;
+				}else if (tokens.get(3).toLowerCase().equals("drop")){
+					type = AlterationType.DROP;
+				}else{
+					throw new parseException("[ERROR], Alter operation doesn't know to do add or drop.");
+				}
 
-			AlterCmd alterCmd = new AlterCmd(currentDBName, tokens.get(2), type, tokens.get(4));
-			execResult = alterCmd.execute();
+				AlterCmd alterCmd = new AlterCmd(currentDBName, tokens.get(2), type, tokens.get(4));
+				execResult = alterCmd.execute();
+			}
+		} catch (Exception e){
+			throw new parseException("[ERROR] Alter cmd is incomplete. " + e.getMessage());
 		}
+
 	}
 
 	private void parseDROP() throws DBException {
-		if (tokens.get(1).toLowerCase().equals("database")){
-			DropDBCmd dropDBCmd = new DropDBCmd(tokens.get(2), null);
-			execResult = dropDBCmd.execute();
-			File dir = new File("databases" + File.separator + tokens.get(2));
-			dir.delete();
-		}else if (tokens.get(1).toLowerCase().equals("table")){
-			DropTableCmd dropTableCmd = new DropTableCmd(currentDBName, tokens.get(2));
-			execResult = dropTableCmd.execute();
-		}else{
-			throw new parseException("[ERROR], Drop Query needs to know it's database or table");
+		try {
+			if (tokens.get(1).toLowerCase().equals("database")){
+				DropDBCmd dropDBCmd = new DropDBCmd(tokens.get(2), null);
+				execResult = dropDBCmd.execute();
+				File dir = new File("databases" + File.separator + tokens.get(2));
+				dir.delete();
+			}else if (tokens.get(1).toLowerCase().equals("table")){
+				DropTableCmd dropTableCmd = new DropTableCmd(currentDBName, tokens.get(2));
+				execResult = dropTableCmd.execute();
+			}else{
+				throw new parseException("Drop Query needs to know it's database or table");
+			}
+		} catch (Exception e){
+			throw new parseException("[ERROR] Drop cmd is incomplete. " + e.getMessage());
 		}
 	}
 
 	private void parseSELECT() throws DBException {
-		List<String> conditionTokens = null;
-		for (int i = 0; i < tokens.size(); i++){
-			if (tokens.get(i).toLowerCase().equals("where")){
-				parseConditions(i + 1);
-				conditionTokens = tokens.subList(i + 1, tokens.size());
-				break;
+		try {
+			List<String> conditionTokens = null;
+			for (int i = 0; i < tokens.size(); i++){
+				if (tokens.get(i).toLowerCase().equals("where")){
+					parseConditions(i + 1);
+					conditionTokens = tokens.subList(i + 1, tokens.size());
+					break;
+				}
 			}
-		}
 
-		int indexofFrom = -1;
-		for (int i = 0; i < tokens.size(); i++){
-			if (tokens.get(i).toLowerCase().equals("from")){
-				indexofFrom = i;
-				break;
+			int indexofFrom = -1;
+			for (int i = 0; i < tokens.size(); i++){
+				if (tokens.get(i).toLowerCase().equals("from")){
+					indexofFrom = i;
+					break;
+				}
 			}
+
+			if (indexofFrom == -1){
+				throw new parseException("Select Query needs to have FROM");
+			}
+
+			String tableName = tokens.get(indexofFrom + 1);
+			List<String[]> attributesList = parseAttributeList(tokens, tableName, 1);
+			SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList, conditionTokens);
+			execResult = selectCmd.execute();
+		} catch (Exception e){
+			throw new parseException("[ERROR] Select cmd is incomplete. " + e.getMessage());
 		}
 
-		if (indexofFrom == -1){
-			throw new parseException("[ERROR], Select Query needs to have FROM");
-		}
-
-		String tableName = tokens.get(indexofFrom + 1);
-		List<String[]> attributesList = parseAttributeList(tokens, tableName, 1);
-		SelectCmd selectCmd = new SelectCmd(currentDBName, tableName, attributesList, conditionTokens);
-		execResult = selectCmd.execute();
 	}
 
 	private void parseUSE() throws DBException{
+		if (!tokens.get(1).matches("[a-zA-Z0-9]+")){
+			throw new parseException("[ERROR] DBName invalidated.");
+		}
 		UseCmd useCmd = new UseCmd(tokens.get(1));
 		execResult = useCmd.execute();
 		if (execResult.contains("exists")){
@@ -171,35 +198,56 @@ public class Parser {
 				throw new parseException("Join operation needs an AND after first Attribute name");
 			}
 
+			if (!tokens.get(1).matches("[a-zA-Z0-9]+")) {
+				throw new parseException("First table name invalidated");
+			}
+			if (!tokens.get(3).matches("[a-zA-Z0-9]+")) {
+				throw new parseException("Second table name invalidated");
+			}
+			if (!tokens.get(5).matches("[a-zA-Z][a-zA-Z0-9.]*")){
+				throw new parseException("First Attribute name invalidated");
+			}
+			if (!tokens.get(7).matches("[a-zA-Z][a-zA-Z0-9.]*")){
+				throw new parseException("Second Attribute name invalidated");
+			}
+
 			JoinCmd joinCmd = new JoinCmd(currentDBName, tokens.get(1), tokens.get(3), tokens.get(5), tokens.get(7));
 			execResult = joinCmd.execute();
-		}catch (Exception e){
+		} catch (DBException e){
 			throw new parseException("[ERROR], Join operation is incomplete. " + e.getMessage());
 		}
 	}
 
 	private void parseCREATE() throws DBException {
-		if (tokens.get(1).toLowerCase().equals("database")){
-			if (tokens.get(2).equals(";")){
-				throw new parseException("[ERROR], create database without giving name.");
+		try{
+			if (!tokens.get(2).matches("[a-zA-Z0-9]+")){
+				throw new parseException("Name format invalidated");
 			}
-			CreateDBCmd createDBCmd = new CreateDBCmd(tokens.get(2));
-			execResult = createDBCmd.execute();
-		} else if (tokens.get(1).toLowerCase().equals("table")) {
-			if (tokens.get(2).equals(";")){
-				throw new parseException("[ERROR], create table without giving name.");
+			if (tokens.get(1).toLowerCase().equals("database")){
+				if (tokens.get(2).equals(";")){
+					throw new parseException("create database without giving name.");
+				}
+				CreateDBCmd createDBCmd = new CreateDBCmd(tokens.get(2));
+				execResult = createDBCmd.execute();
+			} else if (tokens.get(1).toLowerCase().equals("table")) {
+				if (tokens.get(2).equals(";")){
+					throw new parseException("create table without giving name.");
+				}
+				if (!tokens.get(3).equals("(")){
+					CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), null);
+					execResult = createTableCmd.execute();
+				}else if (tokens.get(3).equals("(")){
+					List<String[]> attributeList = parseAttributeList(tokens, tokens.get(2), 4);
+					CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), attributeList);
+					execResult = createTableCmd.execute();
+				}
+			} else{
+				throw new parseException("CREATE cmd should come with DATABASE or TABLE");
 			}
-			if (!tokens.get(3).equals("(")){
-				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), null);
-				execResult = createTableCmd.execute();
-			}else if (tokens.get(3).equals("(")){
-				List<String[]> attributeList = parseAttributeList(tokens, tokens.get(2), 4);
-				CreateTableCmd createTableCmd = new CreateTableCmd(currentDBName, tokens.get(2), attributeList);
-				execResult = createTableCmd.execute();
-			}
-		} else{
-			throw new parseException("[ERROR], CREATE cmd should come with DATABASE or TABLE");
+		}catch (Exception e){
+			throw new parseException("[ERROR], Create operation is incomplete. " + e.getMessage());
 		}
+
 
 	}
 
@@ -208,7 +256,10 @@ public class Parser {
 			if (!tokens.get(1).toLowerCase().equals("into")){
 				throw new parseException("INSERT cmd should come with a INTO");
 			}
-			String tableName = tokens.get(2);
+
+			if (!tokens.get(2).matches("[a-zA-Z0-9]+")){
+				throw new parseException("Table name format invalidated");
+			}
 
 			if (!tokens.get(3).toLowerCase().equals("values")){
 				throw new parseException("INSERT cmd should come with a VALUES");
@@ -220,7 +271,7 @@ public class Parser {
 
 			List<String> valueList = parseValueList(tokens, 5);
 
-			InsertCmd insertCmd = new InsertCmd(currentDBName, tableName, valueList);
+			InsertCmd insertCmd = new InsertCmd(currentDBName, tokens.get(2), valueList);
 			execResult = insertCmd.execute();
 		} catch (Exception e){
 			throw new parseException("[ERROR] INSERT operation is incomplete." + e.getMessage());
@@ -228,17 +279,25 @@ public class Parser {
 
 	}
 
-	public void parseConditions(int index){
-		for (int i = index; i < tokens.size() - 1; i++){
-			if (ConditionDealer.operator.contains(tokens.get(i))){
-				String singleCondition = tokens.get(i - 1).toLowerCase() + " " + tokens.get(i) + " ";
-				singleCondition = singleCondition + tokens.get(i + 1).replaceAll("'(.*?)'", "$1");
-				tokens.remove(i);
-				tokens.remove(i);
-				tokens.set(i - 1, singleCondition);
+	public void parseConditions(int index) throws parseException {
+		try{
+			for (int i = index; i < tokens.size() - 1; i++){
+				if (ConditionDealer.operator.contains(tokens.get(i))){
+					if (!tokens.get(i - 1).matches("[a-zA-Z][a-zA-Z0-9.]*")){
+						throw new parseException("Condition's attributeName invalidated.");
+					}
+					String singleCondition = tokens.get(i - 1).toLowerCase() + " " + tokens.get(i) + " ";
+					singleCondition = singleCondition + tokens.get(i + 1).replaceAll("'(.*?)'", "$1");
+					tokens.remove(i);
+					tokens.remove(i);
+					tokens.set(i - 1, singleCondition);
+				}
 			}
+			tokens.remove(tokens.size() - 1);
+		} catch (Exception e){
+			throw new parseException("[ERROR] Condition(s) incomplete " + e.getMessage());
 		}
-		tokens.remove(tokens.size() - 1);
+
 	}
 
 	private List<String> parseValueList(List<String> tokens, int index) throws parseException {
@@ -260,7 +319,7 @@ public class Parser {
 	public List<List<String>> parseNameValueList(List<String> tokens) throws parseException {
 		List<List<String>> res = new ArrayList<>();
 		int i = 3;
-		while (!tokens.get(i).toLowerCase().equals("where")){
+		while (i < tokens.size() && !tokens.get(i).toLowerCase().equals("where")){
 			List<String> curNameValuePair = new ArrayList<>();
 			try{
 				for (int cnt = 0; cnt < 3; cnt++){
@@ -281,7 +340,7 @@ public class Parser {
 					i++;
 				}
 			} catch (Exception e){
-				throw new parseException("[ERROR], NameValueList is incomplete " + e.getMessage());
+				throw new parseException("NameValueList is incomplete");
 			}
 
 		}
@@ -309,8 +368,16 @@ public class Parser {
 				}else{
 					curAttributeName[0] = defaultTableName;
 					curAttributeName[1] = tokens.get(index);
-
 				}
+
+				if (!curAttributeName[0].matches("[a-zA-Z0-9]+")){
+					throw new parseException("[ERROR] TableName's format invalidated.");
+				}
+
+				if (!curAttributeName[0].matches("[a-zA-Z0-9]+")){
+					throw new parseException("[ERROR] AttributeName's format invalidated.");
+				}
+
 				ans.add(curAttributeName);
 
 				index++;

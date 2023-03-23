@@ -1,17 +1,13 @@
 package edu.uob;
 
 import edu.uob.Enums.ItemType;
-import edu.uob.Exceptions.DBException;
 import edu.uob.Exceptions.interpException;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.HashMap;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,7 +26,7 @@ public class Table implements Predicate<String>, Writeable{
 	private int numofAttributes;
 	private int numofItems;
 
-	private static HashMap<String, Integer> ref = new HashMap<String, Integer>();
+	private static Map<String, Integer> ref = new HashMap<String, Integer>();
 
 	public Table(String DBName, String tableName){
 		this.DBName = DBName;
@@ -114,7 +110,7 @@ public class Table implements Predicate<String>, Writeable{
 		numofAttributes++;
 
 		for (int i = 0; i < numofItems; i++){
-			columns.get(columns.size() - 1).addValue(null);
+			columns.get(columns.size() - 1).addValue("NULL");
 		}
 	}
 
@@ -180,7 +176,6 @@ public class Table implements Predicate<String>, Writeable{
 
 	public void updateClass(List<String> ref){
 		cleanAll();
-		int j = 0;
 		for (String entry: ref){
 			List<String> splited = Arrays.stream(entry.split("\t")).toList();
 			for (int i = 0; i < numofAttributes; i++){
@@ -201,6 +196,10 @@ public class Table implements Predicate<String>, Writeable{
 		String operator = condition.getOperator();
 		String value = condition.getValue();
 		int attributeIndex = indexofAttribute(condition.getAttribute());
+		//AttributeName doesn't match any one from the table, return false.
+		if (attributeIndex == -1){
+			return false;
+		}
 
 		if (operator.equals("==")){
 			return t.split("\t")[attributeIndex].equals(value);

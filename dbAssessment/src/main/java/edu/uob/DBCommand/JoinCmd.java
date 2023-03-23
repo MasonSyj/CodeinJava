@@ -1,7 +1,6 @@
 package edu.uob.DBCommand;
 
 import edu.uob.BoolOperation;
-import edu.uob.DBCommand.Command;
 import edu.uob.Exceptions.interpException;
 import edu.uob.FileDealer;
 import edu.uob.Table;
@@ -9,7 +8,6 @@ import edu.uob.Table;
 import java.util.*;
 
 public class JoinCmd extends ComplexCommand {
-    private String secondTableName;
     private String firstAttributeName;
     private String secondAttributeName;
     FileDealer fileDealer2;
@@ -21,7 +19,6 @@ public class JoinCmd extends ComplexCommand {
 
     public JoinCmd(String DBname, String firstTableName, String secondTableName, String firstAttributeName, String secondAttributeName) throws interpException {
         super(DBname, firstTableName);
-        this.secondTableName = secondTableName;
         this.firstAttributeName = firstAttributeName;
         this.secondAttributeName = secondAttributeName;
         fileDealer2 = new FileDealer(getDBName(), secondTableName);
@@ -54,13 +51,14 @@ public class JoinCmd extends ComplexCommand {
         }
     }
 
-    private int getTableIndex(Table table, String attribute) {
-        if (attribute.split("\\.").length != 1){
+    private int getTableIndex(Table table, String attribute) throws interpException {
+        if (firstAttributeName.split("\\.").length > 2){
+            throw new interpException("[ERROR] Attribute name format");
+        }
+        if (attribute.split("\\.").length == 2){
             return table.indexofAttribute(attribute.split("\\.")[1]);
-//            return table.getAttributesName().indexOf(Attributes.split("\\.")[1]);
         }else{
             return table.indexofAttribute(attribute);
-//            return table.getAttributesName().indexOf(Attributes);
         }
     }
 
