@@ -27,17 +27,18 @@ public class ExampleDBTests {
     }
 
     // Random name generator - useful for testing "bare earth" queries (i.e. where tables don't previously exist)
-    private String generateRandomName()
-    {
+    private String generateRandomName() {
         String randomName = "";
-        for(int i=0; i<10 ;i++) randomName += (char)( 97 + (Math.random() * 25.0));
+        for (int i = 0; i < 10; i++) randomName += (char) (97 + (Math.random() * 25.0));
         return randomName;
     }
 
     private String sendCommandToServer(String command) {
         // Try to send a command to the server - this call will timeout if it takes too long (in case the server enters an infinite loop)
-        return assertTimeoutPreemptively(Duration.ofMillis(1000), () -> { return server.handleCommand(command);},
-        "Server took too long to respond (probably stuck in an infinite loop)");
+        return assertTimeoutPreemptively(Duration.ofMillis(1000), () -> {
+                    return server.handleCommand(command);
+                },
+                "Server took too long to respond (probably stuck in an infinite loop)");
     }
 
     // A basic test that creates a database, creates a table, inserts some test data, then queries it.
@@ -70,11 +71,11 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
         String response = sendCommandToServer("SELECT id FROM marks WHERE name == 'Steve';");
         // Convert multi-lined responses into just a single line
-        String singleLine = response.replace("\n"," ").trim();
+        String singleLine = response.replace("\n", " ").trim();
         // Split the line on the space character
         String[] tokens = singleLine.split(" ");
         // Check that the very last token is a number (which should be the ID of the entry)
-        String lastToken = tokens[tokens.length-1];
+        String lastToken = tokens[tokens.length - 1];
         try {
             Integer.parseInt(lastToken);
         } catch (NumberFormatException nfe) {
@@ -123,7 +124,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testCreate(){
+    public void testCreate() {
         String randomName = generateRandomName();
         String reponse = sendCommandToServer("CREATE DATABASE . ;");
         assertTrue(reponse.contains("[ERROR]"));
@@ -152,8 +153,9 @@ public class ExampleDBTests {
         reponse = sendCommandToServer("CREATE TABLE laptop (name, brand, usage, function, select);");
         assertTrue(reponse.contains("[ERROR] table attribute cannot be SQL Keywords"));
     }
+
     @Test
-    public void testUse(){
+    public void testUse() {
         String randomName = generateRandomName();
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
@@ -173,7 +175,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testDropCommand(){
+    public void testDropCommand() {
         String randomName = generateRandomName();
         String response = "";
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
@@ -193,7 +195,6 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"));
 
         response = sendCommandToServer("DROP DATABASE " + randomName + ";");
-        System.out.println(response);
         assertTrue(response.contains("[OK]"));
 
         response = sendCommandToServer("DROP DATABASE " + randomName + ";");
@@ -201,14 +202,13 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testAlterCommand(){
+    public void testAlterCommand() {
         String randomName = generateRandomName();
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
         String response = sendCommandToServer("ALTER TABLE MARKS add rank;");
-        System.out.println(response);
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("ALTER TABLE marks add Rank;");
         assertTrue(response.contains("[ERROR]"));
@@ -231,17 +231,17 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testInsert(){
+    public void testInsert() {
         String randomName = generateRandomName();
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         String response = sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
         assertTrue(response.contains("[OK]"));
-        response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
+        response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
         assertTrue(response.contains("[OK]"));
-        response = sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
+        response = sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
         assertTrue(response.contains("[OK]"));
-        response = sendCommandToServer("INSERT INTO marks VALUES (Xiaomi, 6000);");
+        response = sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi', 6000);");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("select * from marks;");
         assertTrue(response.contains("Google"));
@@ -250,19 +250,18 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
         String randomName = generateRandomName();
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        sendCommandToServer("update marks set price =10000, brand= HW where brand like Huawei;");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', 'Huawei', 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', 'Huawei', 5500);");
+        sendCommandToServer("update marks set price =10000, brand= HW where brand like 'Huawei';");
         String response = sendCommandToServer("select * from marks;");
-        System.out.println(response);
         assertTrue(response.contains("[OK]"));
         assertTrue(response.contains("HW"));
         assertFalse(response.contains("Huawei"));
@@ -274,61 +273,57 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', 'Huawei', 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', 'Huawei', 5500);");
         String response = "";
         response = sendCommandToServer("SELECT marks.brand, marks.price FROM marks where Price > 6000;");
-        System.out.println(response);
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("SELECT marks.brand, noname.price FROM marks where Price > 6000;");
-        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
-        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand != Huawei);");
-        System.out.println(response);
+        response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or Brand != 'Huawei');");
         assertTrue(response.contains("[OK]"));
-        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 and (Brand like Google or Brand like Apple);");
-        System.out.println(response);
+        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 and (Brand like 'Google' or Brand like 'Apple');");
         assertTrue(response.contains("[OK]"));
 
-        response = sendCommandToServer("SELECT * FROM marks where Brand like Huawei and (Price > 5000 or Brand ! = Huawei);");
-        System.out.println(response);
+        response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or Brand ! = 'Huawei');");
         assertTrue(response.contains("[ERROR]"));
 
-        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 or Brand like Google and Brand like Apple;");
-        System.out.println(response);
+        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 or Brand like 'Google' and Brand like 'Apple';");
         assertTrue(response.contains("[OK]"));
         assertTrue(response.contains("Apple"));
         assertFalse(response.contains("Huawei"));
 
     }
+
     @Test
     public void testSelectWildWithConditions() {
         String randomName = generateRandomName();
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        String response = sendCommandToServer("SELECT Name, Brand FROM marks where Price >=6000 and Brand like Apple;");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', 'Huawei', 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', 'Huawei', 5500);");
+        String response = sendCommandToServer("SELECT Name, Brand FROM marks where Price >=6000 and Brand like 'Apple';");
         assertTrue(response.contains("Apple"));
         assertFalse(response.contains("Mate"));
-        response = sendCommandToServer("SELECT Name, Price FROM marks where Brand like Huawei or Price<= 6000;");
+        response = sendCommandToServer("SELECT Name, Price FROM marks where Brand like 'Huawei' or Price<= 6000;");
         assertTrue(response.contains("Xiaomi"));
         assertFalse(response.contains("Iphone 13"));
         assertFalse(response.contains("Huawei")); //didn't choose the column, so also not exist
     }
+
     @Test
-    public void testJoin(){
+    public void testJoin() {
         String randomName = generateRandomName();
-        String response;
+        String response = "";
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
-        response = sendCommandToServer("USE " + randomName + ";");
+        sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE customers (Customid, name, email);");
         sendCommandToServer("CREATE TABLE orders (Orderid, order_date, cost);");
         sendCommandToServer("INSERT INTO customers VALUES (21, 'John Doe', 'johndoe@example.com');");
@@ -339,7 +334,6 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO orders VALUES (23, '2022-02-15', 75);");
         response = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND customers.Customid;");
         String response2 = sendCommandToServer("JOIN customers AND orders ON ORDERID AND customers.CUSTOMID;");
-        System.out.println(response2);
         String response3 = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND Customid;");
         assertTrue(response.equals(response2));
         assertTrue(response2.equals(response3));
@@ -354,17 +348,16 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', 'Huawei', 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', 'Huawei', 5500);");
 
         String response = sendCommandToServer("select * from marks;");
         assertTrue(response.contains("Mate40"));
 
         response = sendCommandToServer("DELETE FROM marks Where Price<5500;");
-        System.out.println(response);
         response = sendCommandToServer("select * from marks;");
         assertFalse(response.contains("Mate40"));
 
@@ -379,7 +372,7 @@ public class ExampleDBTests {
     public void testTableUpdateClass() throws interpException {
         Table t = new Table("Electronics", "PhoneBrand");
         File directory = new File("databases" + File.separator + "Electronics");
-        if (!directory.exists()){
+        if (!directory.exists()) {
             assertTrue(directory.mkdir(), "unable to create directory as prerequisite work for this test");
         }
 
@@ -420,7 +413,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testListStringAndOrOperation(){
+    public void testListStringAndOrOperation() {
         String a = "Apple 5 UK";
         String b = "Pear 6 France";
         String c = "Banana 4 German";
@@ -450,7 +443,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testConditionFunctions(){
+    public void testConditionFunctions() {
         //test infix to suffix
         List<String> conditionTokens = new ArrayList<>();
         conditionTokens.add("Brand like APPLE");
@@ -472,19 +465,19 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
-        sendCommandToServer("delete from marks where Brand like Huawei;");
-        sendCommandToServer("INSERT INTO marks VALUES ('galaxy23', Samsung, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', 'Huawei', 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', 'Huawei', 5500);");
+        sendCommandToServer("delete from marks where Brand like 'Huawei';");
+        sendCommandToServer("INSERT INTO marks VALUES ('galaxy23', 'Samsung', 6000);");
         response = sendCommandToServer("select id from marks");
         assertFalse(response.contains("4"));
         assertFalse(response.contains("5"));
         sendCommandToServer("delete from marks where Price >= 7000;");
-        sendCommandToServer("INSERT INTO marks VALUES ('galaxy22', Samsung, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('galaxy22', 'Samsung', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
         response = sendCommandToServer("select id from marks;");
         assertTrue(response.contains("7"));
         assertTrue(response.contains("8"));
@@ -492,7 +485,7 @@ public class ExampleDBTests {
 
     //table db attribute name can't be keyword, and keyword is not case sensitive
     @Test
-    public void testKeyWordsCase(){
+    public void testKeyWordsCase() {
         String response = sendCommandToServer("CREATE DATABASE " + "create" + ";");
         assertTrue(response.contains("[ERROR]"));
 
@@ -515,10 +508,10 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        String response = sendCommandToServer("select * from marks where Price>=7000;");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
+        String response = sendCommandToServer("select * from marks;");
         assertTrue(response.contains("Google"));
         assertTrue(response.contains("Apple"));
         assertFalse(response.contains("Xiami"));
@@ -531,7 +524,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testJoin2(){
+    public void testJoin2() {
         String randomName = generateRandomName();
         sendCommandToServer("Create database " + randomName + " ;");
         sendCommandToServer("Use " + randomName + " ;");
@@ -559,7 +552,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testParserIssue(){
+    public void testParserIssue() {
         String response = "";
         response = sendCommandToServer("Unknown operation here;");
         assertTrue(response.contains("[ERROR], Don't know what operation you want to do;"));
@@ -570,29 +563,29 @@ public class ExampleDBTests {
         response = sendCommandToServer("CREATE marks (Name, Brand, Price);");
         assertTrue(response.contains("[ERROR]"));
         sendCommandToServer("CREATE TABLE marks (Name, Brand, Price);");
-        response = sendCommandToServer("INSERT marks VALUES ('Pixel 7', Google, 7000);");
+        response = sendCommandToServer("INSERT marks VALUES ('Pixel 7', 'Google', 7000);");
         assertTrue(response.contains("INSERT cmd should come with a INTO"));
-        response = sendCommandToServer("INSERT INTO marks ('Pixel 7', Google, 7000);");
+        response = sendCommandToServer("INSERT INTO marks ('Pixel 7', 'Google', 7000);");
         assertTrue(response.contains("INSERT cmd should come with a VALUES"));
-        response = sendCommandToServer("INSERT INTO marks VALUES 'Pixel 7', Google, 7000);");
+        response = sendCommandToServer("INSERT INTO marks VALUES 'Pixel 7', 'Google', 7000);");
         assertTrue(response.contains("INSERT cmd should come with a ( after VALUES)"));
-        response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000;");
+        response = sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000;");
         assertTrue(response.contains("ValueList didn't end correctly"));
 
-        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', Google, 7000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', Apple, 8000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', Xiaomi, 6000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', Huawei, 5000);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', Huawei, 5500);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Pixel 7', 'Google', 7000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Iphone 13', 'Apple', 8000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate40', 'Huawei', 5000);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Mate50', 'Huawei', 5500);");
         response = sendCommandToServer("update marks Price = 7000;");
         assertTrue(response.contains("Update operation needs to have a set"));
-        response = sendCommandToServer("update marks set Price = 7000 Brand like Huawei;");
+        response = sendCommandToServer("update marks set Price = 7000 Brand like 'Huawei';");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("update marks set Price = 7000 where;");
         assertTrue(response.contains("Update operation must have condition(s)"));
-        response = sendCommandToServer("update marks set Price 7000 where Brand like Huawei;");
+        response = sendCommandToServer("update marks set Price 7000 where Brand like 'Huawei';");
         assertTrue(response.contains("[ERROR]"));
-        response = sendCommandToServer("update marks set Price = where Brand like Huawei;");
+        response = sendCommandToServer("update marks set Price = where Brand like 'Huawei';");
         assertTrue(response.contains("NameValueList is incomplete"));
 
         response = sendCommandToServer("delete marks where Price > 7000;");
@@ -629,138 +622,5 @@ public class ExampleDBTests {
 
         response = sendCommandToServer("join marks and markii on Price level;");
         assertTrue(response.contains("Join operation needs an AND after first Attribute name"));
-    }
-
-
-    //---------------------------------------------------------------------------
-    //---------------Test for invalid command cause parser error-----------------
-    //---------------------------------------------------------------------------
-    @Test
-    public void testForErrorParser() {
-        String randomName = generateRandomName();
-        String response;
-        // missing ; at end
-        response = sendCommandToServer("USE " + randomName);
-        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
-        // wrong command keyword
-        response = sendCommandToServer("vim DATABASE " + randomName + ";");
-        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("ALTER TABLE " + randomName + " XOR name;");
-        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
-        // missing keyword
-        response = sendCommandToServer("CREATE " + randomName + ";");
-        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("JOIN tableA AND tableB ON key1;");
-        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("INSERT INTO tableA VALUES 3,5,6;"); // missing brackets of value list
-        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("DELETE FROM marks name == 'Dave';");
-        assertTrue(response.contains("[ERROR]"), "Command can't pass parser, however an [ERROR] tag was not returned");
-    }
-
-    @Test
-    public void testParserInvalidPlainText() {
-        String response;
-        // Use reserved words as table/database/attribute name
-        response = sendCommandToServer("USE TABLE;");
-        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("CREATE TABLE drop;");
-        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("CREATE TABLE test (first, USE);");
-        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
-        // Having symbols in table/database/attribute name
-        response = sendCommandToServer("USE Sim29*(b;");
-        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("CREATE TABLE *;");
-        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("CREATE TABLE test (first, one_row);");
-        System.out.println(response);
-        assertTrue(response.contains("[ERROR]"), "Invalid plain text, however an [ERROR] tag was not returned");
-    }
-
-    @Test
-    public void testParserInvalidAttribute() {
-        String randomName = generateRandomName();
-        // missing ; at end
-        sendCommandToServer("USE " + randomName);
-        String response;
-        // Invalid attribute name
-        response = sendCommandToServer("CREATE TABLE test (table.name.error);");
-        assertTrue(response.contains("[ERROR]"), "Invalid attribute name, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("CREATE TABLE test (table..name);");
-        assertTrue(response.contains("[ERROR]"), "Invalid attribute name, however an [ERROR] tag was not returned");
-        // Invalid attribute list
-        response = sendCommandToServer("CREATE TABLE marks (name, mark, );");
-        assertTrue(response.contains("[ERROR]"), "Invalid attribute list, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("CREATE TABLE marks ();");
-        assertTrue(response.contains("[ERROR]"), "Invalid attribute list, however an [ERROR] tag was not returned");
-    }
-
-    @Test
-    public void testParserInvalidValue() {
-        String randomName = generateRandomName();
-        sendCommandToServer("create database " + randomName + ";");
-        // missing ; at end
-        sendCommandToServer("USE " + randomName + ";");
-        String response = sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
-        System.out.println(response);
-        // Invalid value name
-        response = sendCommandToServer("INSERT INTO marks VALUES (Steve, 65, TRUE);");// StringLiteral without ''
-        System.out.println(response);
-        assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("INSERT INTO marks VALUES (3.2.2);");// Invalid FloatLiteral
-        assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("INSERT INTO marks VALUES (XOR);");// Invalid BooleanLiteral
-        assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
-        // Invalid value list
-        response = sendCommandToServer("INSERT INTO marks VALUES (, 65, TRUE);");
-        assertTrue(response.contains("[ERROR]"), "Invalid value list, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("INSERT INTO marks VALUES ();");
-        assertTrue(response.contains("[ERROR]"), "Invalid value list, however an [ERROR] tag was not returned");
-    }
-
-    @Test
-    public void testParserInvalidCondition() {
-        String response;
-        String randomName = generateRandomName();
-        // missing ; at end
-        sendCommandToServer("USE " + randomName + ";");
-        // Invalid Comparator
-        response = sendCommandToServer("SELECT * FROM marks WHERE name = 'Steve';");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-        // Invalid BoolOperator
-        response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Steve' XOR mark > 65;");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-        // Invalid Condition list
-        response = sendCommandToServer("SELECT * FROM marks WHERE (name == 'Steve' OR mark > 65;");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Steve') OR mark > 65;");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("SELECT * FROM marks WHERE name == 'Steve') ()OR mark( > 65;");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("SELECT * FROM marks WHERE (name() == 'Steve') OR mark > 65;");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("SELECT * FROM marks WHERE ();");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("SELECT * FROM marks WHERE ;");
-        assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
-    }
-
-    @Test
-    public void testParserInvalidNameValueList() {
-        String response;
-        String randomName = generateRandomName();
-        // missing ; at end
-        sendCommandToServer("USE " + randomName + ";");
-        // Don't have space in NameValueList
-        response = sendCommandToServer("UPDATE test SET mark==5 WHERE name == 'Steve';");
-        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
-        // Invalid NameValueList
-        response = sendCommandToServer("UPDATE test SET mark WHERE name == 'Steve';");
-        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("UPDATE test SET mark = 5 name = 'Bob' WHERE name == 'Steve';");
-        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
-        response = sendCommandToServer("UPDATE test SET mark = 5, name = 'Bob', WHERE name == 'Steve';");
-        assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
     }
 }

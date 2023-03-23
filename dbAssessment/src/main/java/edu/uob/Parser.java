@@ -6,6 +6,7 @@ import edu.uob.Exceptions.DBException;
 import edu.uob.Exceptions.parseException;
 
 import java.io.File;
+import java.text.ParseException;
 import java.util.*;
 
 public class Parser {
@@ -281,11 +282,13 @@ public class Parser {
 
 	public void parseConditions(int index) throws parseException {
 		try{
+
 			for (int i = index; i < tokens.size() - 1; i++){
 				if (ConditionDealer.operator.contains(tokens.get(i))){
 					if (!tokens.get(i - 1).matches("[a-zA-Z][a-zA-Z0-9.]*")){
 						throw new parseException("Condition's attributeName invalidated.");
 					}
+					parseValidValue(tokens.get(i+1));
 					String singleCondition = tokens.get(i - 1).toLowerCase() + " " + tokens.get(i) + " ";
 					singleCondition = singleCondition + tokens.get(i + 1).replaceAll("'(.*?)'", "$1");
 					tokens.remove(i);
@@ -294,10 +297,38 @@ public class Parser {
 				}
 			}
 			tokens.remove(tokens.size() - 1);
+			parseValidConditions(index);
 		} catch (Exception e){
 			throw new parseException("[ERROR] Condition(s) incomplete " + e.getMessage());
 		}
 
+	}
+
+	private void parseValidConditions(int index) throws parseException {
+		Deque<String> stack = new ArrayDeque<>();
+		for (int i = index; i < tokens.size(); i++){
+			if (tokens.get(i).equals("(")){
+				stack.add("(");
+			}else if (tokens.get(i).equals(")")){
+				if (stack.isEmpty() || !stack.pop().equals("(")){
+					throw new parseException("Conditions is missing ( or )");
+				}
+			}
+		}
+		int opcodeOcccurence = 0;
+		int operandOcccurence = 0;
+		for (int i = index; i < tokens.size(); i++){
+			if (tokens.get(i).toLowerCase().equals("and") || tokens.get(i).toLowerCase().equals("or")){
+				opcodeOcccurence++;
+			}else if (tokens.get(i).length() > 1){  // not ( or ), so is operand
+				operandOcccurence++;
+			}
+		}
+		if (opcodeOcccurence + 1 < operandOcccurence){
+			throw new parseException("Conditions is missing opcode");
+		}else if (opcodeOcccurence + 1 > operandOcccurence){
+			throw new parseException("Conditions is missing operand");
+		}
 	}
 
 	private List<String> parseValueList(List<String> tokens, int index) throws parseException {
@@ -305,6 +336,7 @@ public class Parser {
 		try{
 			while (!tokens.get(index).equals(")")){
 				if (!tokens.get(index).equals(",")){
+					parseValidValue(tokens.get(index));
 					ans.add(tokens.get(index).replaceAll("'(.*?)'", "$1"));
 				}
 				index++;
@@ -387,5 +419,15 @@ public class Parser {
 		}
 
 		return ans;
+	}
+
+	public void parseValidValue(String token) throws parseException {
+		if(token.matches("^[0-9.]+$")){
+
+		}else if (token.toLowerCase().equals("true") || token.toLowerCase().equals("false") || token.toLowerCase().equals("null")){
+
+		}else if (!(token.matches(".*[a-zA-Z\\s\\p{P}\\d].*") && token.startsWith("'") && token.endsWith("'"))){
+			throw new parseException("value invalidated.");
+		}
 	}
 }
