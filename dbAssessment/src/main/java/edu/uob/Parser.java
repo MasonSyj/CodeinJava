@@ -80,8 +80,6 @@ public class Parser {
 		} catch (Exception e){
 			throw new parseException("[ERROR] Update cmd is incomplete. " + e.getMessage());
 		}
-
-
 	}
 
 	private void parseDELETE() throws DBException {
@@ -132,8 +130,8 @@ public class Parser {
 			if (tokens.get(1).toLowerCase().equals("database")){
 				DropDBCmd dropDBCmd = new DropDBCmd(tokens.get(2), null);
 				execResult = dropDBCmd.execute();
-				File dir = new File("databases" + File.separator + tokens.get(2));
-				dir.delete();
+//				File dir = new File("databases" + File.separator + tokens.get(2));
+//				dir.delete();
 			}else if (tokens.get(1).toLowerCase().equals("table")){
 				DropTableCmd dropTableCmd = new DropTableCmd(currentDBName, tokens.get(2));
 				execResult = dropTableCmd.execute();

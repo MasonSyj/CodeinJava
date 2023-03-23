@@ -127,11 +127,15 @@ public class ExampleDBTests {
     @Test
     public void testCreate() {
         String randomName = generateRandomName();
-        String reponse = sendCommandToServer("CREATE DATABASE . ;");
+        String reponse = sendCommandToServer("CREATE;");
+        assertTrue(reponse.contains("[ERROR]"));
+        reponse = sendCommandToServer("CREATE DATABASE . ;");
         assertTrue(reponse.contains("[ERROR]"));
         reponse = sendCommandToServer("CREATE DATABASE " + randomName + ";");
         assertTrue(reponse.contains("[OK]"));
         reponse = sendCommandToServer("CREATE DATABASE " + randomName + ";");
+        assertTrue(reponse.contains("[ERROR]"));
+        reponse = sendCommandToServer("CREATE DATABASE;");
         assertTrue(reponse.contains("[ERROR]"));
 
         sendCommandToServer("USE " + randomName + ";");
@@ -247,6 +251,8 @@ public class ExampleDBTests {
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi', 6000);");
         assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("INSERT INTO ma?rks VALUES ('Iphone 13', 'Apple', 8000);");
+        assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("select * from marks;");
         assertTrue(response.contains("Google"));
         assertTrue(response.contains("Apple"));
@@ -308,6 +314,12 @@ public class ExampleDBTests {
         response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or or Brand != 'Huawei');");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or ) Brand != 'Huawei');");
+        assertTrue(response.contains("[ERROR]"));
+
+        response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or Price > 5000 Price > 5000) Brand != 'Huawei');");
+        assertTrue(response.contains("[ERROR]"));
+
+        response = sendCommandToServer("SELECT * FROM marks where Price > 5500 or Brand? like 'Google' and Brand like 'Apple';");
         assertTrue(response.contains("[ERROR]"));
 
 
@@ -494,7 +506,7 @@ public class ExampleDBTests {
         sendCommandToServer("INSERT INTO marks VALUES ('galaxy22', 'Samsung', 7000);");
         sendCommandToServer("INSERT INTO marks VALUES ('Xiaomi 10', 'Xiaomi', 6000);");
         response = sendCommandToServer("select id from marks;");
-        assertTrue(response.contains("7"));
+        assertTrue(response.contains("7")); // check the id is not recycled.
         assertTrue(response.contains("8"));
     }
 
@@ -637,5 +649,8 @@ public class ExampleDBTests {
 
         response = sendCommandToServer("join marks and markii on Price level;");
         assertTrue(response.contains("Join operation needs an AND after first Attribute name"));
+
+        response = sendCommandToServer("create table marks(?marks.?a23);");
+        assertTrue(response.contains("[ERROR]"));
     }
 }
