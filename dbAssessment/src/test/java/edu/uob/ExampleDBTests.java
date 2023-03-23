@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.sql.SQLOutput;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,10 +50,10 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Dave', 55, TRUE);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Bob', 35, FALSE);");
-        sendCommandToServer("INSERT INTO marks VALUES ('Clive', 20, FALSE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRuE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Dave', 55, trUE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Bob', 35, FAlsE);");
+        sendCommandToServer("INSERT INTO marks VALUES ('Clive', 20, FalSe);");
         String response = sendCommandToServer("SELECT * FROM marks;");
         assertTrue(response.contains("[OK]"), "A valid query was made, however an [OK] tag was not returned");
         assertFalse(response.contains("[ERROR]"), "A valid query was made, however an [ERROR] tag was returned");
@@ -97,15 +98,19 @@ public class ExampleDBTests {
         server = new DBServer();
         sendCommandToServer("USE " + randomName + ";");
         String response;
-        sendCommandToServer("SELECT * FROM marks;");
-        response = sendCommandToServer("SELECT * FROM marks where pass like TRUE;");
+        response = sendCommandToServer("SELECT * FROM marks;");
+        System.out.println(response);
+        response = sendCommandToServer("SELECT * FROM marks where pass like TruE;");
+        System.out.println(response);
         assertFalse(response.contains("tom"));
         assertTrue(response.contains("Steve"), "Steve was added to a table and the server restarted - but Steve was not returned by SELECT *");
         response = sendCommandToServer("Select pass, name from marks;");
+        System.out.println(response);
         assertTrue((response.contains("name")));
         assertTrue((response.contains("pass")));
         assertFalse((response.contains("mark")));
         response = sendCommandToServer("Select pass, name from marks where mark > 50;");
+        System.out.println(response);
         assertFalse(response.contains("tom"));
         assertTrue(response.contains("Steve"));
     }
@@ -134,6 +139,8 @@ public class ExampleDBTests {
         assertTrue(reponse.contains("[ERROR]"));
 
         sendCommandToServer("USE " + randomName + ";");
+        reponse = sendCommandToServer("CREATE TABLE;");
+        assertTrue(reponse.contains("[ERROR]"));
         reponse = sendCommandToServer("CREATE TABLE blank;");
         assertTrue(reponse.contains("[OK]"));
         reponse = sendCommandToServer("CREATE TABLE empty ();");
@@ -165,6 +172,7 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName2 + ";");
         sendCommandToServer("USE " + randomName2 + ";");
         // no place can show the db name, but in my code it's static in the Parser Class.
+        // if the server went down, the static will be gone, so still need use in next round.
         assertTrue(Parser.getCurrentDBName().equals(randomName2));
 
         sendCommandToServer("USE " + randomName + ";");
@@ -209,13 +217,13 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
         String response = sendCommandToServer("ALTER TABLE MARKS add rank;");
-        System.out.println(response);
         assertTrue(response.contains("[OK]"));
+        response = sendCommandToServer("select * from marks;");
+        assertTrue(response.contains("[OK]"));
+        assertTrue(response.contains("rank"));
         response = sendCommandToServer("ALTER TABLE marks add Rank;");
-        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks add rank;");
-        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks add select;");
         assertTrue(response.contains("[ERROR]"));
@@ -227,6 +235,9 @@ public class ExampleDBTests {
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks drop Pass;");
         assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("select * from marks;");
+        assertTrue(response.contains("[OK]"));
+        assertFalse(response.contains("pass"));
         response = sendCommandToServer("ALTER TABLE marks drop UnknownName;");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks drop id;");
@@ -268,6 +279,9 @@ public class ExampleDBTests {
         assertTrue(response.contains("[OK]"));
         assertTrue(response.contains("HW"));
         assertFalse(response.contains("Huawei"));
+        assertTrue(response.contains("10000"));
+        assertFalse(response.contains("5500"));
+        assertFalse(response.contains("5000"));
     }
 
     @Test
@@ -287,17 +301,28 @@ public class ExampleDBTests {
         response = sendCommandToServer("SELECT marks.brand, noname.price FROM marks where Price > 6000;");
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or Brand != 'Huawei');");
+        System.out.println(response);
+        assertTrue(response.contains("5500"));
+        assertFalse(response.contains("5000"));
+
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("SELECT * FROM marks where Price > 5500 and (Brand like 'Google' or Brand like 'Apple');");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
+        assertFalse(response.contains("Xiaomi"));
 
         response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or Brand ! = 'Huawei');");
+        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
-
         response = sendCommandToServer("SELECT * FROM marks where Price > 5500 or Brand like 'Google' and Brand like 'Apple';");
         assertTrue(response.contains("[OK]"));
         assertTrue(response.contains("Apple"));
         assertFalse(response.contains("Huawei"));
+        response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or or Brand != 'Huawei');");
+        assertTrue(response.contains("[ERROR]"));
+        response = sendCommandToServer("SELECT * FROM marks where Brand like 'Huawei' and (Price > 5000 or ) Brand != 'Huawei');");
+        assertTrue(response.contains("[ERROR]"));
+
 
     }
 
@@ -328,13 +353,14 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE DATABASE " + randomName + ";");
         sendCommandToServer("USE " + randomName + ";");
         sendCommandToServer("CREATE TABLE customers (Customid, name, email);");
-        sendCommandToServer("CREATE TABLE orders (Orderid, order_date, cost);");
+        response = sendCommandToServer("CREATE TABLE orders (Orderid, orderdate, cost);");
         sendCommandToServer("INSERT INTO customers VALUES (21, 'John Doe', 'johndoe@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (22, 'Jane Smith', 'janesmith@example.com');");
         sendCommandToServer("INSERT INTO customers VALUES (23, 'Bob Johnson', 'bjohnson@example.com');");
 
         sendCommandToServer("INSERT INTO orders VALUES (21, '2022-01-01', 100);");
         sendCommandToServer("INSERT INTO orders VALUES (23, '2022-02-15', 75);");
+        System.out.println(sendCommandToServer("select * from orders;"));
         response = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND customers.Customid;");
         String response2 = sendCommandToServer("JOIN customers AND orders ON ORDERID AND customers.CUSTOMID;");
         String response3 = sendCommandToServer("JOIN customers AND orders ON orders.Orderid AND Customid;");
@@ -361,6 +387,7 @@ public class ExampleDBTests {
         assertTrue(response.contains("Mate40"));
 
         response = sendCommandToServer("DELETE FROM marks Where Price<5500;");
+        System.out.println(response);
         response = sendCommandToServer("select * from marks;");
         assertFalse(response.contains("Mate40"));
 
@@ -372,7 +399,7 @@ public class ExampleDBTests {
     }
 
     @Test
-    public void testTableUpdateClass() throws interpException {
+    public void testTableOwnMethods() throws interpException {
         Table t = new Table("Electronics", "PhoneBrand", 0);
         File directory = new File("databases" + File.separator + "Electronics");
         if (!directory.exists()) {
@@ -450,12 +477,12 @@ public class ExampleDBTests {
         //test infix to suffix
         List<String> conditionTokens = new ArrayList<>();
         conditionTokens.add("Brand like APPLE");
-        conditionTokens.add("and");
+        conditionTokens.add("or");
         conditionTokens.add("Price > 700");
         List<String> res = ConditionDealer.convertToSuffix(conditionTokens);
-        assertTrue(res.get(2).equals("and"));
+        assertTrue(res.get(2).equals("or"));
 
-        conditionTokens.add("or");
+        conditionTokens.add("and");
         conditionTokens.add("Name like Huawei");
         res = ConditionDealer.convertToSuffix(conditionTokens);
         assertTrue(res.get(4).equals("or"));

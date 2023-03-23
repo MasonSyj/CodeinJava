@@ -204,7 +204,7 @@ public class Table implements Predicate<String>, Writeable{
 		}else if (operator.equals("!=")){
 			return !t.split("\t")[attributeIndex].equals(value);
 		}else if (operator.toUpperCase().equals("LIKE")){
-			return t.split("\t")[attributeIndex].contains(value);
+			return t.split("\t")[attributeIndex].toLowerCase().contains(value.toLowerCase());
 		}
 
 		try {
