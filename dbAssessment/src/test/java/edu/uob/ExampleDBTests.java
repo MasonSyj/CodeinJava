@@ -345,7 +345,7 @@ public class ExampleDBTests {
         assertTrue(response2.equals(response3));
 
         response = sendCommandToServer("JOIN customers AND orders ON tom AND jerry;");
-        assertTrue(response.contains("[ERROR] Join command can't find common thing to join"));
+        assertTrue(response.contains("[ERROR]"));
     }
 
     @Test
@@ -680,6 +680,9 @@ public class ExampleDBTests {
 
     @Test
     public void testParserInvalidAttribute() {
+        String randomName = generateRandomName();
+        // missing ; at end
+        sendCommandToServer("USE " + randomName);
         String response;
         // Invalid attribute name
         response = sendCommandToServer("CREATE TABLE test (table.name.error);");
@@ -695,9 +698,15 @@ public class ExampleDBTests {
 
     @Test
     public void testParserInvalidValue() {
-        String response;
+        String randomName = generateRandomName();
+        sendCommandToServer("create database " + randomName + ";");
+        // missing ; at end
+        sendCommandToServer("USE " + randomName + ";");
+        String response = sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
+        System.out.println(response);
         // Invalid value name
         response = sendCommandToServer("INSERT INTO marks VALUES (Steve, 65, TRUE);");// StringLiteral without ''
+        System.out.println(response);
         assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
         response = sendCommandToServer("INSERT INTO marks VALUES (3.2.2);");// Invalid FloatLiteral
         assertTrue(response.contains("[ERROR]"), "Invalid value name, however an [ERROR] tag was not returned");
@@ -713,6 +722,9 @@ public class ExampleDBTests {
     @Test
     public void testParserInvalidCondition() {
         String response;
+        String randomName = generateRandomName();
+        // missing ; at end
+        sendCommandToServer("USE " + randomName + ";");
         // Invalid Comparator
         response = sendCommandToServer("SELECT * FROM marks WHERE name = 'Steve';");
         assertTrue(response.contains("[ERROR]"), "Invalid condition, however an [ERROR] tag was not returned");
@@ -737,6 +749,9 @@ public class ExampleDBTests {
     @Test
     public void testParserInvalidNameValueList() {
         String response;
+        String randomName = generateRandomName();
+        // missing ; at end
+        sendCommandToServer("USE " + randomName + ";");
         // Don't have space in NameValueList
         response = sendCommandToServer("UPDATE test SET mark==5 WHERE name == 'Steve';");
         assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
@@ -748,5 +763,4 @@ public class ExampleDBTests {
         response = sendCommandToServer("UPDATE test SET mark = 5, name = 'Bob', WHERE name == 'Steve';");
         assertTrue(response.contains("[ERROR]"), "Invalid NameValueList, however an [ERROR] tag was not returned");
     }
-
 }

@@ -86,7 +86,6 @@ public class ConditionDealer {
                 stack.add(currentItem);
             }
         }
-
         return stack.get(0);
     }
 

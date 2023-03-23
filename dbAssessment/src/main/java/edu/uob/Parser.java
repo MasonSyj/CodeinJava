@@ -374,7 +374,7 @@ public class Parser {
 					throw new parseException("[ERROR] TableName's format invalidated.");
 				}
 
-				if (!curAttributeName[0].matches("[a-zA-Z0-9]+")){
+				if (!curAttributeName[1].matches("[a-zA-Z0-9]+")){
 					throw new parseException("[ERROR] AttributeName's format invalidated.");
 				}
 
