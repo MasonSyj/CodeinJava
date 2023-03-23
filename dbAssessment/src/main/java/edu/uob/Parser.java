@@ -57,24 +57,24 @@ public class Parser {
 				throw new parseException("Update operation needs to have a set");
 			}
 
-			int ConditionBeginIndex = -1;
+			int conditionBeginIndex = -1;
 			for (int i = 0; i < tokens.size(); i++){
 				if (tokens.get(i).toLowerCase().equals("where")){
-					ConditionBeginIndex = i + 1;
+					conditionBeginIndex = i + 1;
 					break;
 				}
 			}
 
-			if (ConditionBeginIndex == -1){
+			if (conditionBeginIndex == -1){
 				throw new parseException("Update operation needs to have a where");
 			}
 
-			if (ConditionBeginIndex == tokens.size() - 1){
+			if (conditionBeginIndex == tokens.size() - 1){
 				throw new parseException("Update operation must have condition(s)");
 			}
 
-			parseConditions(ConditionBeginIndex);
-			List<String> conditionTokens = tokens.subList(ConditionBeginIndex, tokens.size());
+			parseConditions(conditionBeginIndex);
+			List<String> conditionTokens = tokens.subList(conditionBeginIndex, tokens.size());
 			UpdateCmd updateCmd = new UpdateCmd(currentDBName, tokens.get(1), parseNameValueList(tokens), conditionTokens);
 			execResult = updateCmd.execute();
 		} catch (Exception e){
@@ -381,7 +381,7 @@ public class Parser {
 	}
 
 	private List<String[]> parseAttributeList(List<String> tokens, String defaultTableName, int index) throws parseException {
-		if (index == 1 && tokens.get(index).equals("*")){
+		if (index == 1 && tokens.get(index).equals("*")){ //select * case
 			return null;
 		}
 

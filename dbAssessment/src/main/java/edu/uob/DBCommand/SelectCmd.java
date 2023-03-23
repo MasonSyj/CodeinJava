@@ -10,12 +10,12 @@ import java.util.List;
 public class SelectCmd extends ComplexCommand {
 
     List<String[]> attributeList;
-    List<String> ConditionTokens;
+    List<String> conditionTokens;
 
     public SelectCmd(String DBName, String tableName, List<String[]> attributeList, List<String> ConditionTokens) throws interpException {
         super(DBName, tableName);
         this.attributeList = attributeList;
-        this.ConditionTokens = ConditionTokens;
+        this.conditionTokens = ConditionTokens;
     }
 
     public List<String> getAttributeName() throws interpException {
@@ -33,10 +33,10 @@ public class SelectCmd extends ComplexCommand {
     public String execute() throws interpException {
         try{
             List<String> items;
-            if (ConditionTokens == null){
+            if (conditionTokens == null){
                 items = table.getAllItems();
             }else{
-                items = ConditionDealer.conditionExecute(ConditionTokens, table);
+                items = ConditionDealer.conditionExecute(conditionTokens, table);
             }
             table.updateClass(items);
 

@@ -93,10 +93,6 @@ public class Token {
 			input = input.replaceAll("= !", "!=");
 		}
 
-
-
-
-
 		// Finally split on the space char (since there will now ALWAYS be a space between tokens)
 		return input.split(" ");
 	}
