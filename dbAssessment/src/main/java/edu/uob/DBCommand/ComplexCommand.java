@@ -11,7 +11,7 @@ public abstract class ComplexCommand extends Command{
 
     public ComplexCommand(String DBName, String tableName) throws interpException {
         super(DBName, tableName);
-        fileDealer = new FileDealer(DBName, tableName);
+        fileDealer = new FileDealer(DBName, getTableName());
         table = fileDealer.file2Table();
     }
 

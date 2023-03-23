@@ -209,10 +209,13 @@ public class ExampleDBTests {
         sendCommandToServer("CREATE TABLE marks (name, mark, pass);");
         sendCommandToServer("INSERT INTO marks VALUES ('Steve', 65, TRUE);");
         String response = sendCommandToServer("ALTER TABLE MARKS add rank;");
+        System.out.println(response);
         assertTrue(response.contains("[OK]"));
         response = sendCommandToServer("ALTER TABLE marks add Rank;");
+        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks add rank;");
+        System.out.println(response);
         assertTrue(response.contains("[ERROR]"));
         response = sendCommandToServer("ALTER TABLE marks add select;");
         assertTrue(response.contains("[ERROR]"));
@@ -370,7 +373,7 @@ public class ExampleDBTests {
 
     @Test
     public void testTableUpdateClass() throws interpException {
-        Table t = new Table("Electronics", "PhoneBrand");
+        Table t = new Table("Electronics", "PhoneBrand", 0);
         File directory = new File("databases" + File.separator + "Electronics");
         if (!directory.exists()) {
             assertTrue(directory.mkdir(), "unable to create directory as prerequisite work for this test");

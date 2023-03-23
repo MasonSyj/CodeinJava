@@ -101,7 +101,7 @@ public class JoinCmd extends ComplexCommand {
     public String execute() throws interpException {
         List<String> rawJoin = BoolOperation.join(table.getAllItems(), secondTable.getAllItems(), indexFirstTable, indexSecondTable);
 
-        Table temp = new Table(getDBName(), "temp" + (int) (Math.random() * 1000));
+        Table temp = new Table(getDBName(), "temp" + (int) (Math.random() * 1000), 0);
 
         for (int i = 0; i < table.getNumofAttributes() + secondTable.getNumofAttributes(); i++){
             temp.addNewColumn("null");

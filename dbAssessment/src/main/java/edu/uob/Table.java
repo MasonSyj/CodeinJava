@@ -20,24 +20,23 @@ public class Table implements Predicate<String>, Writeable{
 	private List<Column> columns;
 
 	private String tableKey;
+	private int id;
 
 	Condition condition;
 
 	private int numofAttributes;
 	private int numofItems;
 
-	private static Map<String, Integer> ref = new HashMap<String, Integer>();
+//	private static Map<String, Integer> ref = new HashMap<String, Integer>();
 
-	public Table(String DBName, String tableName){
+	public Table(String DBName, String tableName, int id){
 		this.DBName = DBName;
 		this.tableName = tableName;
 		attributesName = new ArrayList<String>();
 		columns = new ArrayList<Column>();
 		numofItems = 0;
 		tableKey = getDBName() + getTableName();
-		if (!ref.containsKey(tableKey)){
-			ref.put(tableKey, 0);
-		}
+		this.id = id;
 	}
 
 	public String getDBName() {
@@ -132,8 +131,8 @@ public class Table implements Predicate<String>, Writeable{
 		try {
 			File file = new File("databases" + File.separator + getDBName() + File.separator + getTableName());
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
-
-
+			writer.write(String.valueOf(id));
+			writer.newLine();
 			writer.write(FileDealer.transform2csvLine(attributesName));
 			writer.newLine();
 
@@ -160,8 +159,7 @@ public class Table implements Predicate<String>, Writeable{
 			for (int j = 1; j < numofAttributes; j++){
 				columns.get(j).addValue(String.valueOf(value.get(j - 1)));
 			}
-			columns.get(0).addValue(String.valueOf(ref.get(tableKey) + 1));
-			ref.replace(tableKey, ref.get(tableKey) + 1);
+			columns.get(0).addValue(String.valueOf(++id));
 		}
 
 

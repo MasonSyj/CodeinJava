@@ -34,12 +34,13 @@ public class FileDealer {
 		List<String> attributesList = new ArrayList<String>();
 
 		try {
+			int id = Integer.parseInt(reader.readLine());
 			line = reader.readLine();
 			attributesList = csvLineParse(line);
 
 			line = reader.readLine();
 
-			ans = new Table(DBName, TableName);
+			ans = new Table(DBName, TableName, id);
 			for (String attribute: attributesList){
 				ans.addNewColumn(attribute);
 			}

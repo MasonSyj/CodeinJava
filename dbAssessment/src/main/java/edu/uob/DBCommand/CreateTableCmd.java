@@ -30,6 +30,8 @@ public class CreateTableCmd extends BasicCommand {
             if (fileContainTable.createNewFile()) {
                 String attributeLine = setUpAttributeLine();
                 BufferedWriter writer = new BufferedWriter(new FileWriter(fileContainTable));
+                writer.write("0");
+                writer.newLine();
                 writer.write(attributeLine);
                 writer.flush();
                 return "[OK]";
