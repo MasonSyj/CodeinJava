@@ -1,15 +1,28 @@
 import java.io.File;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.*;
 
 public class Main {
 
     static int id;
     public static void main(String[] args) {
-        System.out.println(id++);
-        System.out.println(id++);
-        System.out.println(id++);
+        List<Integer> queue = new LinkedList<>();
+        for (int i = 0; i < 5; i++){
+            queue.add(i + 1);
+        }
+
+        int[] queries = new int[4];
+        queries[0] = 2;
+        queries[1] = 1;
+        queries[2] = 2;
+        queries[3] = 1;
+
+        for (int i = 0; i < queries.length; i++){
+//            queue.indexOf()
+            int val = queue.remove(queries[i]);
+            queue.add(0, val);
+        }
+        int num = 9669;
+        
 //        File dir = new File("databases" + File.separator + "happy");
 //
 //        dir.mkdirs();
