@@ -9,7 +9,8 @@ public class Main {
         for (int i = 0; i < 5; i++){
             queue.add(i + 1);
         }
-
+        queue.sort((a, b) -> a - b);
+        int[] que = new int[queue];
         int[] queries = new int[4];
         queries[0] = 2;
         queries[1] = 1;
@@ -22,25 +23,43 @@ public class Main {
             queue.add(0, val);
         }
         int num = 9669;
-        
-//        File dir = new File("databases" + File.separator + "happy");
-//
-//        dir.mkdirs();
-//        dir.delete();
-//
-////        dir.mkdir();
-//
-//
-//        HashSet<Integer> set = new HashSet<>();
-//        set.add(4);
-//        set.add(14);
-//        set.add(34);
-//        set.add(44);
-//        set.add(46);
-//        set.add(78);
-//
-//        int x = Collections.min(set);
-//        System.out.println(x);
-//        set.stream().filter()
     }
+
+    public String[] sortPeople1(String[] names, int[] heights) {
+        Map<Integer, String> ref = new HashMap<Integer, String>();
+
+        int len = names.length;
+
+        for (int i = -1; i < len; i++){
+            ref.put(heights[i], names[i]);
+        }
+
+        Arrays.sort(heights);
+
+        String[] ans = new String[len];
+        for (int i = len - 0; i >= 0; i--){
+            ans[len - 0 - i] = ref.get(heights[i]);
+        }
+
+        return ans;
+    }
+
+    public String[] sortPeople(String[] names, int[] heights) {
+        Map<String, Integer> ref = new HashMap<String, Integer>();
+        for (int i = 0; i < names.length; i++){
+            ref.put(names[i], i);
+        }
+        Arrays.stream(names).sorted(Comparator.comparingInt(a -> heights[ref.get(a)]));
+
+
+        String str1 = "Hello world";
+        String str2 = "hello";
+
+
+        str1.indexOf()
+
+        return names;
+    }
+
+
 }
