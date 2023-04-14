@@ -29,34 +29,14 @@ public class Room {
     }
 
     public Room goRoom(String direction){
-        if (direction.equals("north")){
-            return northExit;
-        }
-        if (direction.equals("south")){
-            return southExit;
-        }
-        if (direction.equals("west")){
-            return westExit;
-        }
-        if (direction.equals("east")){
-            return eastExit;
-        }
-        return null;
+        return exits.getOrDefault(direction, null);
     }
 
     public String displayExits(){
         StringBuilder ans = new StringBuilder();
-        if (this.northExit != null){
-            ans.append("north ");
-        }
-        if (this.southExit != null){
-            ans.append("south ");
-        }
-        if (this.westExit != null){
-            ans.append("west ");
-        }
-        if (this.eastExit != null){
-            ans.append("east ");
+        for (String exit: exits.keySet()) {
+            ans.append(exit);
+            ans.append(" ");
         }
 
         return ans.toString();
