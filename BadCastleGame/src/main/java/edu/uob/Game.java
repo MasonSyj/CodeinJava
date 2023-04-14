@@ -1,5 +1,6 @@
+package edu.uob;
 import java.util.Scanner;
-
+import java.util.Arrays;
 public class Game {
     private Room currentRoom;
     
@@ -10,18 +11,24 @@ public class Game {
     private void createRooms(){
         Room outside, lobby, pub, study, bedroom;
         
-        outside = new Room("outside the garden");
+        outside = new Room("outside");
         lobby = new Room("lobby");
         pub = new Room("pub");
         study = new Room("study");
         bedroom = new Room("bedroom");
-        
+/*        
         outside.setExits(null, lobby, study, pub);
         lobby.setExits(null, null, null, outside);
         pub.setExits(null, outside, null, null);
         study.setExits(outside, bedroom, null, null); 
         bedroom.setExits(null, null, null, study);
-        
+*/        
+        outside.setExits(Arrays.asList(lobby, study, pub));
+        lobby.setExits(Arrays.asList(outside));
+        pub.setExits(Arrays.asList(outside));
+        study.setExits(Arrays.asList(outside, bedroom));
+        bedroom.setExits(Arrays.asList(study));
+
         currentRoom = outside;
     }
 
@@ -33,61 +40,27 @@ public class Game {
         System.out.println();
         System.out.println("Now you are at: " + currentRoom);
         System.out.print("Your exits available: ");
-        if (currentRoom.northExit != null){
-            System.out.print("north ");
-        }
-        if (currentRoom.southExit != null){
-            System.out.print("south ");
-        }
-        if (currentRoom.westExit != null){
-            System.out.print("west ");
-        }
-        if (currentRoom.eastExit != null){
-            System.out.print("east ");
-        }
+        System.out.println(currentRoom.displayExits());
         System.out.println();
     }
 
     public void goRoom(String direction){
-        Room nextRoom = null;
-        if (direction.equals("north")){
-            nextRoom = currentRoom.northExit;
-        }
-        if (direction.equals("south")){
-            nextRoom = currentRoom.southExit;
-        }
-        if (direction.equals("west")){
-            nextRoom = currentRoom.westExit;
-        }
-        if (direction.equals("east")){
-            nextRoom = currentRoom.eastExit;
-        }
-
+        Room nextRoom = currentRoom.goRoom(direction);
+        
         if (nextRoom == null){
             System.out.println("There's no room here");
         } else {
             currentRoom = nextRoom;
             System.out.println("Now you are at: " + currentRoom);
             System.out.print("Your exits available: ");
-            if (currentRoom.northExit != null){
-                System.out.print("north ");
-            }
-            if (currentRoom.southExit != null){
-                System.out.print("south ");
-            }
-            if (currentRoom.westExit != null){
-                System.out.print("west ");
-            }
-            if (currentRoom.eastExit != null){
-                System.out.print("east ");
-            }
+            System.out.println(currentRoom.displayExits());
             System.out.println();
         }
     }
 
     public void printHelp(){
         System.out.println("Are you lost? Commands you can type: go bye help");
-        System.out.println("for example: go east");
+        System.out.println("e.g. go east");
     }
 
     public static void main(String[] args) {
@@ -100,10 +73,16 @@ public class Game {
             String[] words = line.split(" ");
             if (words[0].equals("help")){
                 game.printHelp();
-            } else if (words[0].equals("go")){
-                game.goRoom(words[1]);
             } else if (words[0].equals("bye")){
                 break;
+            } else if (words[0].equals("go")){
+                if (words.length == 1){
+                    System.out.println("You don't know where to go.");
+                } else {
+                    game.goRoom(words[1]);
+                }
+            } else {
+                System.out.println("Unknown Command");
             }
         }
 
