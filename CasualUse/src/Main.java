@@ -1,46 +1,43 @@
+import com.sun.source.tree.Tree;
+
 import java.io.File;
 import java.util.*;
 
 public class Main {
 
-    static int id;
+    public void levelOrder(TreeNode root, Deque<TreeNode> deque, List<Integer> list){
+        if (root == null){
+            return;
+        }
+
+        list.add(root.val) ;
+        deque.add(root.left);
+        deque.add(root.right);
+        levelOrder(deque.poll(), deque, list);
+
+    }
+    public TreeNode reverseOddLevels(TreeNode root) {
+        Deque<TreeNode> deque = new ArrayDeque<TreeNode>();
+        List<Integer> list = new ArrayList<Integer>();
+        levelOrder(root, deque, list);
+        int[] arr = list.stream().mapToInt(Integer::intValue).toArray();
+        for (int i = 0; i < arr.length; i++){
+            System.out.print(arr[i] + " ");
+        }
+
+        return root;
+    }
     public static void main(String[] args) {
-        List<Integer> queue = new LinkedList<>();
-        for (int i = 0; i < 5; i++){
-            queue.add(i + 1);
+        int a = 3;
+        int b = 4;
+        if (a > b){
+            System.out.println("a > b");
+        } else{
+            if (a == 3){
+                System.out.println("a == b");
+            } else {
+                System.out.println("a < b");
+            }
         }
-
-        int[] queries = new int[4];
-        queries[0] = 2;
-        queries[1] = 1;
-        queries[2] = 2;
-        queries[3] = 1;
-
-        for (int i = 0; i < queries.length; i++){
-//            queue.indexOf()
-            int val = queue.remove(queries[i]);
-            queue.add(0, val);
-        }
-        int num = 9669;
-        
-//        File dir = new File("databases" + File.separator + "happy");
-//
-//        dir.mkdirs();
-//        dir.delete();
-//
-////        dir.mkdir();
-//
-//
-//        HashSet<Integer> set = new HashSet<>();
-//        set.add(4);
-//        set.add(14);
-//        set.add(34);
-//        set.add(44);
-//        set.add(46);
-//        set.add(78);
-//
-//        int x = Collections.min(set);
-//        System.out.println(x);
-//        set.stream().filter()
     }
 }

@@ -1,0 +1,13 @@
+
+o
+java:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(ÖÒ¼
+t
+java:S2293"YReplace the type specification in this constructor call with the diamond operator ("<>").(½áØÔùÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(º¼É°
+U	java:S106""9Replace this use of System.out or System.err by a logger.(ïƒ¦·8Ê€±¶ø0
+Z	java:S106%"9Replace this use of System.out or System.err by a logger.(”»«Àüÿÿÿÿ8Ë€±¶ø0
+Z	java:S106'"9Replace this use of System.out or System.err by a logger.(äœÂüÿÿÿÿ8Ë€±¶ø0
+P
+java:S1128"5Remove this unused import 'com.sun.source.tree.Tree'.(·óƒüıÿÿÿÿ
+?
+java:S1128")Remove this unused import 'java.io.File'.(†Ğ¥Å
