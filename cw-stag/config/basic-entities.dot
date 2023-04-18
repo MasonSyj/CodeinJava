@@ -14,6 +14,7 @@ digraph layout {
             subgraph furniture {
                 node [shape = "hexagon"];
                 trapdoor [description = "Wooden trapdoor"];
+                table [description = "A broken table"];
             }
         }
 

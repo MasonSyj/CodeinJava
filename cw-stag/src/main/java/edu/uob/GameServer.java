@@ -44,7 +44,7 @@ public final class GameServer {
         Parser parser = new Parser();
         FileReader reader = null;
         try {
-            reader = new FileReader("config" + File.separator + entitiesFile);
+            reader = new FileReader("config" + File.separator + "basic-entities.dot");
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -57,7 +57,7 @@ public final class GameServer {
         ArrayList<Graph> sections = wholeDocument.getSubgraphs();
 
         locationHashMap = new HashMap<String, Location>();
-        Location currentLocation;
+
         // locations
         ArrayList<Graph> locations = sections.get(0).getSubgraphs();
         for (Graph location: locations){
@@ -71,7 +71,6 @@ public final class GameServer {
             loadGameEntity(currentLocation, others, "furniture");
             loadGameEntity(currentLocation, others, "characters");
             loadGameEntity(currentLocation, others, "players");
-            System.out.println(currentLocation.showInformation());
             locationHashMap.put(currentLocation.getName(), currentLocation);
             /*
             List<Graph> artefacts = others.stream().filter(graph -> graph.getId().getId().equals("artefacts")).toList();
@@ -82,25 +81,38 @@ public final class GameServer {
                 }
             }
             **/
+            System.out.println(currentLocation.toString());
+            System.out.println(currentLocation.showInformation());
         }
 
+        currentLocation = locationHashMap.values().stream().toList().get(0);
         //////////////////////////////////////////////////////////////////////////
-        //load Commands
+        //load Path
+
+        ArrayList<Edge> paths = sections.get(1).getEdges();
+        for (Edge edge: paths){
+            Node fromLocation = edge.getSource().getNode();
+            Node toLocation = edge.getTarget().getNode();
+            String fromLocationName = fromLocation.getId().getId();
+            String toLocationName = toLocation.getId().getId();
+            if (locationHashMap.containsKey(fromLocationName)
+                    && locationHashMap.containsKey(toLocationName)){
+                locationHashMap.get(fromLocationName).addExit(locationHashMap.get(toLocationName));
+            }
+            System.out.println(fromLocationName + " -> " + toLocationName);
+        }
     }
 
     public void loadGameEntity(Location location, ArrayList<Graph> graph, String name){
         List<Graph> graphs = graph.stream().filter(currentGraph -> currentGraph.getId().getId().equals(name)).toList();
         if (graphs.size() == 1){
-            for (Node artefact: graphs.get(0).getNodes(false)){
-                GameEntity currentEntity = new Artefact(artefact.getId().getId(), artefact.getAttribute("description"));
+            for (Node item: graphs.get(0).getNodes(false)){
                 if (name.equals("artefacts")){
-                    location.addArtefact((Artefact) currentEntity);
+                    location.addArtefact(new Artefact(item.getId().getId(), item.getAttribute("description")));
                 } else if (name.equals("furniture")){
-                    location.addFurniture((Furniture) currentEntity);
+                    location.addFurniture(new Furniture(item.getId().getId(), item.getAttribute("description")));
                 } else if (name.equals("characters")){
-                    location.addCharacter((Character) currentEntity);
-                } else if (name.equals("players")){
-                    ((Player) currentEntity).setCurrentLocation(location);
+                    location.addCharacter(new Character(item.getId().getId(), item.getAttribute("description")));
                 }
             }
         }
@@ -115,20 +127,47 @@ public final class GameServer {
     public String handleCommand(String command) {
         // TODO implement your server logic here
         String[] tokens = command.split(" ");
-        if (tokens.length == 0){
-            return "";
-        } else if (tokens[0].equals("inventory") || tokens[0].equals("inv")){
-            return playerHashMap.get("Simon").displayInventory();
-        } else if (tokens[0].equals("get") && tokens.length == 2){
-            if (currentLocation.getArtefacts().containsKey(tokens[1])){
-                Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[1]);
-                playerHashMap.get("Simon").addArtefact(currentArtefact);
-                currentLocation.getArtefacts().remove(currentArtefact);
-            }
+        tokens[0] = tokens[0].substring(0, tokens[0].length() - 1);
+        if (!playerHashMap.containsKey(tokens[0])){
+            playerHashMap.put(tokens[0], new Player(tokens[0], ""));
         }
 
-        System.out.println(command);
-        return "";
+        System.out.println("Command: " + command);
+        for (String str: tokens){
+            System.out.println(str);
+        }
+        if (tokens.length == 1){
+            return "";
+        } else if (tokens[1].equals("inventory") || tokens[1].equals("inv")){
+            return playerHashMap.get(tokens[0]).displayInventory();
+        } else if (tokens[1].equals("get") && tokens.length == 3){
+            if (currentLocation.getArtefacts().containsKey(tokens[2])){
+                Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[2]);
+                playerHashMap.get(tokens[0]).addArtefact(currentArtefact);
+                currentLocation.getArtefacts().remove(currentArtefact.getName());
+                return "get " + currentArtefact.getName();
+            } else{
+                return "failed to get, you may input the wrong name or it doesn't exist at all.";
+            }
+        } else if (tokens[1].equals("drop") && tokens.length == 3){
+            Artefact artefact = playerHashMap.get(tokens[0]).removeArtefact(tokens[2]);
+            if (artefact != null){
+                currentLocation.addArtefact(artefact);
+                return "drop " + artefact.getName();
+            } else{
+                return "doesn't exist this artefact";
+            }
+        } else if (tokens[1].equals("goto") && tokens.length == 3){
+            if (currentLocation.getExits().containsKey(tokens[2])){
+                currentLocation = currentLocation.getExits().get(tokens[2]);
+                return "you are now at " + currentLocation.getName();
+            } else {
+                return "You can't go to " + tokens[2];
+            }
+        } else if (tokens[1].equals("look")){
+            return currentLocation.showInformation();
+        }
+        return "Failed to execute basic command";
     }
 
     //  === Methods below are there to facilitate server related operations. ===

@@ -20,4 +20,9 @@ public abstract class GameEntity
     {
         return description;
     }
+
+    @Override
+    public String toString(){
+        return "{name:" + getName() +  ", description: " + getDescription() + "}";
+    }
 }
