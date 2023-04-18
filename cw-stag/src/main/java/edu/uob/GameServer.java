@@ -271,7 +271,6 @@ public final class GameServer {
         }
 
         for (String consumable: gameAction.getConsumables()){
-            GameEntity gameEntity = searchingPool.get(consumable);
             if (playerHashMap.get(playerName).getInventory().containsKey(consumable)){
                 playerHashMap.get(playerName).getInventory().remove(consumable);
             } else if (currentLocation.getCharacters().containsKey(consumable)){
@@ -282,6 +281,14 @@ public final class GameServer {
                 currentLocation.getArtefacts().remove(consumable);
             } else if (currentLocation.getName().equals(consumable)){
                 currentLocation = null;
+            }
+        }
+
+        for (String production: gameAction.getProductions()){
+            if (locationHashMap.containsKey(production)){
+                currentLocation.addExit(locationHashMap.get(production));
+            } else {
+                locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
             }
         }
     }
