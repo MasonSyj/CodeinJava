@@ -25,6 +25,10 @@ final class ActionsFileTests {
           Document document = builder.parse("config" + File.separator + "basic-actions.xml");
           Element root = document.getDocumentElement();
           NodeList actions = root.getChildNodes();
+          for (int i = 1; i < actions.getLength(); i += 2){
+              Element element = (Element) actions.item(i);
+              System.out.println(element.toString());
+          }
           // Get the first action (only the odd items are actually actions - 1, 3, 5 etc.)
           Element firstAction = (Element)actions.item(1);
           Element triggers = (Element)firstAction.getElementsByTagName("triggers").item(0);

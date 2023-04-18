@@ -5,7 +5,14 @@ import com.alexmerz.graphviz.Parser;
 import com.alexmerz.graphviz.objects.Graph;
 import com.alexmerz.graphviz.objects.Node;
 import com.alexmerz.graphviz.objects.Edge;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
+import org.xml.sax.SAXException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,6 +27,8 @@ public final class GameServer {
     private HashMap<String, Location> locationHashMap;
     private Location currentLocation;
     private HashMap<String, Player> playerHashMap;
+
+    private Set<GameAction> gameActionSet;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -72,23 +81,14 @@ public final class GameServer {
             loadGameEntity(currentLocation, others, "characters");
             loadGameEntity(currentLocation, others, "players");
             locationHashMap.put(currentLocation.getName(), currentLocation);
-            /*
-            List<Graph> artefacts = others.stream().filter(graph -> graph.getId().getId().equals("artefacts")).toList();
-            if (artefacts.size() == 1){
-                for (Node artefact: artefacts.get(0).getNodes(false)){
-                    Artefact currentArtefact = new Artefact(artefact.getId().getId(), artefact.getAttribute("description"));
-                    currentLocation.addArtefact(currentArtefact);
-                }
-            }
-            **/
+
             System.out.println(currentLocation.toString());
             System.out.println(currentLocation.showInformation());
         }
 
         currentLocation = locationHashMap.values().stream().toList().get(0);
-        //////////////////////////////////////////////////////////////////////////
-        //load Path
 
+        //load Path
         ArrayList<Edge> paths = sections.get(1).getEdges();
         for (Edge edge: paths){
             Node fromLocation = edge.getSource().getNode();
@@ -100,6 +100,56 @@ public final class GameServer {
                 locationHashMap.get(fromLocationName).addExit(locationHashMap.get(toLocationName));
             }
             System.out.println(fromLocationName + " -> " + toLocationName);
+        }
+        gameActionSet = new HashSet<GameAction>();
+        //load actions
+        try {
+          DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+          Document document = builder.parse("config" + File.separator + "basic-actions.xml");
+          Element root = document.getDocumentElement();
+          NodeList actions = root.getChildNodes();
+          // only the odd items are actually actions - 1, 3, 5 etc.
+          for (int i = 1; i < actions.getLength(); i += 2){
+              GameAction currentGameAction = new GameAction();
+              Element currentActionElement = (Element) actions.item(i);
+              loadActionItem(currentGameAction, currentActionElement, "triggers");
+              loadActionItem(currentGameAction, currentActionElement, "subjects");
+              loadActionItem(currentGameAction, currentActionElement, "consumed");
+              loadActionItem(currentGameAction, currentActionElement, "produced");
+              gameActionSet.add(currentGameAction);
+          }
+      } catch(ParserConfigurationException pce) {
+            System.out.println("ParserConfigurationException was thrown when attempting to read basic actions file");
+      } catch(SAXException saxe) {
+            System.out.println("SAXException was thrown when attempting to read basic actions file");
+      } catch(IOException ioe) {
+            System.out.println("IOException was thrown when attempting to read basic actions file");
+      }
+
+        for (GameAction gameAction: gameActionSet){
+            System.out.println(gameAction.toString());
+        }
+    }
+
+    public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
+        NodeList items = gameActionElement.getElementsByTagName(elementName);
+        List<String> listofItems = new ArrayList<String>();
+        for (int i = 0; i < items.; i++){
+            Element element = (Element) gameActionElement.getElementsByTagName(elementName).item(0);
+            String elementSpecificName = element.getElementsByTagName("keyphrase").item(0).getTextContent();
+            System.out.println(elementSpecificName);
+            listofItems.add(elementSpecificName);
+        }
+        for (int i = 0; i < listofItems.size(); i++) {
+            if (elementName.equals("triggers")) {
+                gameAction.addTrigger(listofItems.get(i));
+            } else if (elementName.equals("subjects")) {
+                gameAction.addSubject(listofItems.get(i));
+            } else if (elementName.equals("consumed")) {
+                gameAction.addConsumable(listofItems.get(i));
+            } else if (elementName.equals("produced")) {
+                gameAction.addProduction(listofItems.get(i));
+            }
         }
     }
 
