@@ -33,7 +33,7 @@ public class Game {
     }
 
     public void printWelcome(){
-        System.out.println();
+        qSystem.out.println();
         System.out.println("Welcome to the castle");
         System.out.println("This is a super boring game");
         System.out.println("if you need type, type 'help'");
