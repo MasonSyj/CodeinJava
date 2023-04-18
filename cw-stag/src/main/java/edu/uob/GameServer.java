@@ -112,10 +112,13 @@ public final class GameServer {
           for (int i = 1; i < actions.getLength(); i += 2){
               GameAction currentGameAction = new GameAction();
               Element currentActionElement = (Element) actions.item(i);
+              System.out.println("-----------------------------");
               loadActionItem(currentGameAction, currentActionElement, "triggers");
               loadActionItem(currentGameAction, currentActionElement, "subjects");
               loadActionItem(currentGameAction, currentActionElement, "consumed");
               loadActionItem(currentGameAction, currentActionElement, "produced");
+              System.out.println("-----------------------------");
+              System.out.println(currentGameAction.toString());
               gameActionSet.add(currentGameAction);
           }
       } catch(ParserConfigurationException pce) {
@@ -126,17 +129,21 @@ public final class GameServer {
             System.out.println("IOException was thrown when attempting to read basic actions file");
       }
 
-        for (GameAction gameAction: gameActionSet){
-            System.out.println(gameAction.toString());
-        }
     }
 
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
-        NodeList items = gameActionElement.getElementsByTagName(elementName);
+        System.out.println("+++++++" + elementName + "++++++");
+        Element certainType = (Element) gameActionElement.getElementsByTagName(elementName).item(0);
         List<String> listofItems = new ArrayList<String>();
-        for (int i = 0; i < items.; i++){
-            Element element = (Element) gameActionElement.getElementsByTagName(elementName).item(0);
-            String elementSpecificName = element.getElementsByTagName("keyphrase").item(0).getTextContent();
+        NodeList nodeList;
+        if (elementName.equals("triggers")){
+            nodeList = certainType.getElementsByTagName("keyphrase");
+        } else {
+            nodeList = certainType.getElementsByTagName("entity");
+        }
+        int len = nodeList.getLength();
+        for (int i = 0; i < len; i++){
+            String elementSpecificName = nodeList.item(i).getTextContent();
             System.out.println(elementSpecificName);
             listofItems.add(elementSpecificName);
         }
@@ -216,10 +223,68 @@ public final class GameServer {
             }
         } else if (tokens[1].equals("look")){
             return currentLocation.showInformation();
+        } else if (tokens.length >= 3){
+            return parseGameAction(tokens);
         }
         return "Failed to execute basic command";
     }
 
+    public String parseGameAction(String[] tokens) {
+        int subjectsLength = tokens.length - 2; // name of player and trigger phrase
+        Set<String> subjects = new HashSet<String>();
+        for (int i = 2; i < tokens.length; i++){
+           subjects.add(tokens[i]);
+        }
+        String subjectInString = subjects.stream().sorted((a, b) -> a.compareTo(b)).toString():
+        for (GameAction gameAction: gameActionSet){
+            if (gameAction.getTriggers().contains(tokens[1]) &&
+                    subjectInString.equals(gameAction.printSubject())){
+                executeGameAction(gameAction, subjects, tokens[0]);
+            }
+        }
+    }
+
+    public boolean executeGameAction(GameAction gameAction, Set<String> subjects, String playerName){
+        Map<String, GameEntity> searchingPool = new HashMap<String, GameEntity>();
+        for (String str: playerHashMap.get(playerName).getInventory().keySet()){
+            searchingPool.put(str, playerHashMap.get(playerName).getInventory().get(str));
+        }
+
+        for (String str: currentLocation.getFurnitures().keySet()){
+            searchingPool.put(str, currentLocation.getFurnitures().get(str));
+        }
+
+        for (String str: currentLocation.getArtefacts().keySet()){
+            searchingPool.put(str, currentLocation.getArtefacts().get(str));
+        }
+
+        for (String str: currentLocation.getCharacters().keySet()){
+            searchingPool.put(str, currentLocation.getCharacters().get(str));
+        }
+
+        searchingPool.put(currentLocation.getName(), currentLocation);
+
+        for (String subject: subjects){
+            if (!searchingPool.containsKey(subject)){
+                return false;
+            }
+        }
+
+        for (String consumable: gameAction.getConsumables()){
+            GameEntity gameEntity = searchingPool.get(consumable);
+            if (playerHashMap.get(playerName).getInventory().containsKey(consumable)){
+                playerHashMap.get(playerName).getInventory().remove(consumable);
+            } else if (currentLocation.getCharacters().containsKey(consumable)){
+                currentLocation.getCharacters().remove(consumable);
+            } else if (currentLocation.getFurnitures().containsKey(consumable)){
+                currentLocation.getFurnitures().remove(consumable);
+            } else if (currentLocation.getArtefacts().containsKey(consumable)){
+                currentLocation.getArtefacts().remove(consumable);
+            } else if (currentLocation.getName().equals(consumable)){
+                currentLocation = null;
+            }
+        }
+    }
     //  === Methods below are there to facilitate server related operations. ===
 
     /**

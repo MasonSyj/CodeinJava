@@ -32,4 +32,54 @@ public class GameAction{
     public void addProduction(String production){
         this.productions.add(production);
     }
+
+    public Set<String> getTriggers() {
+        return triggers;
+    }
+
+    public Set<String> getSubjects() {
+        return subjects;
+    }
+
+    public String printSubject(){
+        return subjects.stream().sorted((a, b) -> a.compareTo(b)).toString();
+    }
+
+    public Set<String> getConsumables() {
+        return consumables;
+    }
+
+    public Set<String> getProductions() {
+        return productions;
+    }
+
+    public String getNarration() {
+        return narration;
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("trigger: \n");
+        for (String str: this.triggers){
+            stringBuilder.append(" " + str + " ");
+        }
+
+        stringBuilder.append("\n subjects: \n");
+        for (String str: this.subjects){
+            stringBuilder.append(" " + str + " ");
+        }
+
+        stringBuilder.append("\n consumables: \n");
+        for (String str: this.consumables){
+            stringBuilder.append(" " + str + " ");
+        }
+
+        stringBuilder.append("\n productions: \n");
+        for (String str: this.productions){
+            stringBuilder.append(" " + str + " ");
+        }
+        return stringBuilder.toString();
+    }
+
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.File;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -32,6 +33,8 @@ final class ActionsFileTests {
           // Get the first action (only the odd items are actually actions - 1, 3, 5 etc.)
           Element firstAction = (Element)actions.item(1);
           Element triggers = (Element)firstAction.getElementsByTagName("triggers").item(0);
+          int len = triggers.getElementsByTagName("keyphrase").getLength();
+          System.out.println("length: " + len);
           // Get the first trigger phrase
           String firstTriggerPhrase = triggers.getElementsByTagName("keyphrase").item(0).getTextContent();
           assertEquals("open", firstTriggerPhrase, "First trigger phrase was not 'open'");

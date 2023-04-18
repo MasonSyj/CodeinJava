@@ -14,6 +14,11 @@ public class Player extends GameEntity{
         inventory = new HashMap<String, Artefact>();
     }
 
+    public Map<String, Artefact> getInventory(){
+        return this.inventory;
+    }
+
+
     public void setCurrentLocation(Location location){
         this.currentLocation = location;
     }

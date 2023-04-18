@@ -72,6 +72,14 @@ public class Location extends GameEntity{
         return stringBuilder.toString();
     }
 
+    public Map<String, Character> getCharacters() {
+        return characters;
+    }
+
+    public Map<String, Furniture> getFurnitures() {
+        return furnitures;
+    }
+
     public Map<String, Artefact> getArtefacts() {
         return artefacts;
     }
