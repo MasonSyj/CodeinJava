@@ -10,13 +10,16 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /** This class implements the STAG server. */
 public final class GameServer {
 
     private static final char END_OF_TRANSMISSION = 4;
+
+    private HashMap<String, Location> locationHashMap;
+    private Location currentLocation;
+    private HashMap<String, Player> playerHashMap;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -37,6 +40,7 @@ public final class GameServer {
     */
     public GameServer(File entitiesFile, File actionsFile) {
         // TODO implement your server logic here
+        playerHashMap = new HashMap<String, Player>();
         Parser parser = new Parser();
         FileReader reader = null;
         try {
@@ -52,12 +56,14 @@ public final class GameServer {
         Graph wholeDocument = parser.getGraphs().get(0);
         ArrayList<Graph> sections = wholeDocument.getSubgraphs();
 
+        locationHashMap = new HashMap<String, Location>();
+        Location currentLocation;
         // locations
         ArrayList<Graph> locations = sections.get(0).getSubgraphs();
         for (Graph location: locations){
             Node locationDetails = location.getNodes(false).get(0);
             String locationName = locationDetails.getId().getId();
-            Location currentLocation = new Location(locationName, locationDetails.getAttribute("description"));
+            currentLocation = new Location(locationName, locationDetails.getAttribute("description"));
 
             ArrayList<Graph> others = location.getSubgraphs();
 
@@ -66,6 +72,7 @@ public final class GameServer {
             loadGameEntity(currentLocation, others, "characters");
             loadGameEntity(currentLocation, others, "players");
             System.out.println(currentLocation.showInformation());
+            locationHashMap.put(currentLocation.getName(), currentLocation);
             /*
             List<Graph> artefacts = others.stream().filter(graph -> graph.getId().getId().equals("artefacts")).toList();
             if (artefacts.size() == 1){
@@ -76,6 +83,9 @@ public final class GameServer {
             }
             **/
         }
+
+        //////////////////////////////////////////////////////////////////////////
+        //load Commands
     }
 
     public void loadGameEntity(Location location, ArrayList<Graph> graph, String name){
@@ -90,7 +100,7 @@ public final class GameServer {
                 } else if (name.equals("characters")){
                     location.addCharacter((Character) currentEntity);
                 } else if (name.equals("players")){
-                    location.addPlayer((Player) currentEntity);
+                    ((Player) currentEntity).setCurrentLocation(location);
                 }
             }
         }
@@ -104,6 +114,19 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
+        String[] tokens = command.split(" ");
+        if (tokens.length == 0){
+            return "";
+        } else if (tokens[0].equals("inventory") || tokens[0].equals("inv")){
+            return playerHashMap.get("Simon").displayInventory();
+        } else if (tokens[0].equals("get") && tokens.length == 2){
+            if (currentLocation.getArtefacts().containsKey(tokens[1])){
+                Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[1]);
+                playerHashMap.get("Simon").addArtefact(currentArtefact);
+                currentLocation.getArtefacts().remove(currentArtefact);
+            }
+        }
+
         System.out.println(command);
         return "";
     }
