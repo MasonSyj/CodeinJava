@@ -247,23 +247,90 @@ public final class GameServer {
         String subjectInString = subjects.stream().sorted((a, b) -> a.compareTo(b)).toList().toString();
         System.out.println("subjectInString" + subjectInString);
         for (GameAction gameAction: gameActionSet){
-            boolean result = executeGameAction(gameAction, subjects, tokens[0]);
-            if (result == true){
-                System.out.println("correctgameAction" + gameAction.printSubject());
-                return;
+            if (matchedGameAction(gameAction, subjects)){
+                System.out.println("following GameAction matched: ");
+                System.out.println(gameAction.getTriggers().toString() + " " + gameAction.getSubjects().toString());
+                executeMatchedGameAction(gameAction, tokens[0]);
+            }else{
+                boolean result = executeGameAction(gameAction, subjects, tokens[0]);
+                if (result == true){
+                    System.out.println("correctgameAction: " + gameAction.printSubject());
+                }
             }
+
         }
     }
 
-    public boolean executeGameAction(GameAction gameAction, Set<String> subjects, String playerName){
-        Map<String, GameEntity> searchingPool = new HashMap<String, GameEntity>();
-        boolean matchTrigger = false;
-        for (String str: gameAction.getTriggers()){
-            searchingPool.put(str, null);
-            if (subjects.contains(str)){
-                matchTrigger = true;
+    public boolean matchedGameAction(GameAction gameAction, Set<String> subjects){
+        boolean hasTrigger = false;
+        for (String trigger: subjects){
+            if (gameAction.getTriggers().contains(trigger)){
+                hasTrigger = true;
+                break;
             }
         }
+        if (hasTrigger == false){
+            return false;
+        }
+
+        for (String subject: subjects){
+           if (gameAction.getSubjects().contains(subject)) {
+               return true;
+           }
+        }
+        return false;
+    }
+
+    public void executeMatchedGameAction(GameAction gameAction, String playerName){
+        Map<String, GameEntity> searchingPool = new HashMap<String, GameEntity>();
+        for (String subject: gameAction.getSubjects().stream().toList()){
+            if (!searchingPool.containsKey(subject)){
+                return;
+            }
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        for (String consumable: gameAction.getConsumables()){
+            result.append("Consumed: " + consumable);
+            result.append("  \n");
+            if (playerHashMap.get(playerName).getInventory().containsKey(consumable)){
+                playerHashMap.get(playerName).getInventory().remove(consumable);
+            } else if (currentLocation.getCharacters().containsKey(consumable)){
+                currentLocation.getCharacters().remove(consumable);
+            } else if (currentLocation.getFurnitures().containsKey(consumable)){
+                currentLocation.getFurnitures().remove(consumable);
+            } else if (currentLocation.getArtefacts().containsKey(consumable)){
+                currentLocation.getArtefacts().remove(consumable);
+            } else if (currentLocation.getName().equals(consumable)){
+                currentLocation = null;
+            }
+        }
+
+        for (String production: gameAction.getProductions()){
+            if (locationHashMap.containsKey(production)){
+                currentLocation.addExit(locationHashMap.get(production));
+                result.append("\nnew exit: ");
+                result.append(production);
+            } else {
+                locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
+                result.append("\nnew Artefacts at storeroom");
+                result.append(production);
+            }
+        }
+        System.out.println("--------------------------------");
+        System.out.println("executeMatchedGameAction: ");
+        System.out.println(gameActionResult);
+        System.out.println("--------------------------------");
+        gameActionResult = result.toString();
+    }
+
+    public Map<String, GameEntity> buildSearchingPool(GameAction gameAction, String playerName){
+        Map<String, GameEntity> searchingPool = new HashMap<String, GameEntity>();
+        for (String str: gameAction.getTriggers()){
+            searchingPool.put(str, null);
+        }
+
         for (String str: playerHashMap.get(playerName).getInventory().keySet()){
             searchingPool.put(str, playerHashMap.get(playerName).getInventory().get(str));
         }
@@ -281,6 +348,12 @@ public final class GameServer {
         }
 
         searchingPool.put(currentLocation.getName(), currentLocation);
+        return searchingPool;
+
+    }
+
+    public boolean executeGameAction(GameAction gameAction, Set<String> subjects, String playerName){
+        Map<String, GameEntity> searchingPool = buildSearchingPool(gameAction, playerName);
 
         int cnt = 0;
         for (String subject: subjects){
@@ -290,10 +363,8 @@ public final class GameServer {
                 cnt++;
             }
         }
-      //  System.out.println("cnt: " + cnt);
-      //  System.out.println("----------------------------");
 
-        if (cnt != gameAction.getSubjects().size() + 1 &&matchTrigger =){
+        if (cnt != gameAction.getSubjects().size() + 1){
             return false;
         }
         System.out.println("succeed to match");
