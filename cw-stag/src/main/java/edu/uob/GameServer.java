@@ -129,8 +129,6 @@ public final class GameServer {
       } catch(IOException ioe) {
             System.out.println("IOException was thrown when attempting to read basic actions file");
       }
-
-        currentLocation = locationHashMap.get("cellar");
     }
 
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
@@ -185,10 +183,17 @@ public final class GameServer {
     */
     public String handleCommand(String command) {
         // TODO implement your server logic here
+        String username = "";
+        for (int i = 0; i < command.length(); i++){
+            if (command.charAt(i) == ':'){
+               username = command.substring(0, i);
+               command = command.substring(i + 1, command.length());
+            }
+        }
+
         String[] tokens = command.split(" ");
-        tokens[0] = tokens[0].substring(0, tokens[0].length() - 1);
-        if (!playerHashMap.containsKey(tokens[0])){
-            playerHashMap.put(tokens[0], new Player(tokens[0], ""));
+        if (!playerHashMap.containsKey(username)){
+            playerHashMap.put(tokens[0], new Player(username, ""));
         }
 
         System.out.println("Command: " + command);
@@ -198,11 +203,11 @@ public final class GameServer {
         if (tokens.length == 1){
             return "";
         } else if (tokens[1].equals("inventory") || tokens[1].equals("inv")){
-            return playerHashMap.get(tokens[0]).displayInventory();
+            return playerHashMap.get(username).displayInventory();
         } else if (tokens[1].equals("get") && tokens.length == 3){
             if (currentLocation.getArtefacts().containsKey(tokens[2])){
                 Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[2]);
-                playerHashMap.get(tokens[0]).addArtefact(currentArtefact);
+                playerHashMap.get(username).addArtefact(currentArtefact);
                 currentLocation.getArtefacts().remove(currentArtefact.getName());
                 return "get " + currentArtefact.getName();
             } else{
@@ -251,10 +256,13 @@ public final class GameServer {
                 System.out.println("following GameAction matched: ");
                 System.out.println(gameAction.getTriggers().toString() + " " + gameAction.getSubjects().toString());
                 executeMatchedGameAction(gameAction, tokens[0]);
+                return;
             }else{
+                System.out.println("didn't match the game Action");
                 boolean result = executeGameAction(gameAction, subjects, tokens[0]);
                 if (result == true){
                     System.out.println("correctgameAction: " + gameAction.printSubject());
+                    return;
                 }
             }
 
@@ -282,8 +290,8 @@ public final class GameServer {
     }
 
     public void executeMatchedGameAction(GameAction gameAction, String playerName){
-        Map<String, GameEntity> searchingPool = new HashMap<String, GameEntity>();
-        for (String subject: gameAction.getSubjects().stream().toList()){
+        Map<String, GameEntity> searchingPool = buildSearchingPool(gameAction, playerName);
+        for (String subject: gameAction.getSubjects()){
             if (!searchingPool.containsKey(subject)){
                 return;
             }
@@ -320,7 +328,7 @@ public final class GameServer {
         }
         System.out.println("--------------------------------");
         System.out.println("executeMatchedGameAction: ");
-        System.out.println(gameActionResult);
+        System.out.println(result.toString());
         System.out.println("--------------------------------");
         gameActionResult = result.toString();
     }

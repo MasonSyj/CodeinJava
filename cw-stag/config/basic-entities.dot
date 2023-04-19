@@ -24,6 +24,7 @@ digraph layout {
             subgraph artefacts {
                 node [shape = "diamond"];
                 key [description = "Brass key"];
+                axe [description = "a heavey axe"];
             }
             subgraph furniture {
                 node [shape = "hexagon"];

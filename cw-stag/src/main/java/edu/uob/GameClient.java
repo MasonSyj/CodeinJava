@@ -28,7 +28,18 @@ public final class GameClient {
         try (var socket = new Socket("localhost", 8888);
         var socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         var socketWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
-            socketWriter.write(username + ": " + command + "\n");
+            String writeCommand = "";
+            if (command.contains(":")){
+                for (int i = 0; i < command.length(); i++){
+                    if (command.charAt(i) == ':'){
+                        String newUsername = command.substring(0, i);
+                        writeCommand = newUsername + ": " + command.substring(i + 1, command.length()) + "\n";
+                    }
+                }
+            } else {
+                writeCommand = username + ": " + command + "\n";
+            }
+            socketWriter.write(writeCommand);
             socketWriter.flush();
             String incomingMessage = socketReader.readLine();
             if (incomingMessage == null) {
