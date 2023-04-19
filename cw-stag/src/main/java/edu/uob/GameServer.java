@@ -29,6 +29,7 @@ public final class GameServer {
     private HashMap<String, Player> playerHashMap;
 
     private Set<GameAction> gameActionSet;
+    private String gameActionResult;
 
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
@@ -117,7 +118,7 @@ public final class GameServer {
               loadActionItem(currentGameAction, currentActionElement, "subjects");
               loadActionItem(currentGameAction, currentActionElement, "consumed");
               loadActionItem(currentGameAction, currentActionElement, "produced");
-              System.out.println("-----------------------------");
+//              System.out.println("-----------------------------");
               System.out.println(currentGameAction.toString());
               gameActionSet.add(currentGameAction);
           }
@@ -129,10 +130,11 @@ public final class GameServer {
             System.out.println("IOException was thrown when attempting to read basic actions file");
       }
 
+        currentLocation = locationHashMap.get("cellar");
     }
 
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
-        System.out.println("+++++++" + elementName + "++++++");
+//        System.out.println("+++++++" + elementName + "++++++");
         Element certainType = (Element) gameActionElement.getElementsByTagName(elementName).item(0);
         List<String> listofItems = new ArrayList<String>();
         NodeList nodeList;
@@ -144,7 +146,7 @@ public final class GameServer {
         int len = nodeList.getLength();
         for (int i = 0; i < len; i++){
             String elementSpecificName = nodeList.item(i).getTextContent();
-            System.out.println(elementSpecificName);
+//            System.out.println(elementSpecificName);
             listofItems.add(elementSpecificName);
         }
         for (int i = 0; i < listofItems.size(); i++) {
@@ -224,28 +226,44 @@ public final class GameServer {
         } else if (tokens[1].equals("look")){
             return currentLocation.showInformation();
         } else if (tokens.length >= 3){
-            return parseGameAction(tokens);
+            gameActionResult = null;
+            parseGameAction(tokens);
+            if (gameActionResult != null){
+                return gameActionResult;
+            } else {
+                return "Failed to execute basic command";
+            }
+        } else{
+            return "Failed to execute basic command";
         }
-        return "Failed to execute basic command";
     }
 
-    public String parseGameAction(String[] tokens) {
-        int subjectsLength = tokens.length - 2; // name of player and trigger phrase
+    public void parseGameAction(String[] tokens) {
+        System.out.println("Begin parsing GameAction: ");
         Set<String> subjects = new HashSet<String>();
-        for (int i = 2; i < tokens.length; i++){
+        for (int i = 1; i < tokens.length; i++){
            subjects.add(tokens[i]);
         }
-        String subjectInString = subjects.stream().sorted((a, b) -> a.compareTo(b)).toString():
+        String subjectInString = subjects.stream().sorted((a, b) -> a.compareTo(b)).toList().toString();
+        System.out.println("subjectInString" + subjectInString);
         for (GameAction gameAction: gameActionSet){
-            if (gameAction.getTriggers().contains(tokens[1]) &&
-                    subjectInString.equals(gameAction.printSubject())){
-                executeGameAction(gameAction, subjects, tokens[0]);
+            boolean result = executeGameAction(gameAction, subjects, tokens[0]);
+            if (result == true){
+                System.out.println("correctgameAction" + gameAction.printSubject());
+                return;
             }
         }
     }
 
     public boolean executeGameAction(GameAction gameAction, Set<String> subjects, String playerName){
         Map<String, GameEntity> searchingPool = new HashMap<String, GameEntity>();
+        boolean matchTrigger = false;
+        for (String str: gameAction.getTriggers()){
+            searchingPool.put(str, null);
+            if (subjects.contains(str)){
+                matchTrigger = true;
+            }
+        }
         for (String str: playerHashMap.get(playerName).getInventory().keySet()){
             searchingPool.put(str, playerHashMap.get(playerName).getInventory().get(str));
         }
@@ -264,13 +282,26 @@ public final class GameServer {
 
         searchingPool.put(currentLocation.getName(), currentLocation);
 
+        int cnt = 0;
         for (String subject: subjects){
-            if (!searchingPool.containsKey(subject)){
-                return false;
+            System.out.println("current subject / trigger: " + subject);
+            if (searchingPool.containsKey(subject)){
+                System.out.println("subject existed in the searchingPool:" + subject);
+                cnt++;
             }
         }
+      //  System.out.println("cnt: " + cnt);
+      //  System.out.println("----------------------------");
+
+        if (cnt != gameAction.getSubjects().size() + 1 &&matchTrigger =){
+            return false;
+        }
+        System.out.println("succeed to match");
+        StringBuilder result = new StringBuilder();
 
         for (String consumable: gameAction.getConsumables()){
+            result.append("Consumed: " + consumable);
+            result.append("  \n");
             if (playerHashMap.get(playerName).getInventory().containsKey(consumable)){
                 playerHashMap.get(playerName).getInventory().remove(consumable);
             } else if (currentLocation.getCharacters().containsKey(consumable)){
@@ -287,10 +318,16 @@ public final class GameServer {
         for (String production: gameAction.getProductions()){
             if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
+                result.append("\nnew exit: ");
+                result.append(production);
             } else {
                 locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
+                result.append("\nnew Artefacts at storeroom");
+                result.append(production);
             }
         }
+        gameActionResult = result.toString();
+        return true;
     }
     //  === Methods below are there to facilitate server related operations. ===
 

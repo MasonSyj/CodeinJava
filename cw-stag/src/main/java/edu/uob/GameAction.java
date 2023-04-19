@@ -42,7 +42,7 @@ public class GameAction{
     }
 
     public String printSubject(){
-        return subjects.stream().sorted((a, b) -> a.compareTo(b)).toString();
+        return subjects.stream().sorted((a, b) -> a.compareTo(b)).toList().toString();
     }
 
     public Set<String> getConsumables() {
@@ -62,22 +62,22 @@ public class GameAction{
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("trigger: \n");
         for (String str: this.triggers){
-            stringBuilder.append(" " + str + " ");
+            stringBuilder.append(str + " ");
         }
 
-        stringBuilder.append("\n subjects: \n");
+        stringBuilder.append("\nsubjects: \n");
         for (String str: this.subjects){
-            stringBuilder.append(" " + str + " ");
+            stringBuilder.append(str + " ");
         }
 
-        stringBuilder.append("\n consumables: \n");
+        stringBuilder.append("\nconsumables: \n");
         for (String str: this.consumables){
-            stringBuilder.append(" " + str + " ");
+            stringBuilder.append(str + " ");
         }
 
-        stringBuilder.append("\n productions: \n");
+        stringBuilder.append("\nproductions: \n");
         for (String str: this.productions){
-            stringBuilder.append(" " + str + " ");
+            stringBuilder.append(str + " ");
         }
         return stringBuilder.toString();
     }
