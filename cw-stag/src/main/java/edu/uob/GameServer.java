@@ -191,48 +191,48 @@ public final class GameServer {
             }
         }
 
-        String[] tokens = command.split(" ");
+        String[] tokens = command.trim().replaceAll("\\s+", " ").split(" ");
         if (!playerHashMap.containsKey(username)){
-            playerHashMap.put(tokens[0], new Player(username, ""));
+            playerHashMap.put(username, new Player(username, ""));
         }
 
         System.out.println("Command: " + command);
         for (String str: tokens){
             System.out.println(str);
         }
-        if (tokens.length == 1){
+        if (tokens.length == 0){
             return "";
-        } else if (tokens[1].equals("inventory") || tokens[1].equals("inv")){
+        } else if (tokens[0].equals("inventory") || tokens[0].equals("inv")){
             return playerHashMap.get(username).displayInventory();
-        } else if (tokens[1].equals("get") && tokens.length == 3){
-            if (currentLocation.getArtefacts().containsKey(tokens[2])){
-                Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[2]);
+        } else if (tokens[0].equals("get") && tokens.length == 2){
+            if (currentLocation.getArtefacts().containsKey(tokens[1])){
+                Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[1]);
                 playerHashMap.get(username).addArtefact(currentArtefact);
                 currentLocation.getArtefacts().remove(currentArtefact.getName());
                 return "get " + currentArtefact.getName();
             } else{
                 return "failed to get, you may input the wrong name or it doesn't exist at all.";
             }
-        } else if (tokens[1].equals("drop") && tokens.length == 3){
-            Artefact artefact = playerHashMap.get(tokens[0]).removeArtefact(tokens[2]);
+        } else if (tokens[0].equals("drop") && tokens.length == 2){
+            Artefact artefact = playerHashMap.get(username).removeArtefact(tokens[1]);
             if (artefact != null){
                 currentLocation.addArtefact(artefact);
                 return "drop " + artefact.getName();
             } else{
                 return "doesn't exist this artefact";
             }
-        } else if (tokens[1].equals("goto") && tokens.length == 3){
-            if (currentLocation.getExits().containsKey(tokens[2])){
-                currentLocation = currentLocation.getExits().get(tokens[2]);
+        } else if (tokens[0].equals("goto") && tokens.length == 2){
+            if (currentLocation.getExits().containsKey(tokens[1])){
+                currentLocation = currentLocation.getExits().get(tokens[1]);
                 return "you are now at " + currentLocation.getName();
             } else {
                 return "You can't go to " + tokens[2];
             }
-        } else if (tokens[1].equals("look")){
+        } else if (tokens[0].equals("look")){
             return currentLocation.showInformation();
-        } else if (tokens.length >= 3){
+        } else if (tokens.length >= 2){
             gameActionResult = null;
-            parseGameAction(tokens);
+            parseGameAction(tokens, username);
             if (gameActionResult != null){
                 return gameActionResult;
             } else {
@@ -243,10 +243,10 @@ public final class GameServer {
         }
     }
 
-    public void parseGameAction(String[] tokens) {
+    public void parseGameAction(String[] tokens, String currentPlayerName) {
         System.out.println("Begin parsing GameAction: ");
         Set<String> subjects = new HashSet<String>();
-        for (int i = 1; i < tokens.length; i++){
+        for (int i = 0; i < tokens.length; i++){
            subjects.add(tokens[i]);
         }
         String subjectInString = subjects.stream().sorted((a, b) -> a.compareTo(b)).toList().toString();
@@ -255,11 +255,11 @@ public final class GameServer {
             if (matchedGameAction(gameAction, subjects)){
                 System.out.println("following GameAction matched: ");
                 System.out.println(gameAction.getTriggers().toString() + " " + gameAction.getSubjects().toString());
-                executeMatchedGameAction(gameAction, tokens[0]);
+                executeMatchedGameAction(gameAction, currentPlayerName);
                 return;
             }else{
                 System.out.println("didn't match the game Action");
-                boolean result = executeGameAction(gameAction, subjects, tokens[0]);
+                boolean result = executeGameAction(gameAction, subjects, currentPlayerName);
                 if (result == true){
                     System.out.println("correctgameAction: " + gameAction.printSubject());
                     return;
