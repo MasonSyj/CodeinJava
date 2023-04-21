@@ -26,6 +26,8 @@ public final class GameServer {
 
     private HashMap<String, Location> locationHashMap;
     private Location currentLocation;
+
+    private Location startLocation;
     private HashMap<String, Player> playerHashMap;
 
     private Set<GameAction> gameActionSet;
@@ -74,13 +76,15 @@ public final class GameServer {
             Node locationDetails = location.getNodes(false).get(0);
             String locationName = locationDetails.getId().getId();
             currentLocation = new Location(locationName, locationDetails.getAttribute("description"));
+            if (startLocation == null) {
+                startLocation = currentLocation;
+            }
 
             ArrayList<Graph> others = location.getSubgraphs();
 
             loadGameEntity(currentLocation, others, "artefacts");
             loadGameEntity(currentLocation, others, "furniture");
             loadGameEntity(currentLocation, others, "characters");
-            loadGameEntity(currentLocation, others, "players");
             locationHashMap.put(currentLocation.getName(), currentLocation);
 
             System.out.println(currentLocation.toString());
@@ -129,6 +133,8 @@ public final class GameServer {
       } catch(IOException ioe) {
             System.out.println("IOException was thrown when attempting to read basic actions file");
       }
+
+        currentLocation = startLocation;
     }
 
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
@@ -190,11 +196,13 @@ public final class GameServer {
                command = command.substring(i + 1, command.length());
             }
         }
-
         String[] tokens = command.trim().replaceAll("\\s+", " ").split(" ");
         if (!playerHashMap.containsKey(username)){
             playerHashMap.put(username, new Player(username, ""));
+            playerHashMap.get(username).setCurrentLocation(startLocation);
         }
+
+        Player currentPlayer = playerHashMap.get(username);
 
         System.out.println("Command: " + command);
         for (String str: tokens){
@@ -203,18 +211,18 @@ public final class GameServer {
         if (tokens.length == 0){
             return "";
         } else if (tokens[0].equals("inventory") || tokens[0].equals("inv")){
-            return playerHashMap.get(username).displayInventory();
+            return currentPlayer.displayInventory();
         } else if (tokens[0].equals("get") && tokens.length == 2){
             if (currentLocation.getArtefacts().containsKey(tokens[1])){
                 Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[1]);
-                playerHashMap.get(username).addArtefact(currentArtefact);
+                currentPlayer.addArtefact(currentArtefact);
                 currentLocation.getArtefacts().remove(currentArtefact.getName());
                 return "get " + currentArtefact.getName();
             } else{
                 return "failed to get, you may input the wrong name or it doesn't exist at all.";
             }
         } else if (tokens[0].equals("drop") && tokens.length == 2){
-            Artefact artefact = playerHashMap.get(username).removeArtefact(tokens[1]);
+            Artefact artefact = currentPlayer.removeArtefact(tokens[1]);
             if (artefact != null){
                 currentLocation.addArtefact(artefact);
                 return "drop " + artefact.getName();
@@ -226,10 +234,10 @@ public final class GameServer {
                 currentLocation = currentLocation.getExits().get(tokens[1]);
                 return "you are now at " + currentLocation.getName();
             } else {
-                return "You can't go to " + tokens[2];
+                return "You can't go to " + tokens[1];
             }
         } else if (tokens[0].equals("look")){
-            return currentLocation.showInformation();
+            return currentPlayer.getCurrentLocation().showInformation();
         } else if (tokens.length >= 2){
             gameActionResult = null;
             parseGameAction(tokens, username);
@@ -299,11 +307,22 @@ public final class GameServer {
 
         StringBuilder result = new StringBuilder();
 
+        Player currentPlayer = playerHashMap.get(playerName);
+
         for (String consumable: gameAction.getConsumables()){
             result.append("Consumed: " + consumable);
             result.append("  \n");
-            if (playerHashMap.get(playerName).getInventory().containsKey(consumable)){
-                playerHashMap.get(playerName).getInventory().remove(consumable);
+            if (consumable.equals("health")){
+                currentPlayer.decreaseHealth();
+                if (currentPlayer.getHealth() == 0){
+                    currentPlayer.resetHealth();
+                    currentPlayer.setCurrentLocation(startLocation);
+                    currentLocation = startLocation;
+                    result.append("You died, go back to the start Location. \n");
+                }
+            }
+            if (currentPlayer.getInventory().containsKey(consumable)){
+                currentPlayer.getInventory().remove(consumable);
             } else if (currentLocation.getCharacters().containsKey(consumable)){
                 currentLocation.getCharacters().remove(consumable);
             } else if (currentLocation.getFurnitures().containsKey(consumable)){

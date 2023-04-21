@@ -9,15 +9,39 @@ public class Player extends GameEntity{
     private Location currentLocation;
 
     private Map<String, Artefact> inventory;
+
+    int health;
     public Player(String name, String description) {
         super(name, description);
         inventory = new HashMap<String, Artefact>();
+        health = 3;
+    }
+
+    public Location getCurrentLocation(){
+        return this.currentLocation;
     }
 
     public Map<String, Artefact> getInventory(){
         return this.inventory;
     }
 
+    public void decreaseHealth(){
+        this.health--;
+    }
+
+    public void increaseHealth(){
+        if (this.health == 3){
+            return;
+        }
+        this.health++;
+    }
+    public int getHealth(){
+        return this.health;
+    }
+
+    public void resetHealth(){
+        this.health = 3;
+    }
 
     public void setCurrentLocation(Location location){
         this.currentLocation = location;
