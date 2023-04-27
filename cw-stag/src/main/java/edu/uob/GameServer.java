@@ -186,20 +186,45 @@ public final class GameServer {
         actions = loadActions(actionsFile);
     }
 
-    public String executeBasicCommands(String[] tokens, Player currentPlayer){
+    public Boolean checkDuplicateBasicCommands(String[] tokens){
         int numOfBasicCommmands = 0;
-        int indexCommand = -1;
         for (int i = 0; i < tokens.length; i++){
             if (basicCommands.contains(tokens[i])){
                 numOfBasicCommmands++;
-                indexCommand = i;
             }
         }
 
         if (numOfBasicCommmands > 1){
-            return "what the hell is wrong with you?";
+            return true;
+        } else {
+            return false;
         }
+    }
 
+    public int indexCommand(String[] tokens){
+        for (int i = 0; i < tokens.length; i++) {
+            if (basicCommands.contains(tokens[i])){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private String executeInv(Player currentPlayer) {
+        return currentPlayer.displayInventory();
+    }
+
+    private String executeLook(Player currentPlayer){
+        return currentPlayer.getCurrentLocation().showInformation();
+    }
+
+    private String executeGoto(Player currentPlayer, String newLocation){
+    }
+    private String executeGet(Player currentPlayer, String artefactName){
+    }
+    private String executeDrop(Player currentPlayer, String artefactName){
+    }
+    public String executeBasicCommands(String[] tokens, Player currentPlayer){
         // inv or look doesn't require following object
         if (tokens[indexCommand].equals("inventory") || tokens[indexCommand].equals("inv")){
             return currentPlayer.displayInventory();
@@ -255,35 +280,35 @@ public final class GameServer {
         currentLocation = currentPlayer.getCurrentLocation();
         if (tokens.length == 0){
             return "";
-        } else if (tokens[0].equals("inventory") || tokens[0].equals("inv")){
-            return currentPlayer.displayInventory();
-        } else if (tokens[0].equals("get") && tokens.length == 2){
-            if (currentLocation.getArtefacts().containsKey(tokens[1])){
-                Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[1]);
-                currentPlayer.addArtefact(currentArtefact);
-                currentLocation.getArtefacts().remove(currentArtefact.getName());
-                return "get " + currentArtefact.getName();
-            } else{
-                return "failed to get, you may input the wrong name or it doesn't exist at all.";
+        }
+
+        for (String basicCommand: basicCommands){
+            if (command.contains(basicCommand)){
+                if (checkDuplicateBasicCommands(tokens)){
+                    return "What the hell is wrong with you";
+                }
+                if (basicCommand.equals("inv") || basicCommand.equals("inventory")){
+                    return executeInv(currentPlayer);
+                } else if (basicCommand.equals("look")){
+                    return executeLook(currentPlayer);
+                }
+
+                if (indexCommand(tokens) + 1 >= tokens.length){
+                    return basicCommand + " requires further object";
+                }
+
+                if (basicCommand.equals("get")){
+                    return executeGet(currentPlayer, tokens[indexCommand(tokens) + 1]);
+                } else if (basicCommand.equals("goto")){
+                    return executeGoto(currentPlayer, tokens[indexCommand(tokens) + 1]);
+                } else {
+                    return executeDrop(currentPlayer, tokens[indexCommand(tokens) + 1]);
+                }
             }
-        } else if (tokens[0].equals("drop") && tokens.length == 2){
-            Artefact artefact = currentPlayer.removeArtefact(tokens[1]);
-            if (artefact != null){
-                currentLocation.addArtefact(artefact);
-                return "drop " + artefact.getName();
-            } else{
-                return "doesn't exist this artefact";
-            }
-        } else if (tokens[0].equals("goto") && tokens.length == 2){
-            if (currentLocation.getExits().containsKey(tokens[1])){
-                currentPlayer.setCurrentLocation(currentLocation.getExits().get(tokens[1]));
-                return "you are now at " + currentLocation.getName();
-            } else {
-                return "You can't go to " + tokens[1];
-            }
-        } else if (tokens[0].equals("look")){
-            return currentPlayer.getCurrentLocation().showInformation();
-        } else if (tokens.length >= 2){
+        }
+
+
+        if (tokens.length >= 2){
             gameActionResult = null;
             parseGameAction(tokens, username);
             if (gameActionResult != null){
@@ -295,6 +320,8 @@ public final class GameServer {
             return "Failed to execute basic command";
         }
     }
+
+
 
     public void parseGameAction(String[] tokens, String currentPlayerName) {
         System.out.println("Begin parsing GameAction: ");
