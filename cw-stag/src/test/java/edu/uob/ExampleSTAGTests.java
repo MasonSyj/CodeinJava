@@ -33,6 +33,7 @@ class ExampleSTAGTests {
   void testLook() {
     String response = sendCommandToServer("simon: look");
     response = response.toLowerCase();
+      System.out.println(response);
     assertTrue(response.contains("cabin"), "Did not see the name of the current room in response to look");
     assertTrue(response.contains("log cabin"), "Did not see a description of the room in response to look");
     assertTrue(response.contains("magic potion"), "Did not see a description of artifacts in response to look");
@@ -58,9 +59,14 @@ class ExampleSTAGTests {
   @Test
   void testGoto()
   {
-      sendCommandToServer("simon: goto forest");
-      String response = sendCommandToServer("simon: look");
+      String response;
+      response = sendCommandToServer("simon: goto forest");
+      System.out.println(response);
+      response = sendCommandToServer("simon: look");
       response = response.toLowerCase();
+      System.out.println("--------------");
+      System.out.println(response);
+      System.out.println("--------------");
       assertTrue(response.contains("key"), "Failed attempt to use 'goto' command to move to the forest - there is no key in the current location");
   }
 

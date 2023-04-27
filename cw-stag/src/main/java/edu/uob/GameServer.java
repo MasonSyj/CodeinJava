@@ -30,6 +30,8 @@ public final class GameServer {
     private Location startLocation;
     private HashMap<String, Player> playerHashMap;
 
+    private HashMap<String, HashSet<GameAction>> actions;
+
     private Set<GameAction> gameActionSet;
     private String gameActionResult;
 
@@ -40,23 +42,12 @@ public final class GameServer {
         server.blockingListenOn(8888);
     }
 
-    /**
-    * KEEP this signature (i.e. {@code edu.uob.GameServer(File, File)}) otherwise we won't be able to mark
-    * your submission correctly.
-    *
-    * <p>You MUST use the supplied {@code entitiesFile} and {@code actionsFile}
-    *
-    * @param entitiesFile The game configuration file containing all game entities to use in your game
-    * @param actionsFile The game configuration file containing all game actions to use in your game
-    *
-    */
-    public GameServer(File entitiesFile, File actionsFile) {
-        // TODO implement your server logic here
-        playerHashMap = new HashMap<String, Player>();
+    public ArrayList<Graph> getSections(File entitiesFile) {
         Parser parser = new Parser();
-        FileReader reader = null;
+        FileReader reader;
+
         try {
-            reader = new FileReader("config" + File.separator + "basic-entities.dot");
+            reader = new FileReader("config" + File.separator + entitiesFile);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -65,76 +56,95 @@ public final class GameServer {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+
         Graph wholeDocument = parser.getGraphs().get(0);
-        ArrayList<Graph> sections = wholeDocument.getSubgraphs();
+        return wholeDocument.getSubgraphs();
+    }
 
-        locationHashMap = new HashMap<String, Location>();
-
-        // locations
-        ArrayList<Graph> locations = sections.get(0).getSubgraphs();
+    public HashMap<String, Location> loadLocations(ArrayList<Graph> locations){
+        HashMap<String, Location> answer = new HashMap<String, Location>();
         for (Graph location: locations){
             Node locationDetails = location.getNodes(false).get(0);
             String locationName = locationDetails.getId().getId();
             currentLocation = new Location(locationName, locationDetails.getAttribute("description"));
+
+            // set the start location
             if (startLocation == null) {
                 startLocation = currentLocation;
             }
 
-            ArrayList<Graph> others = location.getSubgraphs();
-
-            loadGameEntity(currentLocation, others, "artefacts");
-            loadGameEntity(currentLocation, others, "furniture");
-            loadGameEntity(currentLocation, others, "characters");
+            ArrayList<Graph> locationEntities = location.getSubgraphs();
+            loadGameEntity(currentLocation, locationEntities, "artefacts");
+            loadGameEntity(currentLocation, locationEntities, "furniture");
+            loadGameEntity(currentLocation, locationEntities, "characters");
             locationHashMap.put(currentLocation.getName(), currentLocation);
-
-            System.out.println(currentLocation.toString());
-            System.out.println(currentLocation.showInformation());
         }
+        return answer;
+    }
 
-        currentLocation = locationHashMap.values().stream().toList().get(0);
-
-        //load Path
-        ArrayList<Edge> paths = sections.get(1).getEdges();
+    public void loadPaths(ArrayList<Edge> paths){
         for (Edge edge: paths){
-            Node fromLocation = edge.getSource().getNode();
-            Node toLocation = edge.getTarget().getNode();
-            String fromLocationName = fromLocation.getId().getId();
-            String toLocationName = toLocation.getId().getId();
+            String fromLocationName = edge.getSource().getNode().getId().getId();
+            String toLocationName = edge.getTarget().getNode().getId().getId();
             if (locationHashMap.containsKey(fromLocationName)
                     && locationHashMap.containsKey(toLocationName)){
                 locationHashMap.get(fromLocationName).addExit(locationHashMap.get(toLocationName));
             }
-            System.out.println(fromLocationName + " -> " + toLocationName);
         }
-        gameActionSet = new HashSet<GameAction>();
-        //load actions
-        try {
-          DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-          Document document = builder.parse("config" + File.separator + "basic-actions.xml");
-          Element root = document.getDocumentElement();
-          NodeList actions = root.getChildNodes();
-          // only the odd items are actually actions - 1, 3, 5 etc.
-          for (int i = 1; i < actions.getLength(); i += 2){
-              GameAction currentGameAction = new GameAction();
-              Element currentActionElement = (Element) actions.item(i);
-              System.out.println("-----------------------------");
-              loadActionItem(currentGameAction, currentActionElement, "triggers");
-              loadActionItem(currentGameAction, currentActionElement, "subjects");
-              loadActionItem(currentGameAction, currentActionElement, "consumed");
-              loadActionItem(currentGameAction, currentActionElement, "produced");
-//              System.out.println("-----------------------------");
-              System.out.println(currentGameAction.toString());
-              gameActionSet.add(currentGameAction);
-          }
-      } catch(ParserConfigurationException pce) {
-            System.out.println("ParserConfigurationException was thrown when attempting to read basic actions file");
-      } catch(SAXException saxe) {
-            System.out.println("SAXException was thrown when attempting to read basic actions file");
-      } catch(IOException ioe) {
-            System.out.println("IOException was thrown when attempting to read basic actions file");
-      }
+    }
 
-        currentLocation = startLocation;
+    public Map<String, HashSet<GameAction>> loadActions(File actionsFile) {
+        Map<String, HashSet<GameAction>> answer = new HashMap<String, HashSet<GameAction>>();
+
+        gameActionSet = new HashSet<GameAction>();
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document document = builder.parse("config" + File.separator + actionsFile);
+            Element root = document.getDocumentElement();
+            NodeList actionList = root.getChildNodes();
+            // only the odd items are actually actions - 1, 3, 5 etc.
+            for (int i = 1; i < actionList.getLength(); i += 2){
+                GameAction currentGameAction = new GameAction();
+                Element currentActionElement = (Element) actionList.item(i);
+                loadActionItem(currentGameAction, currentActionElement, "triggers");
+                loadActionItem(currentGameAction, currentActionElement, "subjects");
+                loadActionItem(currentGameAction, currentActionElement, "consumed");
+                loadActionItem(currentGameAction, currentActionElement, "produced");
+                for (String trigger: currentGameAction.getTriggers()){
+                    if (!answer.containsKey(trigger)){
+                        answer.put(trigger, new HashSet<GameAction>());
+                    }
+                    answer.get(trigger).add(currentGameAction);
+                }
+                gameActionSet.add(currentGameAction);
+            }
+        } catch(ParserConfigurationException pce) {
+            System.out.println("ParserConfigurationException was thrown when attempting to read basic actions file");
+        } catch(SAXException saxe) {
+            System.out.println("SAXException was thrown when attempting to read basic actions file");
+        } catch(IOException ioe) {
+            System.out.println("IOException was thrown when attempting to read basic actions file");
+        }
+
+        return answer;
+    }
+
+    // @param entitiesFile The game configuration file containing all game entities to use in your game
+    // @param actionsFile The game configuration file containing all game actions to use in your game
+    public GameServer(File entitiesFile, File actionsFile) {
+        actions = new HashMap<String, HashSet<GameAction>>();
+        playerHashMap = new HashMap<String, Player>();
+
+        ArrayList<Graph> sections = getSections(entitiesFile);
+
+        // load locations
+        locationHashMap = loadLocations(sections.get(0).getSubgraphs());
+
+        //load Paths
+        loadPaths(sections.get(1).getEdges());
+
+        //load actions
+
     }
 
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
@@ -150,7 +160,6 @@ public final class GameServer {
         int len = nodeList.getLength();
         for (int i = 0; i < len; i++){
             String elementSpecificName = nodeList.item(i).getTextContent();
-//            System.out.println(elementSpecificName);
             listofItems.add(elementSpecificName);
         }
         for (int i = 0; i < listofItems.size(); i++) {
@@ -181,6 +190,7 @@ public final class GameServer {
         }
     }
 
+
     /**
     * KEEP this signature (i.e. {@code edu.uob.GameServer.handleCommand(String)}) otherwise we won't be
     * able to mark your submission correctly.
@@ -203,11 +213,13 @@ public final class GameServer {
         }
 
         Player currentPlayer = playerHashMap.get(username);
+        currentLocation = currentPlayer.getCurrentLocation();
 
         System.out.println("Command: " + command);
         for (String str: tokens){
             System.out.println(str);
         }
+
         if (tokens.length == 0){
             return "";
         } else if (tokens[0].equals("inventory") || tokens[0].equals("inv")){
@@ -231,7 +243,7 @@ public final class GameServer {
             }
         } else if (tokens[0].equals("goto") && tokens.length == 2){
             if (currentLocation.getExits().containsKey(tokens[1])){
-                currentLocation = currentLocation.getExits().get(tokens[1]);
+                currentPlayer.setCurrentLocation(currentLocation.getExits().get(tokens[1]));
                 return "you are now at " + currentLocation.getName();
             } else {
                 return "You can't go to " + tokens[1];

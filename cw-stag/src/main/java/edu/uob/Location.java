@@ -39,6 +39,7 @@ public class Location extends GameEntity{
     public String showInformation() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("You current are: " + this.getName());
+        stringBuilder.append(" " + this.getDescription());
         if (exits.size() != 0){
             stringBuilder.append(" | exits: ");
             for (Location exist: exits.values()){
