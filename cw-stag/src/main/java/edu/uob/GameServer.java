@@ -21,8 +21,9 @@ import java.util.*;
 
 /** This class implements the STAG server. */
 public final class GameServer {
-
     private static final char END_OF_TRANSMISSION = 4;
+
+    public static List<String> basicCommands = Arrays.asList("look", "goto", "drop", "get", "inv", "inventory");
 
     private HashMap<String, Location> locationHashMap;
     private Location currentLocation;
@@ -32,7 +33,6 @@ public final class GameServer {
 
     private HashMap<String, HashSet<GameAction>> actions;
 
-    private Set<GameAction> gameActionSet;
     private String gameActionResult;
 
     public static void main(String[] args) throws IOException {
@@ -93,10 +93,9 @@ public final class GameServer {
         }
     }
 
-    public Map<String, HashSet<GameAction>> loadActions(File actionsFile) {
-        Map<String, HashSet<GameAction>> answer = new HashMap<String, HashSet<GameAction>>();
+    public HashMap<String, HashSet<GameAction>> loadActions(File actionsFile) {
+        HashMap<String, HashSet<GameAction>> answer = new HashMap<String, HashSet<GameAction>>();
 
-        gameActionSet = new HashSet<GameAction>();
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document document = builder.parse("config" + File.separator + actionsFile);
@@ -116,7 +115,6 @@ public final class GameServer {
                     }
                     answer.get(trigger).add(currentGameAction);
                 }
-                gameActionSet.add(currentGameAction);
             }
         } catch(ParserConfigurationException pce) {
             System.out.println("ParserConfigurationException was thrown when attempting to read basic actions file");
@@ -128,37 +126,18 @@ public final class GameServer {
 
         return answer;
     }
-
-    // @param entitiesFile The game configuration file containing all game entities to use in your game
-    // @param actionsFile The game configuration file containing all game actions to use in your game
-    public GameServer(File entitiesFile, File actionsFile) {
-        actions = new HashMap<String, HashSet<GameAction>>();
-        playerHashMap = new HashMap<String, Player>();
-
-        ArrayList<Graph> sections = getSections(entitiesFile);
-
-        // load locations
-        locationHashMap = loadLocations(sections.get(0).getSubgraphs());
-
-        //load Paths
-        loadPaths(sections.get(1).getEdges());
-
-        //load actions
-
-    }
-
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
-//        System.out.println("+++++++" + elementName + "++++++");
         Element certainType = (Element) gameActionElement.getElementsByTagName(elementName).item(0);
         List<String> listofItems = new ArrayList<String>();
+
         NodeList nodeList;
         if (elementName.equals("triggers")){
             nodeList = certainType.getElementsByTagName("keyphrase");
         } else {
             nodeList = certainType.getElementsByTagName("entity");
         }
-        int len = nodeList.getLength();
-        for (int i = 0; i < len; i++){
+
+        for (int i = 0; i < nodeList.getLength(); i++){
             String elementSpecificName = nodeList.item(i).getTextContent();
             listofItems.add(elementSpecificName);
         }
@@ -190,15 +169,76 @@ public final class GameServer {
         }
     }
 
+    // @param entitiesFile The game configuration file containing all game entities to use in your game
+    // @param actionsFile The game configuration file containing all game actions to use in your game
+    public GameServer(File entitiesFile, File actionsFile) {
+        playerHashMap = new HashMap<String, Player>();
 
-    /**
-    * KEEP this signature (i.e. {@code edu.uob.GameServer.handleCommand(String)}) otherwise we won't be
-    * able to mark your submission correctly.
-    *
-    * <p>This method handles all incoming game commands and carries out the corresponding actions.
-    */
+        ArrayList<Graph> sections = getSections(entitiesFile);
+
+        // load locations
+        locationHashMap = loadLocations(sections.get(0).getSubgraphs());
+
+        //load Paths
+        loadPaths(sections.get(1).getEdges());
+
+        //load actions
+        actions = loadActions(actionsFile);
+    }
+
+    public String executeBasicCommands(String[] tokens, Player currentPlayer){
+        int numOfBasicCommmands = 0;
+        int indexCommand = -1;
+        for (int i = 0; i < tokens.length; i++){
+            if (basicCommands.contains(tokens[i])){
+                numOfBasicCommmands++;
+                indexCommand = i;
+            }
+        }
+
+        if (numOfBasicCommmands > 1){
+            return "what the hell is wrong with you?";
+        }
+
+        // inv or look doesn't require following object
+        if (tokens[indexCommand].equals("inventory") || tokens[indexCommand].equals("inv")){
+            return currentPlayer.displayInventory();
+        } else if (tokens[0].equals("look")){
+            return currentPlayer.getCurrentLocation().showInformation();
+        }
+
+        if (indexCommand + 1 >= tokens.length){
+            return tokens[indexCommand] + " requires further object";
+        }
+
+        if (tokens[indexCommand].equals("get")){
+            if (currentLocation.getArtefacts().containsKey(tokens[indexCommand + 1])){
+                Artefact currentArtefact = currentLocation.getArtefacts().get(tokens[indexCommand + 1]);
+                currentPlayer.addArtefact(currentArtefact);
+                currentLocation.getArtefacts().remove(currentArtefact.getName());
+                return "get " + currentArtefact.getName();
+            } else{
+                return "failed to get, you may input the wrong name or it doesn't exist at all.";
+            }
+        } else if (tokens[indexCommand].equals("drop")){
+            Artefact artefact = currentPlayer.removeArtefact(tokens[indexCommand + 1]);
+            if (artefact != null){
+                currentLocation.addArtefact(artefact);
+                return "drop " + artefact.getName();
+            } else{
+                return "doesn't exist this artefact";
+            }
+        } else if (tokens[indexCommand].equals("goto")){
+            if (currentLocation.getExits().containsKey(tokens[indexCommand + 1])){
+                currentPlayer.setCurrentLocation(currentLocation.getExits().get(tokens[indexCommand + 1]));
+                return "you are now at " + currentLocation.getName();
+            } else {
+                return "You can't go to " + tokens[indexCommand + 1];
+            }
+        }
+    }
+
     public String handleCommand(String command) {
-        // TODO implement your server logic here
         String username = "";
         for (int i = 0; i < command.length(); i++){
             if (command.charAt(i) == ':'){
@@ -211,15 +251,8 @@ public final class GameServer {
             playerHashMap.put(username, new Player(username, ""));
             playerHashMap.get(username).setCurrentLocation(startLocation);
         }
-
         Player currentPlayer = playerHashMap.get(username);
         currentLocation = currentPlayer.getCurrentLocation();
-
-        System.out.println("Command: " + command);
-        for (String str: tokens){
-            System.out.println(str);
-        }
-
         if (tokens.length == 0){
             return "";
         } else if (tokens[0].equals("inventory") || tokens[0].equals("inv")){
