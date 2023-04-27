@@ -73,7 +73,7 @@ class ExampleSTAGTests {
     @Test
   void testGameAction1(){
       String response;
-      response = sendCommandToServer("goto forest");
+      sendCommandToServer("goto forest");
       response = sendCommandToServer("chop");
       System.out.println(response);
   }
@@ -126,6 +126,32 @@ class ExampleSTAGTests {
       sendCommandToServer("get key");
       sendCommandToServer("goto cabin");
       response = sendCommandToServer("open key");
+      System.out.println(response);
+  }
+  @Test
+  void testGameAction9(){
+      String response;
+      sendCommandToServer("goto forest");
+      sendCommandToServer("get key");
+      sendCommandToServer("goto cabin");
+      response = sendCommandToServer("open key and hit elf");
+      System.out.println(response);
+  }
+  @Test
+  void testGameAction10(){
+      String response;
+      sendCommandToServer("goto forest");
+      sendCommandToServer("get key");
+      sendCommandToServer("goto cabin");
+      response = sendCommandToServer("open key and look");
+      System.out.println(response);
+  }
+  @Test
+  void testGameAction11(){
+      String response;
+      response = sendCommandToServer("look look");
+      System.out.println(response);
+      response = sendCommandToServer("goto forest goto forest");
       System.out.println(response);
   }
 }

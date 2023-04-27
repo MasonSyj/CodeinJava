@@ -111,6 +111,7 @@ public final class GameServer {
                 loadActionItem(currentGameAction, currentActionElement, "subjects");
                 loadActionItem(currentGameAction, currentActionElement, "consumed");
                 loadActionItem(currentGameAction, currentActionElement, "produced");
+                currentGameAction.setNarration(currentActionElement.getElementsByTagName("narration").item(0).getTextContent());
                 for (String trigger: currentGameAction.getTriggers()){
                     if (!answer.containsKey(trigger)){
                         answer.put(trigger, new HashSet<GameAction>());
@@ -288,6 +289,11 @@ public final class GameServer {
             return "";
         }
 
+        String str = proceedGameAction(command, tokens);
+        if (!str.equals("")){
+            return str;
+        }
+
         for (String basicCommand: basicCommands){
             if (command.contains(basicCommand)){
                 if (checkDuplicateBasicCommands(tokens)){
@@ -312,12 +318,11 @@ public final class GameServer {
                 }
             }
         }
-
-        return proceedGameAction(command, tokens);
+        return "failed to excute game action or basic commands";
     }
 
     private String proceedGameAction(String command, String[] tokens) {
-        List<String> tokenList = Arrays.stream(tokens).toList();
+        // List<String> tokenList = Arrays.stream(tokens).toList();
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
         Set<String> triggers = new HashSet<String>();
         for (String actionName: actions.keySet()){
@@ -328,25 +333,38 @@ public final class GameServer {
                 }
             }
         }
+        if (possibleGameActions.size() == 0){
+            return "";
+        } else {
+            for (String basicCommand: basicCommands){
+                if (command.contains(basicCommand)){
+                    return "what the heck is wrong with you";
+                }
+            }
+
+        }
 
         // if one command contain more than one trigger
         // then valid action must contain all triggers
+        Iterator<GameAction> iterator = possibleGameActions.iterator();
         if (triggers.size() > 1){
-            Iterator<GameAction> iterator = possibleGameActions.iterator();
             while (iterator.hasNext()) {
                 GameAction action = iterator.next();
                 for (String trigger: triggers){
                     if (!action.getTriggers().contains(trigger)){
-                        possibleGameActions.remove(action);
+                        iterator.remove();
                         break;
                     }
                 }
             }
         }
-        Iterator<GameAction> iterator = possibleGameActions.iterator();
+        if (possibleGameActions.size() == 0){
+            return "You might use composite commands, you can only excute one at a time";
+        }
+
+        iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
-        //for (GameAction action: possibleGameActions){
             boolean matchSubject = false;
             for (String subject: action.getSubjects()){
                 if (command.contains(subject)){
@@ -356,8 +374,12 @@ public final class GameServer {
             }
             // Command doesn't hold any subject for the current action. (needs to have at least one)
             if (matchSubject == false){
-                possibleGameActions.remove(action);
+                iterator.remove();
             }
+        }
+
+        if (possibleGameActions.size() == 0){
+            return "your command needs at least one subject";
         }
         // build a set which contains all available entities so that can be used as one action's subject
         Set<String> availableSubjects = new HashSet<String>();
@@ -378,17 +400,6 @@ public final class GameServer {
         }
 
         // check the action's subject are all satisfied, either in player's inv or in current location
-        /*
-        for (GameAction action: possibleGameActions){
-            for (String requiredSubject: action.getSubjects()){
-                if (!availableSubjects.contains(requiredSubject)){
-                   possibleGameActions.remove(action);
-                   break;
-                }
-            }
-        }
-        */
-
         iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
@@ -398,6 +409,9 @@ public final class GameServer {
                     break;
                 }
             }
+        }
+        if (possibleGameActions.size() == 0){
+            return "this game action miss necessary subject to execute";
         }
 
         for (String entity: entities){
@@ -415,6 +429,7 @@ public final class GameServer {
         GameAction action = possibleGameActions.stream().toList().get(0);
         return executeMatchedGameAction(action, currentPlayer.getName());
     }
+
     public String executeMatchedGameAction(GameAction gameAction, String playerName) {
         StringBuilder result = new StringBuilder();
         result.append("-----------------------------\n");
@@ -448,14 +463,14 @@ public final class GameServer {
             if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
                 result.append("\nnew exit: ");
-                result.append(production);
+                result.append(production + "\n");
             } else {
                 locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
                 result.append("\nnew Artefacts (at storeroom): ");
-                result.append(production);
+                result.append(production + "\n");
             }
         }
-
+        result.append(gameAction.getNarration());
         result.append("\n-----------------------------\n");
         return result.toString();
     }

@@ -82,4 +82,7 @@ public class GameAction{
         return stringBuilder.toString();
     }
 
+    public void setNarration(String narration) {
+        this.narration = narration;
+    }
 }
