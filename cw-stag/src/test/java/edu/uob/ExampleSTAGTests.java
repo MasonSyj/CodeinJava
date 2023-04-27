@@ -70,6 +70,62 @@ class ExampleSTAGTests {
       assertTrue(response.contains("key"), "Failed attempt to use 'goto' command to move to the forest - there is no key in the current location");
   }
 
-  // Add more unit tests or integration tests here.
-
+    @Test
+  void testGameAction1(){
+      String response;
+      response = sendCommandToServer("goto forest");
+      response = sendCommandToServer("chop");
+      System.out.println(response);
+  }
+    @Test
+  void testGameAction2(){
+      String response;
+      response = sendCommandToServer("goto forest");
+      response = sendCommandToServer("chop tree");
+      System.out.println(response);
+  }
+    @Test
+  void testGameAction3(){
+      String response;
+      response = sendCommandToServer("goto forest");
+      response = sendCommandToServer("cut down");
+      System.out.println(response);
+  }
+    @Test
+  void testGameAction4(){
+      String response;
+      response = sendCommandToServer("goto forest");
+      response = sendCommandToServer("cut down tree");
+      System.out.println(response);
+  }
+    @Test
+  void testGameAction5(){
+      String response;
+      response = sendCommandToServer("goto forest");
+      response = sendCommandToServer("cut tree down");
+      System.out.println(response);
+  }
+    @Test
+  void testGameAction6(){
+      String response;
+      response = sendCommandToServer("goto forest");
+      response = sendCommandToServer("cut down tree elf");
+      System.out.println(response);
+  }
+    @Test
+  void testGameAction7(){
+      String response;
+      // current location is cabin and the player doesn't have key(it's in the forest)
+      response = sendCommandToServer("open key");
+      System.out.println(response);
+  }
+  @Test
+  void testGameAction8(){
+      String response;
+      sendCommandToServer("goto forest");
+      sendCommandToServer("get key");
+      sendCommandToServer("goto cabin");
+      response = sendCommandToServer("open key");
+      System.out.println(response);
+  }
 }

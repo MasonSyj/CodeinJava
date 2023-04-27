@@ -313,9 +313,7 @@ public final class GameServer {
             }
         }
 
-        proceedGameAction(command, tokens);
-
-        return "Failed to execute basic command";
+        return proceedGameAction(command, tokens);
     }
 
     private String proceedGameAction(String command, String[] tokens) {
@@ -334,7 +332,9 @@ public final class GameServer {
         // if one command contain more than one trigger
         // then valid action must contain all triggers
         if (triggers.size() > 1){
-            for (GameAction action: possibleGameActions){
+            Iterator<GameAction> iterator = possibleGameActions.iterator();
+            while (iterator.hasNext()) {
+                GameAction action = iterator.next();
                 for (String trigger: triggers){
                     if (!action.getTriggers().contains(trigger)){
                         possibleGameActions.remove(action);
@@ -343,8 +343,10 @@ public final class GameServer {
                 }
             }
         }
-
-        for (GameAction action: possibleGameActions){
+        Iterator<GameAction> iterator = possibleGameActions.iterator();
+        while (iterator.hasNext()) {
+            GameAction action = iterator.next();
+        //for (GameAction action: possibleGameActions){
             boolean matchSubject = false;
             for (String subject: action.getSubjects()){
                 if (command.contains(subject)){
@@ -376,11 +378,24 @@ public final class GameServer {
         }
 
         // check the action's subject are all satisfied, either in player's inv or in current location
+        /*
         for (GameAction action: possibleGameActions){
             for (String requiredSubject: action.getSubjects()){
                 if (!availableSubjects.contains(requiredSubject)){
                    possibleGameActions.remove(action);
                    break;
+                }
+            }
+        }
+        */
+
+        iterator = possibleGameActions.iterator();
+        while (iterator.hasNext()) {
+            GameAction action = iterator.next();
+            for (String requiredSubject : action.getSubjects()) {
+                if (!availableSubjects.contains(requiredSubject)) {
+                    iterator.remove();
+                    break;
                 }
             }
         }
@@ -402,6 +417,7 @@ public final class GameServer {
     }
     public String executeMatchedGameAction(GameAction gameAction, String playerName) {
         StringBuilder result = new StringBuilder();
+        result.append("-----------------------------\n");
 
         for (String consumable : gameAction.getConsumables()) {
             result.append("Consumed: " + consumable);
@@ -435,14 +451,12 @@ public final class GameServer {
                 result.append(production);
             } else {
                 locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
-                result.append("\nnew Artefacts at storeroom");
+                result.append("\nnew Artefacts (at storeroom): ");
                 result.append(production);
             }
         }
-        System.out.println("--------------------------------");
-        System.out.println("executeMatchedGameAction: ");
-        System.out.println(result.toString());
-        System.out.println("--------------------------------");
+
+        result.append("\n-----------------------------\n");
         return result.toString();
     }
     //  === Methods below are there to facilitate server related operations. ===

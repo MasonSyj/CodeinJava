@@ -15,6 +15,7 @@ digraph layout {
                 node [shape = "hexagon"];
                 trapdoor [description = "Wooden trapdoor"];
                 table [description = "A broken table"];
+                chest [description = "A golden chest"];
             }
         }
 
@@ -29,6 +30,7 @@ digraph layout {
             subgraph furniture {
                 node [shape = "hexagon"];
                 tree [description = "A big tree"];
+                bush [description = "A huge bush"];
             }
         }
 
