@@ -297,11 +297,11 @@ class ExampleSTAGTests {
     }
 
     @Test
-    void testGameAction19() {
-        String response = sendCommandToServer("simon: goto");
+    void testGoto2() {
+        sendCommandToServer("simon: goto");
+        String response = sendCommandToServer("simon: look");
         assertFalse(response.contains("axe"));
         assertTrue(response.contains("trapdoor"));
-        System.out.println(response);
     }
 
     @Test

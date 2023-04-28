@@ -481,13 +481,17 @@ public final class GameServer {
                 }
             }
             if (currentPlayer.getInventory().containsKey(consumable)) {
-                currentPlayer.getInventory().remove(consumable);
+                Artefact artefact = currentPlayer.getInventory().remove(consumable);
+                locationHashMap.get("storeroom").addArtefact(artefact);
             } else if (currentLocation.getCharacters().containsKey(consumable)) {
-                currentLocation.getCharacters().remove(consumable);
+                Character character = currentLocation.getCharacters().remove(consumable);
+                locationHashMap.get("storeroom").addCharacter(character);
             } else if (currentLocation.getFurnitures().containsKey(consumable)) {
-                currentLocation.getFurnitures().remove(consumable);
+                Furniture furniture = currentLocation.getFurnitures().remove(consumable);
+                locationHashMap.get("storeroom").addFurniture(furniture);
             } else if (currentLocation.getArtefacts().containsKey(consumable)) {
-                currentLocation.getArtefacts().remove(consumable);
+                Artefact artefact = currentLocation.getArtefacts().remove(consumable);
+                locationHashMap.get("storeroom").addArtefact(artefact);
             } else if (currentLocation.getExits().containsKey(consumable)) {
                 currentLocation.getExits().remove(consumable);
             }
@@ -498,8 +502,24 @@ public final class GameServer {
                 currentLocation.addExit(locationHashMap.get(production));
                 result.append("\nnew exit: ").append(production).append("\n");
             } else {
-                locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
-                result.append("\nnew Artefacts (at storeroom): ").append(production).append("\n");
+                for (Location location: locationHashMap.values()){
+                    if (location.getArtefacts().containsKey(production)){
+                        Artefact artefact = location.getArtefacts().remove(production);
+                        currentLocation.addArtefact(artefact);
+                        result.append("\nnew artefact: ").append(artefact.getName()).append("\n");
+                    } else if (location.getFurnitures().containsKey(production)) {
+                        Furniture furniture = location.getFurnitures().remove(production);
+                        currentLocation.addFurniture(furniture);
+                        result.append("\nnew furniture: ").append(furniture.getName()).append("\n");
+                    } else if (location.getCharacters().containsKey(production)) {
+                        Character character = location.getCharacters().remove(production);
+                        currentLocation.addCharacter(character);
+                        result.append("\nnew character: ").append(character.getName()).append("\n");
+                    } else {
+                        currentLocation.addFurniture(new Furniture(production, ""));
+                        result.append("\nnew furniture: ").append(production).append("\n");
+                    }
+                }
             }
         }
         result.append(gameAction.getNarration()).append("\n-----------------------------\n");
