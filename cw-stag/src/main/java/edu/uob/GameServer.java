@@ -291,44 +291,162 @@ public final class GameServer {
             return "";
         }
 
-        String str = proceedGameAction(command, tokens);
-        if (!str.equals("")){
-            return str;
+        Set<String> triggers = new HashSet<String>();
+        Set<GameAction> possibleGameActions = getpossibleGameAction(command, triggers);
+        if (possibleGameActions.size() != 0){
+            return proceedGameAction(possibleGameActions, triggers, command);
         }
         return proceedBasicCommand(command, tokens);
     }
 
-    public String proceedBasicCommand(String command, String[] tokens){
-        for (String basicCommand: basicCommands){
-            for (String token: tokens){
-                if (token.equals(basicCommand)){
-                    if (checkDuplicateBasicCommands(tokens)){
-                        return "What the hell is wrong with you";
-                    }
-                    if (basicCommand.equals("inv") || basicCommand.equals("inventory")){
-                        return executeInv(currentPlayer);
-                    } else if (basicCommand.equals("look")){
-                        return executeLook(currentPlayer);
-                    }
-                    int indexCommand = indexCommand(tokens);
-                    if (indexCommand + 1 >= tokens.length){
-                        return basicCommand + " requires further object";
-                    }
-                    if (basicCommand.equals("get")){
-                        return executeGet(currentPlayer, tokens[indexCommand + 1]);
-                    } else if (basicCommand.equals("goto")){
-                        return executeGoto(currentPlayer, tokens[indexCommand + 1]);
-                    } else {
-                        return executeDrop(currentPlayer, tokens[indexCommand(tokens) + 1]);
+    private String proceedGameAction(Set<GameAction> possibleGameActions, Set<String> triggers, String command){
+        if (includeBasicCommand(command)){
+            return "what the heck is wrong with you";
+        }
+
+        if (checkComposite(possibleGameActions, triggers)){
+            return "You might use composite commands, you can only execute one at a time";
+        }
+
+        if (checkPartial(possibleGameActions, command)){
+            return "your command needs at least one subject";
+        }
+
+        Set<String> availableEntities = getAvailableEntities();
+
+        if (checkPerformable(possibleGameActions, command, availableEntities)){
+            return "this game action miss necessary subject to execute";
+        }
+
+        if (checkExtraneous(availableEntities, command)){
+            return "Your command contains extraneous entities";
+        }
+
+        if (possibleGameActions.size() > 1){
+            return "Your command is ambiguous";
+        } else if (possibleGameActions.size() == 0){
+            return "No game action is matched";
+        }
+
+        GameAction action = possibleGameActions.stream().toList().get(0);
+        return executeMatchedGameAction(action, currentPlayer.getName());
+    }
+
+    private Set<String> getAvailableEntities(){
+        Set<String> availableEntities= new HashSet<String>();
+        for (String invArtefact: currentPlayer.getInventory().keySet()){
+            availableEntities.add(invArtefact);
+        }
+
+        for (String locationArtefact: currentLocation.getArtefacts().keySet()){
+            availableEntities.add(locationArtefact);
+        }
+
+        for (String locationCharacter: currentLocation.getCharacters().keySet()){
+            availableEntities.add(locationCharacter);
+        }
+
+        for (String locationFurniture: currentLocation.getFurnitures().keySet()){
+            availableEntities.add(locationFurniture);
+        }
+        return availableEntities;
+    }
+
+    private boolean checkPartial(Set<GameAction> possibleGameActions, String command) {
+    // a valid performable action must have at least one subject mentioned in client's command
+        Iterator<GameAction> iterator = possibleGameActions.iterator();
+        while (iterator.hasNext()) {
+            GameAction action = iterator.next();
+            boolean matchSubject = false;
+            for (String subject: action.getSubjects()){
+                if (command.contains(subject)){
+                    matchSubject = true;
+                    break;
+                }
+            }
+            // Command doesn't hold any subject for the current action. (needs to have at least one)
+            if (matchSubject == false){
+                iterator.remove();
+            }
+        }
+
+        if (possibleGameActions.size() == 0){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkComposite(Set<GameAction> possibleGameActions, Set<String> triggers) {
+        // if one command contain more than one trigger (might be composite case)
+        // then valid action must contain all triggers
+        Iterator<GameAction> iterator = possibleGameActions.iterator();
+        if (triggers.size() > 1){
+            while (iterator.hasNext()) {
+                GameAction action = iterator.next();
+                for (String trigger: triggers){
+                    if (!action.getTriggers().contains(trigger)){
+                        iterator.remove();
+                        break;
                     }
                 }
             }
-
         }
-        return "failed to execute game action or basic commands";
+        if (possibleGameActions.size() == 0){
+            return true;
+        }
+        return false;
     }
 
-    private String proceedGameAction(String command, String[] tokens) {
+    private boolean checkPerformable(Set<GameAction> possibleGameActions, String command, Set<String> availableEntities){
+        Iterator<GameAction> iterator = possibleGameActions.iterator();
+        while (iterator.hasNext()) {
+            GameAction action = iterator.next();
+            for (String requiredSubject : action.getSubjects()) {
+                if (!availableEntities.contains(requiredSubject)) {
+                    iterator.remove();
+                    break;
+                }
+            }
+        }
+        if (possibleGameActions.size() == 0){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkExtraneous(Set<String> availableEntities, String command){
+        for (String entity: entities){
+            if (!availableEntities.contains(entity) && command.contains(entity)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean includeBasicCommand(String command) {
+        for (String basicCommand: basicCommands){
+            if (command.contains(basicCommand)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<GameAction> getpossibleGameAction(String command, Set<String> triggers){
+        Set<GameAction> possibleGameActions = new HashSet<GameAction>();
+//        Set<String> triggers = new HashSet<String>();
+        for (String actionName: actions.keySet()){
+            if (command.contains(actionName)){
+                triggers.add(actionName);
+                for (GameAction action: actions.get(actionName)){
+                    possibleGameActions.add(action);
+                }
+            }
+        }
+        return possibleGameActions;
+    }
+
+    private String wholeProcessProceedingGameAction(String command, String[] tokens) {
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
         Set<String> triggers = new HashSet<String>();
         for (String actionName: actions.keySet()){
@@ -350,7 +468,7 @@ public final class GameServer {
             }
         }
 
-        // if one command contain more than one trigger
+        // if one command contain more than one trigger (might be composite case)
         // then valid action must contain all triggers
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         if (triggers.size() > 1){
@@ -439,12 +557,10 @@ public final class GameServer {
     }
 
     public String executeMatchedGameAction(GameAction gameAction, String playerName) {
-        StringBuilder result = new StringBuilder();
-        result.append("-----------------------------\n");
+        StringBuilder result = new StringBuilder("-----------------------------\n");
 
         for (String consumable : gameAction.getConsumables()) {
-            result.append("Consumed: " + consumable);
-            result.append("  \n");
+            result.append("Consumed: " + consumable + " \n");
             if (consumable.equals("health")) {
                 currentPlayer.decreaseHealth();
                 if (currentPlayer.getHealth() == 0) {
@@ -470,17 +586,43 @@ public final class GameServer {
         for (String production: gameAction.getProductions()){
             if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
-                result.append("\nnew exit: ");
-                result.append(production + "\n");
+                result.append("\nnew exit: " + production + "\n");
             } else {
                 locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
-                result.append("\nnew Artefacts (at storeroom): ");
-                result.append(production + "\n");
+                result.append("\nnew Artefacts (at storeroom): " + production + "\n");
             }
         }
-        result.append(gameAction.getNarration());
-        result.append("\n-----------------------------\n");
+        result.append(gameAction.getNarration() + "\n-----------------------------\n");
         return result.toString();
+    }
+     public String proceedBasicCommand(String command, String[] tokens){
+        for (String basicCommand: basicCommands){
+            for (String token: tokens){
+                if (token.equals(basicCommand)){
+                    if (checkDuplicateBasicCommands(tokens)){
+                        return "What the hell is wrong with you";
+                    }
+                    if (basicCommand.equals("inv") || basicCommand.equals("inventory")){
+                        return executeInv(currentPlayer);
+                    } else if (basicCommand.equals("look")){
+                        return executeLook(currentPlayer);
+                    }
+                    int indexCommand = indexCommand(tokens);
+                    if (indexCommand + 1 >= tokens.length){
+                        return basicCommand + " requires further object";
+                    }
+                    if (basicCommand.equals("get")){
+                        return executeGet(currentPlayer, tokens[indexCommand + 1]);
+                    } else if (basicCommand.equals("goto")){
+                        return executeGoto(currentPlayer, tokens[indexCommand + 1]);
+                    } else {
+                        return executeDrop(currentPlayer, tokens[indexCommand(tokens) + 1]);
+                    }
+                }
+            }
+
+        }
+        return "failed to execute game action or basic commands";
     }
     //  === Methods below are there to facilitate server related operations. ===
 
