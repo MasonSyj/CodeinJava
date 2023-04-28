@@ -319,7 +319,7 @@ public final class GameServer {
             return "this game action miss necessary subject to execute";
         }
 
-        if (checkExtraneous(availableEntities)){
+        if (checkExtraneous(possibleGameActions, availableEntities)){
             return "Your command contains extraneous entities";
         }
 
@@ -402,13 +402,41 @@ public final class GameServer {
     }
 
     // make sure client doesn't type inappropriate entities
-    public boolean checkExtraneous(Set<String> availableEntities){
+    public boolean checkExtraneous(Set<GameAction> possibleGameActions, Set<String> availableEntities){
         for (String entity: entities){
             if (!availableEntities.contains(entity) && inputCommand.contains(entity)){
                 return true;
             }
         }
-        return false;
+
+        Iterator<GameAction> iterator = possibleGameActions.iterator();
+        while (iterator.hasNext()) {
+            GameAction action = iterator.next();
+            Set<String> excludeEntities = getExcludedEntities(availableEntities, action);
+
+            for (String exclusion: excludeEntities){
+                if (inputCommand.contains(exclusion)){
+                    iterator.remove();
+                    break;
+                }
+            }
+        }
+
+        return possibleGameActions.size() == 0;
+    }
+
+    public Set<String> getExcludedEntities(Set<String> availableEntities, GameAction action){
+        Set<String> excludeEntities = new HashSet<String>();
+        excludeEntities.addAll(availableEntities);
+
+        for (String subject: action.getSubjects()){
+            excludeEntities.remove(subject);
+        }
+
+        for (String consumable: action.getConsumables()) {
+            excludeEntities.remove(consumable);
+        }
+        return excludeEntities;
     }
 
     // avoid case like 'open key and goto' where exist game action and commands
@@ -547,11 +575,11 @@ public final class GameServer {
     */
     private void blockingHandleConnection(ServerSocket serverSocket) throws IOException {
         try (Socket s = serverSocket.accept();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()))) {
+             BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()))) {
             System.out.println("Connection established");
             String incomingCommand = reader.readLine();
-            if(incomingCommand != null) {
+            if (incomingCommand != null) {
                 System.out.println("Received message from " + incomingCommand);
                 String result = handleCommand(incomingCommand);
                 writer.write(result);
@@ -561,3 +589,4 @@ public final class GameServer {
         }
     }
 }
+           

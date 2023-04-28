@@ -202,6 +202,8 @@ class ExampleSTAGTests {
       sendCommandToServer("simon: goto forest");
       sendCommandToServer("simon: get key");
       sendCommandToServer("simon: goto cabin");
+      response = sendCommandToServer("simon: open trapdoor and open chest");
+      System.out.println(response);
       response = sendCommandToServer("simon: open trapdoor and drink potion");
       System.out.println(response);
       response = sendCommandToServer("simon: look");
@@ -209,26 +211,30 @@ class ExampleSTAGTests {
       assertFalse(response.contains("cellar"));
   }
   @Test
-  void testGameAction14(){
+  void testInvalidBasicCommand(){
       String response;
-      response = sendCommandToServer("gotoforest");
+      sendCommandToServer("simon: gotoforest");
+      response = sendCommandToServer("simon: look");
       System.out.println(response);
-      sendCommandToServer("goto forest");
-      response = sendCommandToServer("getkey");
+      assertFalse(response.contains("axe"));
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: getkey");
+      response = sendCommandToServer("simon: inv");
       System.out.println(response);
+      assertFalse(response.contains("key"));
   }
     @Test
-    void testGameAction15(){
+    void testGameActionDecoration(){
         String response;
-        sendCommandToServer("goto forest");
-        response = sendCommandToServer("chop tree with axe");
+        sendCommandToServer("simon: goto forest");
+        response = sendCommandToServer("simon: chop tree with axe");
         System.out.println(response);
     }
     @Test
     void testGameAction16(){
         String response;
-        sendCommandToServer("goto forest");
-        response = sendCommandToServer("use axe to chop tree");
+        sendCommandToServer("simon: goto forest");
+        response = sendCommandToServer("simon:use axe to chop tree");
         System.out.println(response);
     }
     @Test
