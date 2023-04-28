@@ -433,6 +433,7 @@ public final class GameServer {
                     for (Artefact artefact: currentPlayer.getInventory().values()){
                         currentLocation.addArtefact(artefact);
                     }
+                    currentPlayer.removeAllArtefact();
                     currentPlayer.resetHealth();
                     currentPlayer.setCurrentLocation(startLocation);
                     currentLocation = startLocation;

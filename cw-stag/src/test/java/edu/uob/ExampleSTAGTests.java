@@ -202,4 +202,28 @@ class ExampleSTAGTests {
         response = sendCommandToServer("health");
         System.out.println(response);
     }
+    @Test
+    void testGameAction18(){
+        String response;
+        sendCommandToServer("get potion");
+        response = sendCommandToServer("inv");
+        System.out.println(response);
+        sendCommandToServer("goto forest");
+        sendCommandToServer("get key");
+        sendCommandToServer("goto cabin");
+        response = sendCommandToServer("open key");
+        System.out.println(response);
+        sendCommandToServer("open trapdoor");
+        sendCommandToServer("goto cellar");
+        sendCommandToServer("hit elf");
+        sendCommandToServer("hit elf");
+        response = sendCommandToServer("health");
+        System.out.println(response);
+        response = sendCommandToServer("hit elf");
+        System.out.println(response);
+        response = sendCommandToServer("look");
+        System.out.println(response);
+        response = sendCommandToServer("inv");
+        System.out.println(response);
+    }
 }
