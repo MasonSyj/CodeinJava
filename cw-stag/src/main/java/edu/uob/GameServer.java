@@ -342,6 +342,8 @@ public final class GameServer {
         availableEntities.addAll(currentLocation.getCharacters().keySet());
 
         availableEntities.addAll(currentLocation.getFurnitures().keySet());
+
+        availableEntities.addAll(currentLocation.getExits().keySet());
         return availableEntities;
     }
 
@@ -458,8 +460,8 @@ public final class GameServer {
                 currentLocation.getFurnitures().remove(consumable);
             } else if (currentLocation.getArtefacts().containsKey(consumable)) {
                 currentLocation.getArtefacts().remove(consumable);
-            } else if (currentLocation.getName().equals(consumable)) {
-                currentLocation = null;
+            } else if (currentLocation.getExits().containsKey(consumable)) {
+                currentLocation.getExits().remove(consumable);
             }
         }
 

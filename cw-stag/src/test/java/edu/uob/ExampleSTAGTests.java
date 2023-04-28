@@ -71,108 +71,142 @@ class ExampleSTAGTests {
       assertTrue(response.contains("key"), "Failed attempt to use 'goto' command to move to the forest - there is no key in the current location");
   }
 
-    @Test
-  void testGameAction1(){
+  @Test
+  void testdGameActionOnlyTrigger1(){
       String response;
-      sendCommandToServer("goto forest");
-      response = sendCommandToServer("chop");
+      sendCommandToServer("simon: goto forest");
+      response = sendCommandToServer("simon: chop");
       System.out.println(response);
-  }
-    @Test
-  void testGameAction2(){
-      String response;
-      response = sendCommandToServer("goto forest");
-      response = sendCommandToServer("chop tree");
-      System.out.println(response);
-  }
-    @Test
-  void testGameAction3(){
-      String response;
-      response = sendCommandToServer("goto forest");
-      response = sendCommandToServer("cut down");
-      System.out.println(response);
-  }
-    @Test
-  void testGameAction4(){
-      String response;
-      response = sendCommandToServer("goto forest");
-      response = sendCommandToServer("cut down tree");
-      System.out.println(response);
-  }
-    @Test
-  void testGameAction5(){
-      String response;
-      response = sendCommandToServer("goto forest");
-      response = sendCommandToServer("cut tree down");
-      System.out.println(response);
-  }
-    @Test
-  void testGameAction6(){
-      String response;
-      response = sendCommandToServer("goto forest");
-      response = sendCommandToServer("cut down tree elf");
-      System.out.println(response);
-  }
-    @Test
-  void testGameAction7(){
-      String response;
-      // current location is cabin and the player doesn't have key(it's in the forest)
-      response = sendCommandToServer("open key");
-      System.out.println(response);
+      assertTrue(response.contains("subject"));
+      response = sendCommandToServer("simon: look");
+      assertTrue(response.contains("tree"));
   }
   @Test
-  void testGameAction8(){
+  void testdGameActionOnlyTrigger2(){
       String response;
-      sendCommandToServer("goto forest");
-      sendCommandToServer("get key");
-      sendCommandToServer("goto cabin");
-      response = sendCommandToServer("open key");
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: cut down");
+      response = sendCommandToServer("simon: look");
       System.out.println(response);
+      assertTrue(response.contains("tree"));
   }
   @Test
-  void testGameAction9(){
+  void testGameActionSuccessful(){
       String response;
-      sendCommandToServer("goto forest");
-      sendCommandToServer("get key");
-      sendCommandToServer("goto cabin");
-      response = sendCommandToServer("open key and hit elf");
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: chop tree");
+      response = sendCommandToServer("simon: look");
       System.out.println(response);
+      assertTrue(!response.contains("tree"));
   }
+
   @Test
-  void testGameAction10(){
+  void testGameActionSuccessful2(){
       String response;
-      sendCommandToServer("goto forest");
-      sendCommandToServer("get key");
-      sendCommandToServer("goto cabin");
-      response = sendCommandToServer("open key and look");
-      System.out.println(response);
-  }
-  @Test
-  void testGameAction11(){
-      String response;
-      response = sendCommandToServer("look look");
-      System.out.println(response);
-      response = sendCommandToServer("goto forest goto forest");
-      System.out.println(response);
-  }
-  @Test
-  void testGameAction12(){
-      String response;
-      sendCommandToServer("goto forest");
-      sendCommandToServer("get key");
-      sendCommandToServer("goto cabin");
-      response = sendCommandToServer("open key");
+      sendCommandToServer("simon: goto forest");
+      response = sendCommandToServer("simon: cut down tree");
       System.out.println(response);
   }
 
   @Test
-  void testGameAction13(){
+  void testRemoveExit(){
       String response;
-      sendCommandToServer("goto forest");
-      sendCommandToServer("get key");
-      sendCommandToServer("goto cabin");
-      response = sendCommandToServer("open trapdoor and drink potion");
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: get key");
+      sendCommandToServer("simon: goto cabin");
+      sendCommandToServer("simon: open trapdoor");
+      response = sendCommandToServer("simon: look");
+      assertTrue(response.contains("cellar"));
+      response = sendCommandToServer("simon: close trapdoor");
       System.out.println(response);
+      response = sendCommandToServer("simon: look");
+      System.out.println(response);
+      assertTrue(!response.contains("cellar"));
+  }
+  @Test
+  void testGameActionFailedTrigger(){
+      String response;
+      response = sendCommandToServer("simon: goto forest");
+      response = sendCommandToServer("simon: cut tree down");
+      System.out.println(response);
+      response = sendCommandToServer("simon: look");
+      System.out.println(response);
+      assertTrue(response.contains("tree"));
+  }
+  @Test
+  void testGameActionExtraneousCase(){
+      String response;
+      response = sendCommandToServer("simon: goto forest");
+      response = sendCommandToServer("simon: cut down tree elf");
+      System.out.println(response);
+      response = sendCommandToServer("simon: look");
+      System.out.println(response);
+      assertTrue(response.contains("tree"));
+  }
+    @Test
+  void testGameActionNotPerformable(){
+      String response;
+      // current location is cabin and the player doesn't have key(it's in the forest)
+      response = sendCommandToServer("simon: open key");
+      System.out.println(response);
+      response = sendCommandToServer("simon: look");
+      System.out.println(response);
+      assertFalse(response.contains("cellar"));
+  }
+  @Test
+  void testGameActionAmbiguousCase(){
+      String response;
+      sendCommandToServer("Simon: goto forest");
+      sendCommandToServer("Simon: get key");
+      sendCommandToServer("Simon: goto cabin");
+      response = sendCommandToServer("Simon: open key");
+      System.out.println(response);
+      response = sendCommandToServer("simon: look");
+      System.out.println(response);
+      assertFalse(response.contains("cellar"));
+  }
+  @Test
+  void testGameActionCompositeCase(){
+      String response;
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: get key");
+      sendCommandToServer("simon: goto cabin");
+      response = sendCommandToServer("simon: open key and hit elf");
+      System.out.println(response);
+  }
+  @Test
+  void testGameActionCompositeCase2(){
+      String response;
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: get key");
+      sendCommandToServer("simon: goto cabin");
+      response = sendCommandToServer("simon: open key and look");
+      System.out.println(response);
+      response = sendCommandToServer("simon: look");
+      System.out.println(response);
+      assertFalse(response.contains("cellar"));
+  }
+  @Test
+  void testGameActionDuplicateBasicCommands(){
+      String response;
+      response = sendCommandToServer("Simon: look look");
+      System.out.println(response);
+      response = sendCommandToServer("Simon: goto forest goto forest");
+      System.out.println(response);
+      response = sendCommandToServer("Simon: look");
+      assertFalse(response.contains("axe"));
+  }
+  @Test
+  void testGameActionComposite3(){
+      String response;
+      sendCommandToServer("simon: goto forest");
+      sendCommandToServer("simon: get key");
+      sendCommandToServer("simon: goto cabin");
+      response = sendCommandToServer("simon: open trapdoor and drink potion");
+      System.out.println(response);
+      response = sendCommandToServer("simon: look");
+      System.out.println(response);
+      assertFalse(response.contains("cellar"));
   }
   @Test
   void testGameAction14(){
