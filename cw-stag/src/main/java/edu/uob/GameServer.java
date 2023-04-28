@@ -23,7 +23,7 @@ import java.util.*;
 public final class GameServer {
     private static final char END_OF_TRANSMISSION = 4;
 
-    public static List<String> basicCommands = Arrays.asList("look", "goto", "drop", "get", "inv", "inventory");
+    public static List<String> basicCommands = Arrays.asList("look", "goto", "drop", "get", "inv", "inventory", "health");
 
     private HashMap<String, Location> locationHashMap;
     private Location currentLocation;
@@ -33,8 +33,6 @@ public final class GameServer {
 
     private HashMap<String, HashSet<GameAction>> actions;
 
-    private String gameActionResult;
-    
     private Set<String> entities;
 
     public static void main(String[] args) throws IOException {
@@ -132,7 +130,7 @@ public final class GameServer {
     }
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
         Element certainType = (Element) gameActionElement.getElementsByTagName(elementName).item(0);
-        List<String> listofItems = new ArrayList<String>();
+        List<String> listOfItems = new ArrayList<String>();
 
         NodeList nodeList;
         if (elementName.equals("triggers")){
@@ -143,17 +141,17 @@ public final class GameServer {
 
         for (int i = 0; i < nodeList.getLength(); i++){
             String elementSpecificName = nodeList.item(i).getTextContent();
-            listofItems.add(elementSpecificName);
+            listOfItems.add(elementSpecificName);
         }
-        for (int i = 0; i < listofItems.size(); i++) {
+        for (String listOfItem : listOfItems) {
             if (elementName.equals("triggers")) {
-                gameAction.addTrigger(listofItems.get(i));
+                gameAction.addTrigger(listOfItem);
             } else if (elementName.equals("subjects")) {
-                gameAction.addSubject(listofItems.get(i));
+                gameAction.addSubject(listOfItem);
             } else if (elementName.equals("consumed")) {
-                gameAction.addConsumable(listofItems.get(i));
+                gameAction.addConsumable(listOfItem);
             } else if (elementName.equals("produced")) {
-                gameAction.addProduction(listofItems.get(i));
+                gameAction.addProduction(listOfItem);
             }
         }
     }
@@ -162,12 +160,13 @@ public final class GameServer {
         List<Graph> graphs = graph.stream().filter(currentGraph -> currentGraph.getId().getId().equals(name)).toList();
         if (graphs.size() == 1){
             for (Node item: graphs.get(0).getNodes(false)){
-                if (name.equals("artefacts")){
-                    location.addArtefact(new Artefact(item.getId().getId(), item.getAttribute("description")));
-                } else if (name.equals("furniture")){
-                    location.addFurniture(new Furniture(item.getId().getId(), item.getAttribute("description")));
-                } else if (name.equals("characters")){
-                    location.addCharacter(new Character(item.getId().getId(), item.getAttribute("description")));
+                switch (name) {
+                    case "artefacts" ->
+                            location.addArtefact(new Artefact(item.getId().getId(), item.getAttribute("description")));
+                    case "furniture" ->
+                            location.addFurniture(new Furniture(item.getId().getId(), item.getAttribute("description")));
+                    case "characters" ->
+                            location.addCharacter(new Character(item.getId().getId(), item.getAttribute("description")));
                 }
             }
         }
@@ -183,8 +182,8 @@ public final class GameServer {
         // load locations
         locationHashMap = loadLocations(sections.get(0).getSubgraphs());
         
-        // set up a set containning all entities
-        entities = buildEntites();
+        // set up a set containing all entities
+        entities = buildEntities();
 
         //load Paths
         loadPaths(sections.get(1).getEdges());
@@ -193,36 +192,25 @@ public final class GameServer {
         actions = loadActions(actionsFile);
     }
 
-    private Set<String> buildEntites() {
+    public Set<String> buildEntities() {
         Set<String> answer = new HashSet<String>();
         for (Location location: locationHashMap.values()){
-            for (String artefact: location.getArtefacts().keySet()) {
-                answer.add(artefact);
-            }
-
-            for (String character: location.getCharacters().keySet()) {
-                answer.add(character);
-            }
-            for (String furniture: location.getFurnitures().keySet()) {
-                answer.add(furniture);
-            }
+            answer.addAll(location.getArtefacts().keySet());
+            answer.addAll(location.getCharacters().keySet());
+            answer.addAll(location.getFurnitures().keySet());
         }
         return answer;
     }
 
     public Boolean checkDuplicateBasicCommands(String[] tokens){
-        int numOfBasicCommmands = 0;
-        for (int i = 0; i < tokens.length; i++){
-            if (basicCommands.contains(tokens[i])){
-                numOfBasicCommmands++;
+        int numOfBasicCommands = 0;
+        for (String token : tokens) {
+            if (basicCommands.contains(token)) {
+                numOfBasicCommands++;
             }
         }
 
-        if (numOfBasicCommmands > 1){
-            return true;
-        } else {
-            return false;
-        }
+        return numOfBasicCommands > 1;
     }
 
     public int indexCommand(String[] tokens){
@@ -234,15 +222,19 @@ public final class GameServer {
         return -1;
     }
 
-    private String executeInv(Player currentPlayer) {
+    public String executeInv(){
         return currentPlayer.displayInventory();
     }
 
-    private String executeLook(Player currentPlayer){
+    public String executeLook(){
         return currentPlayer.getCurrentLocation().showInformation();
     }
 
-    private String executeGoto(Player currentPlayer, String newLocation) {
+    public String executeHealth() {
+        return "health: " + currentPlayer.getHealth();
+    }
+
+    public String executeGoto(String newLocation) {
         if (currentLocation.getExits().containsKey(newLocation)) {
             currentPlayer.setCurrentLocation(currentLocation.getExits().get(newLocation));
             return "you are now at " + currentPlayer.getCurrentLocation().getName();
@@ -250,7 +242,7 @@ public final class GameServer {
             return "You can't go to " + newLocation;
         }
     }
-    private String executeGet(Player currentPlayer, String artefactName){
+    public String executeGet(String artefactName){
          if (currentLocation.getArtefacts().containsKey(artefactName)){
                 Artefact currentArtefact = currentLocation.getArtefacts().get(artefactName);
                 currentPlayer.addArtefact(currentArtefact);
@@ -261,7 +253,7 @@ public final class GameServer {
          }
     }
 
-    private String executeDrop(Player currentPlayer, String artefactName) {
+    public String executeDrop(String artefactName) {
         Artefact artefact = currentPlayer.removeArtefact(artefactName);
         if (artefact != null) {
             currentLocation.addArtefact(artefact);
@@ -276,7 +268,7 @@ public final class GameServer {
         for (int i = 0; i < command.length(); i++){
             if (command.charAt(i) == ':'){
                username = command.substring(0, i);
-               command = command.substring(i + 1, command.length());
+               command = command.substring(i + 1);
             }
         }
         String[] tokens = command.trim().replaceAll("\\s+", " ").split(" ");
@@ -284,7 +276,7 @@ public final class GameServer {
             playerHashMap.put(username, new Player(username, ""));
             playerHashMap.get(username).setCurrentLocation(startLocation);
         }
-        // does it hurt to use global varibale here?
+        // does it hurt to use global variable here?
         currentPlayer = playerHashMap.get(username);
         currentLocation = currentPlayer.getCurrentLocation();
         if (tokens.length == 0){
@@ -292,14 +284,14 @@ public final class GameServer {
         }
 
         Set<String> triggers = new HashSet<String>();
-        Set<GameAction> possibleGameActions = getpossibleGameAction(command, triggers);
+        Set<GameAction> possibleGameActions = getPossibleGameAction(command, triggers);
         if (possibleGameActions.size() != 0){
             return proceedGameAction(possibleGameActions, triggers, command);
         }
-        return proceedBasicCommand(command, tokens);
+        return proceedBasicCommand(tokens);
     }
 
-    private String proceedGameAction(Set<GameAction> possibleGameActions, Set<String> triggers, String command){
+    public String proceedGameAction(Set<GameAction> possibleGameActions, Set<String> triggers, String command){
         if (includeBasicCommand(command)){
             return "what the heck is wrong with you";
         }
@@ -314,7 +306,7 @@ public final class GameServer {
 
         Set<String> availableEntities = getAvailableEntities();
 
-        if (checkPerformable(possibleGameActions, command, availableEntities)){
+        if (checkPerformable(possibleGameActions, availableEntities)){
             return "this game action miss necessary subject to execute";
         }
 
@@ -329,31 +321,24 @@ public final class GameServer {
         }
 
         GameAction action = possibleGameActions.stream().toList().get(0);
-        return executeMatchedGameAction(action, currentPlayer.getName());
+        return executeGameAction(action);
     }
 
-    private Set<String> getAvailableEntities(){
+    public Set<String> getAvailableEntities(){
         Set<String> availableEntities= new HashSet<String>();
-        for (String invArtefact: currentPlayer.getInventory().keySet()){
-            availableEntities.add(invArtefact);
-        }
+        availableEntities.addAll(currentPlayer.getInventory().keySet());
 
-        for (String locationArtefact: currentLocation.getArtefacts().keySet()){
-            availableEntities.add(locationArtefact);
-        }
+        availableEntities.addAll(currentLocation.getArtefacts().keySet());
 
-        for (String locationCharacter: currentLocation.getCharacters().keySet()){
-            availableEntities.add(locationCharacter);
-        }
+        availableEntities.addAll(currentLocation.getCharacters().keySet());
 
-        for (String locationFurniture: currentLocation.getFurnitures().keySet()){
-            availableEntities.add(locationFurniture);
-        }
+        availableEntities.addAll(currentLocation.getFurnitures().keySet());
         return availableEntities;
     }
 
-    private boolean checkPartial(Set<GameAction> possibleGameActions, String command) {
+
     // a valid performable action must have at least one subject mentioned in client's command
+    public boolean checkPartial(Set<GameAction> possibleGameActions, String command) {
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
@@ -365,20 +350,16 @@ public final class GameServer {
                 }
             }
             // Command doesn't hold any subject for the current action. (needs to have at least one)
-            if (matchSubject == false){
+            if (!matchSubject){
                 iterator.remove();
             }
         }
 
-        if (possibleGameActions.size() == 0){
-            return true;
-        }
-        return false;
+        return possibleGameActions.size() == 0;
     }
 
-    private boolean checkComposite(Set<GameAction> possibleGameActions, Set<String> triggers) {
-        // if one command contain more than one trigger (might be composite case)
-        // then valid action must contain all triggers
+    // if one command contain more than one trigger (might be composite case, valid action must contain all triggers
+    public boolean checkComposite(Set<GameAction> possibleGameActions, Set<String> triggers) {
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         if (triggers.size() > 1){
             while (iterator.hasNext()) {
@@ -391,13 +372,11 @@ public final class GameServer {
                 }
             }
         }
-        if (possibleGameActions.size() == 0){
-            return true;
-        }
-        return false;
+        return possibleGameActions.size() == 0;
     }
 
-    private boolean checkPerformable(Set<GameAction> possibleGameActions, String command, Set<String> availableEntities){
+    // even though there might be vague cases, some might be not performable
+    public boolean checkPerformable(Set<GameAction> possibleGameActions, Set<String> availableEntities){
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
@@ -408,12 +387,10 @@ public final class GameServer {
                 }
             }
         }
-        if (possibleGameActions.size() == 0){
-            return true;
-        }
-        return false;
+        return possibleGameActions.size() == 0;
     }
 
+    // make sure client doesn't type inappropriate entities
     public boolean checkExtraneous(Set<String> availableEntities, String command){
         for (String entity: entities){
             if (!availableEntities.contains(entity) && command.contains(entity)){
@@ -423,7 +400,8 @@ public final class GameServer {
         return false;
     }
 
-    private boolean includeBasicCommand(String command) {
+    // avoid case like 'open key and goto' where exist game action and commands
+    public boolean includeBasicCommand(String command) {
         for (String basicCommand: basicCommands){
             if (command.contains(basicCommand)){
                 return true;
@@ -432,141 +410,33 @@ public final class GameServer {
         return false;
     }
 
-    private Set<GameAction> getpossibleGameAction(String command, Set<String> triggers){
+    // based on the command, find all actions by trigger names
+    private Set<GameAction> getPossibleGameAction(String command, Set<String> triggers){
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
-//        Set<String> triggers = new HashSet<String>();
         for (String actionName: actions.keySet()){
             if (command.contains(actionName)){
                 triggers.add(actionName);
-                for (GameAction action: actions.get(actionName)){
-                    possibleGameActions.add(action);
-                }
+                possibleGameActions.addAll(actions.get(actionName));
             }
         }
         return possibleGameActions;
     }
 
-    private String wholeProcessProceedingGameAction(String command, String[] tokens) {
-        Set<GameAction> possibleGameActions = new HashSet<GameAction>();
-        Set<String> triggers = new HashSet<String>();
-        for (String actionName: actions.keySet()){
-            if (command.contains(actionName)){
-                triggers.add(actionName);
-                for (GameAction action: actions.get(actionName)){
-                    possibleGameActions.add(action);
-                }
-            }
-        }
-
-        if (possibleGameActions.size() == 0){
-            return "";
-        } else {
-            for (String basicCommand: basicCommands){
-                if (command.contains(basicCommand)){
-                    return "what the heck is wrong with you";
-                }
-            }
-        }
-
-        // if one command contain more than one trigger (might be composite case)
-        // then valid action must contain all triggers
-        Iterator<GameAction> iterator = possibleGameActions.iterator();
-        if (triggers.size() > 1){
-            while (iterator.hasNext()) {
-                GameAction action = iterator.next();
-                for (String trigger: triggers){
-                    if (!action.getTriggers().contains(trigger)){
-                        iterator.remove();
-                        break;
-                    }
-                }
-            }
-        }
-        if (possibleGameActions.size() == 0){
-            return "You might use composite commands, you can only execute one at a time";
-        }
-
-        // a valid performable action must have at least one subject mentioned in client's command
-        iterator = possibleGameActions.iterator();
-        while (iterator.hasNext()) {
-            GameAction action = iterator.next();
-            boolean matchSubject = false;
-            for (String subject: action.getSubjects()){
-                if (command.contains(subject)){
-                    matchSubject = true;
-                    break;
-                }
-            }
-            // Command doesn't hold any subject for the current action. (needs to have at least one)
-            if (matchSubject == false){
-                iterator.remove();
-            }
-        }
-
-        if (possibleGameActions.size() == 0){
-            return "your command needs at least one subject";
-        }
-
-        // build a set which contains all available entities so that can be used as one action's subject
-        Set<String> availableSubjects = new HashSet<String>();
-        for (String invArtefact: currentPlayer.getInventory().keySet()){
-            availableSubjects.add(invArtefact);
-        }
-
-        for (String locationArtefact: currentLocation.getArtefacts().keySet()){
-            availableSubjects.add(locationArtefact);
-        }
-        
-        for (String locationCharacter: currentLocation.getCharacters().keySet()){
-            availableSubjects.add(locationCharacter);
-        } 
-        
-        for (String locationFurniture: currentLocation.getFurnitures().keySet()){
-            availableSubjects.add(locationFurniture);
-        }
-
-        // check the action's subject are all satisfied, either in player's inv or in current location
-        iterator = possibleGameActions.iterator();
-        while (iterator.hasNext()) {
-            GameAction action = iterator.next();
-            for (String requiredSubject : action.getSubjects()) {
-                if (!availableSubjects.contains(requiredSubject)) {
-                    iterator.remove();
-                    break;
-                }
-            }
-        }
-        if (possibleGameActions.size() == 0){
-            return "this game action miss necessary subject to execute";
-        }
-
-        for (String entity: entities){
-            if (!availableSubjects.contains(entity) && command.contains(entity)){
-                return "Your command contains extraneous entities";
-            }
-        }
-
-        if (possibleGameActions.size() > 1){
-            return "Your command is ambiguous";
-        } else if (possibleGameActions.size() == 0){
-            return "No game action is matched";
-        }
-
-        GameAction action = possibleGameActions.stream().toList().get(0);
-        return executeMatchedGameAction(action, currentPlayer.getName());
-    }
-
-    public String executeMatchedGameAction(GameAction gameAction, String playerName) {
+    public String executeGameAction(GameAction gameAction) {
         StringBuilder result = new StringBuilder("-----------------------------\n");
 
         for (String consumable : gameAction.getConsumables()) {
-            result.append("Consumed: " + consumable + " \n");
+            result.append("Consumed: ").append(consumable).append(" \n");
             if (consumable.equals("health")) {
                 currentPlayer.decreaseHealth();
                 if (currentPlayer.getHealth() == 0) {
+                    for (Artefact artefact: currentPlayer.getInventory().values()){
+                        currentLocation.addArtefact(artefact);
+                    }
                     currentPlayer.resetHealth();
                     currentPlayer.setCurrentLocation(startLocation);
                     currentLocation = startLocation;
+
                     result.append("You died, go back to the start Location. \n");
                 }
             }
@@ -586,37 +456,41 @@ public final class GameServer {
         for (String production: gameAction.getProductions()){
             if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
-                result.append("\nnew exit: " + production + "\n");
+                result.append("\nnew exit: ").append(production).append("\n");
             } else {
                 locationHashMap.get("storeroom").getArtefacts().put(production, new Artefact(production, ""));
-                result.append("\nnew Artefacts (at storeroom): " + production + "\n");
+                result.append("\nnew Artefacts (at storeroom): ").append(production).append("\n");
             }
         }
-        result.append(gameAction.getNarration() + "\n-----------------------------\n");
+        result.append(gameAction.getNarration()).append("\n-----------------------------\n");
         return result.toString();
     }
-     public String proceedBasicCommand(String command, String[] tokens){
+     public String proceedBasicCommand(String[] tokens){
         for (String basicCommand: basicCommands){
             for (String token: tokens){
                 if (token.equals(basicCommand)){
                     if (checkDuplicateBasicCommands(tokens)){
                         return "What the hell is wrong with you";
                     }
-                    if (basicCommand.equals("inv") || basicCommand.equals("inventory")){
-                        return executeInv(currentPlayer);
-                    } else if (basicCommand.equals("look")){
-                        return executeLook(currentPlayer);
+                    switch (basicCommand) {
+                        case "inv":
+                        case "inventory":
+                            return executeInv();
+                        case "look":
+                            return executeLook();
+                        case "health":
+                            return executeHealth();
                     }
                     int indexCommand = indexCommand(tokens);
                     if (indexCommand + 1 >= tokens.length){
                         return basicCommand + " requires further object";
                     }
                     if (basicCommand.equals("get")){
-                        return executeGet(currentPlayer, tokens[indexCommand + 1]);
+                        return executeGet(tokens[indexCommand + 1]);
                     } else if (basicCommand.equals("goto")){
-                        return executeGoto(currentPlayer, tokens[indexCommand + 1]);
+                        return executeGoto(tokens[indexCommand + 1]);
                     } else {
-                        return executeDrop(currentPlayer, tokens[indexCommand(tokens) + 1]);
+                        return executeDrop(tokens[indexCommand(tokens) + 1]);
                     }
                 }
             }
@@ -624,6 +498,7 @@ public final class GameServer {
         }
         return "failed to execute game action or basic commands";
     }
+
     //  === Methods below are there to facilitate server related operations. ===
 
     /**

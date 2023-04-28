@@ -1,0 +1,109 @@
+private String wholeProcessProceedingGameAction(String command, String[] tokens) {
+        Set<GameAction> possibleGameActions = new HashSet<GameAction>();
+        Set<String> triggers = new HashSet<String>();
+        for (String actionName: actions.keySet()){
+            if (command.contains(actionName)){
+                triggers.add(actionName);
+                for (GameAction action: actions.get(actionName)){
+                    possibleGameActions.add(action);
+                }
+            }
+        }
+
+        if (possibleGameActions.size() == 0){
+            return "";
+        } else {
+            for (String basicCommand: basicCommands){
+                if (command.contains(basicCommand)){
+                    return "what the heck is wrong with you";
+                }
+            }
+        }
+
+        // if one command contain more than one trigger (might be composite case)
+        // then valid action must contain all triggers
+        Iterator<GameAction> iterator = possibleGameActions.iterator();
+        if (triggers.size() > 1){
+            while (iterator.hasNext()) {
+                GameAction action = iterator.next();
+                for (String trigger: triggers){
+                    if (!action.getTriggers().contains(trigger)){
+                        iterator.remove();
+                        break;
+                    }
+                }
+            }
+        }
+        if (possibleGameActions.size() == 0){
+            return "You might use composite commands, you can only execute one at a time";
+        }
+
+        // a valid performable action must have at least one subject mentioned in client's command
+        iterator = possibleGameActions.iterator();
+        while (iterator.hasNext()) {
+            GameAction action = iterator.next();
+            boolean matchSubject = false;
+            for (String subject: action.getSubjects()){
+                if (command.contains(subject)){
+                    matchSubject = true;
+                    break;
+                }
+            }
+            // Command doesn't hold any subject for the current action. (needs to have at least one)
+            if (matchSubject == false){
+                iterator.remove();
+            }
+        }
+
+        if (possibleGameActions.size() == 0){
+            return "your command needs at least one subject";
+        }
+
+        // build a set which contains all available entities so that can be used as one action's subject
+        Set<String> availableSubjects = new HashSet<String>();
+        for (String invArtefact: currentPlayer.getInventory().keySet()){
+            availableSubjects.add(invArtefact);
+        }
+
+        for (String locationArtefact: currentLocation.getArtefacts().keySet()){
+            availableSubjects.add(locationArtefact);
+        }
+
+        for (String locationCharacter: currentLocation.getCharacters().keySet()){
+            availableSubjects.add(locationCharacter);
+        }
+
+        for (String locationFurniture: currentLocation.getFurnitures().keySet()){
+            availableSubjects.add(locationFurniture);
+        }
+
+        // check the action's subject are all satisfied, either in player's inv or in current location
+        iterator = possibleGameActions.iterator();
+        while (iterator.hasNext()) {
+            GameAction action = iterator.next();
+            for (String requiredSubject : action.getSubjects()) {
+                if (!availableSubjects.contains(requiredSubject)) {
+                    iterator.remove();
+                    break;
+                }
+            }
+        }
+        if (possibleGameActions.size() == 0){
+            return "this game action miss necessary subject to execute";
+        }
+
+        for (String entity: entities){
+            if (!availableSubjects.contains(entity) && command.contains(entity)){
+                return "Your command contains extraneous entities";
+            }
+        }
+
+        if (possibleGameActions.size() > 1){
+            return "Your command is ambiguous";
+        } else if (possibleGameActions.size() == 0){
+            return "No game action is matched";
+        }
+
+        GameAction action = possibleGameActions.stream().toList().get(0);
+        return executeMatchedGameAction(action, currentPlayer.getName());
+    }

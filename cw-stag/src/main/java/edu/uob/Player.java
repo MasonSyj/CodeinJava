@@ -62,4 +62,8 @@ public class Player extends GameEntity{
             return null;
         }
     }
+
+    public void removeAllArtefact(){
+        inventory = new HashMap<String, Artefact>();
+    }
 }

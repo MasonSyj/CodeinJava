@@ -196,4 +196,10 @@ class ExampleSTAGTests {
         response = sendCommandToServer("use axe to chop tree");
         System.out.println(response);
     }
+    @Test
+    void testGameAction17(){
+        String response;
+        response = sendCommandToServer("health");
+        System.out.println(response);
+    }
 }
