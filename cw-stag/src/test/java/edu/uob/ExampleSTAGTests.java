@@ -154,4 +154,23 @@ class ExampleSTAGTests {
       response = sendCommandToServer("goto forest goto forest");
       System.out.println(response);
   }
+  @Test
+  void testGameAction12(){
+      String response;
+      sendCommandToServer("goto forest");
+      sendCommandToServer("get key");
+      sendCommandToServer("goto cabin");
+      response = sendCommandToServer("open key");
+      System.out.println(response);
+  }
+
+  @Test
+  void testGameAction13(){
+      String response;
+      sendCommandToServer("goto forest");
+      sendCommandToServer("get key");
+      sendCommandToServer("goto cabin");
+      response = sendCommandToServer("open trapdoor and drink potion");
+      System.out.println(response);
+  }
 }

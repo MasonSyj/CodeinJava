@@ -283,6 +283,7 @@ public final class GameServer {
             playerHashMap.put(username, new Player(username, ""));
             playerHashMap.get(username).setCurrentLocation(startLocation);
         }
+        // does it hurt to use global varibale here?
         currentPlayer = playerHashMap.get(username);
         currentLocation = currentPlayer.getCurrentLocation();
         if (tokens.length == 0){
@@ -293,8 +294,11 @@ public final class GameServer {
         if (!str.equals("")){
             return str;
         }
+        return proceedBasicCommand(command, tokens);
+    }
 
-        for (String basicCommand: basicCommands){
+    public String proceedBasicCommand(String command, String[] tokens){
+       for (String basicCommand: basicCommands){
             if (command.contains(basicCommand)){
                 if (checkDuplicateBasicCommands(tokens)){
                     return "What the hell is wrong with you";
@@ -322,7 +326,6 @@ public final class GameServer {
     }
 
     private String proceedGameAction(String command, String[] tokens) {
-        // List<String> tokenList = Arrays.stream(tokens).toList();
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
         Set<String> triggers = new HashSet<String>();
         for (String actionName: actions.keySet()){
@@ -333,6 +336,7 @@ public final class GameServer {
                 }
             }
         }
+
         if (possibleGameActions.size() == 0){
             return "";
         } else {
@@ -341,7 +345,6 @@ public final class GameServer {
                     return "what the heck is wrong with you";
                 }
             }
-
         }
 
         // if one command contain more than one trigger
@@ -359,9 +362,10 @@ public final class GameServer {
             }
         }
         if (possibleGameActions.size() == 0){
-            return "You might use composite commands, you can only excute one at a time";
+            return "You might use composite commands, you can only execute one at a time";
         }
 
+        // a valid performable action must have at least one subject mentioned in client's command
         iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
@@ -381,6 +385,7 @@ public final class GameServer {
         if (possibleGameActions.size() == 0){
             return "your command needs at least one subject";
         }
+
         // build a set which contains all available entities so that can be used as one action's subject
         Set<String> availableSubjects = new HashSet<String>();
         for (String invArtefact: currentPlayer.getInventory().keySet()){
@@ -421,7 +426,7 @@ public final class GameServer {
         }
 
         if (possibleGameActions.size() > 1){
-            return "Your command is ambiguous or composite";
+            return "Your command is ambiguous";
         } else if (possibleGameActions.size() == 0){
             return "No game action is matched";
         }
