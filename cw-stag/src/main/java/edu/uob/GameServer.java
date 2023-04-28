@@ -53,6 +53,7 @@ public final class GameServer {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+
         try {
             parser.parse(reader);
         } catch (ParseException e) {
@@ -244,7 +245,7 @@ public final class GameServer {
     private String executeGoto(Player currentPlayer, String newLocation) {
         if (currentLocation.getExits().containsKey(newLocation)) {
             currentPlayer.setCurrentLocation(currentLocation.getExits().get(newLocation));
-            return "you are now at " + currentLocation.getName();
+            return "you are now at " + currentPlayer.getCurrentLocation().getName();
         } else {
             return "You can't go to " + newLocation;
         }
@@ -298,31 +299,33 @@ public final class GameServer {
     }
 
     public String proceedBasicCommand(String command, String[] tokens){
-       for (String basicCommand: basicCommands){
-            if (command.contains(basicCommand)){
-                if (checkDuplicateBasicCommands(tokens)){
-                    return "What the hell is wrong with you";
-                }
-                if (basicCommand.equals("inv") || basicCommand.equals("inventory")){
-                    return executeInv(currentPlayer);
-                } else if (basicCommand.equals("look")){
-                    return executeLook(currentPlayer);
-                }
-
-                if (indexCommand(tokens) + 1 >= tokens.length){
-                    return basicCommand + " requires further object";
-                }
-
-                if (basicCommand.equals("get")){
-                    return executeGet(currentPlayer, tokens[indexCommand(tokens) + 1]);
-                } else if (basicCommand.equals("goto")){
-                    return executeGoto(currentPlayer, tokens[indexCommand(tokens) + 1]);
-                } else {
-                    return executeDrop(currentPlayer, tokens[indexCommand(tokens) + 1]);
+        for (String basicCommand: basicCommands){
+            for (String token: tokens){
+                if (token.equals(basicCommand)){
+                    if (checkDuplicateBasicCommands(tokens)){
+                        return "What the hell is wrong with you";
+                    }
+                    if (basicCommand.equals("inv") || basicCommand.equals("inventory")){
+                        return executeInv(currentPlayer);
+                    } else if (basicCommand.equals("look")){
+                        return executeLook(currentPlayer);
+                    }
+                    int indexCommand = indexCommand(tokens);
+                    if (indexCommand + 1 >= tokens.length){
+                        return basicCommand + " requires further object";
+                    }
+                    if (basicCommand.equals("get")){
+                        return executeGet(currentPlayer, tokens[indexCommand + 1]);
+                    } else if (basicCommand.equals("goto")){
+                        return executeGoto(currentPlayer, tokens[indexCommand + 1]);
+                    } else {
+                        return executeDrop(currentPlayer, tokens[indexCommand(tokens) + 1]);
+                    }
                 }
             }
+
         }
-        return "failed to excute game action or basic commands";
+        return "failed to execute game action or basic commands";
     }
 
     private String proceedGameAction(String command, String[] tokens) {
