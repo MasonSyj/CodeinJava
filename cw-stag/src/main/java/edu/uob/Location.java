@@ -39,13 +39,13 @@ public class Location extends GameEntity{
     public String showInformation() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("You current are: " + this.getName());
-        stringBuilder.append(" " + this.getDescription());
+        stringBuilder.append(" " + this.getDescription()).append("\n");
         if (exits.size() != 0){
             stringBuilder.append(" | exits: ");
             for (Location exist: exits.values()){
                 stringBuilder.append(exist.toString());
             }
-            stringBuilder.append(" | ");
+            stringBuilder.append(" | \n");
         }
         // DRY here.
         if (furnitures.size() != 0){
@@ -53,14 +53,14 @@ public class Location extends GameEntity{
             for (Furniture furniture: furnitures.values()){
                 stringBuilder.append(furniture.toString());
             }
-            stringBuilder.append(" | ");
+            stringBuilder.append(" | \n");
         }
         if (artefacts.size() != 0){
             stringBuilder.append("| artefacts: ");
             for (Artefact artefact: artefacts.values()){
                 stringBuilder.append(artefact.toString());
             }
-            stringBuilder.append(" | ");
+            stringBuilder.append(" | \n");
         }
 
         if (characters.size() != 0){
@@ -68,7 +68,7 @@ public class Location extends GameEntity{
             for (Character character: characters.values()){
                 stringBuilder.append(character.toString());
             }
-            stringBuilder.append(" | ");
+            stringBuilder.append(" | \n");
         }
         return stringBuilder.toString();
     }

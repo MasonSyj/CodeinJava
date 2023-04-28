@@ -247,14 +247,14 @@ class ExampleSTAGTests {
         sendCommandToServer("drop potion");
         response = sendCommandToServer("look");
         System.out.println(response);
-        response = sendCommandToServer("drop potion");
+        response = sendCommandToServer("simon: drop potion");
         System.out.println(response);
     }
 
     @Test
     void eatIcecream(){
       String response;
-      response = sendCommandToServer("eat icecream");
+      response = sendCommandToServer("simon: eat icecream");
         System.out.println(response);
     }
 
@@ -269,5 +269,19 @@ class ExampleSTAGTests {
     void gotoWrongLocation(){
       String response = sendCommandToServer("goto library");
         System.out.println(response);
+    }
+
+    @Test
+    void lookOtherPlayer(){
+      String response;
+      response = sendCommandToServer("andy: look");
+        System.out.println(response);
+    }
+
+    @Test
+    void lookOtherPlayer2() {
+      String response;
+      response = sendCommandToServer("andy: look");
+      System.out.println(response);
     }
 }

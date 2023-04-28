@@ -29,6 +29,8 @@ public final class GameServer {
     private Location currentLocation;
     private Player currentPlayer;
     private Location startLocation;
+
+    private String inputCommand;
     private HashMap<String, Player> playerHashMap;
 
     private HashMap<String, HashSet<GameAction>> actions;
@@ -227,7 +229,13 @@ public final class GameServer {
     }
 
     public String executeLook(){
-        return currentPlayer.getCurrentLocation().showInformation();
+        StringBuilder nearbyPlayers = new StringBuilder("Nearby Players: ");
+        for (Player player: playerHashMap.values()){
+           if (player != currentPlayer && player.getCurrentLocation() == currentLocation){
+              nearbyPlayers.append(player.getName()).append(" ");
+           }
+        }
+        return currentPlayer.getCurrentLocation().showInformation() + nearbyPlayers.toString();
     }
 
     public String executeHealth() {
@@ -268,10 +276,11 @@ public final class GameServer {
         for (int i = 0; i < command.length(); i++){
             if (command.charAt(i) == ':'){
                username = command.substring(0, i);
-               command = command.substring(i + 1);
+               this.inputCommand = command.substring(i + 1);
+               break;
             }
         }
-        String[] tokens = command.trim().replaceAll("\\s+", " ").split(" ");
+        String[] tokens = inputCommand.trim().replaceAll("\\s+", " ").split(" ");
         if (!playerHashMap.containsKey(username)){
             playerHashMap.put(username, new Player(username, ""));
             playerHashMap.get(username).setCurrentLocation(startLocation);
@@ -284,15 +293,15 @@ public final class GameServer {
         }
 
         Set<String> triggers = new HashSet<String>();
-        Set<GameAction> possibleGameActions = getPossibleGameAction(command, triggers);
+        Set<GameAction> possibleGameActions = getPossibleGameAction(triggers);
         if (possibleGameActions.size() != 0){
-            return proceedGameAction(possibleGameActions, triggers, command);
+            return proceedGameAction(possibleGameActions, triggers);
         }
         return proceedBasicCommand(tokens);
     }
 
-    public String proceedGameAction(Set<GameAction> possibleGameActions, Set<String> triggers, String command){
-        if (includeBasicCommand(command)){
+    public String proceedGameAction(Set<GameAction> possibleGameActions, Set<String> triggers){
+        if (includeBasicCommand()){
             return "what the heck is wrong with you";
         }
 
@@ -300,7 +309,7 @@ public final class GameServer {
             return "You might use composite commands, you can only execute one at a time";
         }
 
-        if (checkPartial(possibleGameActions, command)){
+        if (checkPartial(possibleGameActions)){
             return "your command needs at least one subject";
         }
 
@@ -310,7 +319,7 @@ public final class GameServer {
             return "this game action miss necessary subject to execute";
         }
 
-        if (checkExtraneous(availableEntities, command)){
+        if (checkExtraneous(availableEntities)){
             return "Your command contains extraneous entities";
         }
 
@@ -338,13 +347,13 @@ public final class GameServer {
 
 
     // a valid performable action must have at least one subject mentioned in client's command
-    public boolean checkPartial(Set<GameAction> possibleGameActions, String command) {
+    public boolean checkPartial(Set<GameAction> possibleGameActions) {
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
             boolean matchSubject = false;
             for (String subject: action.getSubjects()){
-                if (command.contains(subject)){
+                if (inputCommand.contains(subject)){
                     matchSubject = true;
                     break;
                 }
@@ -391,9 +400,9 @@ public final class GameServer {
     }
 
     // make sure client doesn't type inappropriate entities
-    public boolean checkExtraneous(Set<String> availableEntities, String command){
+    public boolean checkExtraneous(Set<String> availableEntities){
         for (String entity: entities){
-            if (!availableEntities.contains(entity) && command.contains(entity)){
+            if (!availableEntities.contains(entity) && inputCommand.contains(entity)){
                 return true;
             }
         }
@@ -401,9 +410,9 @@ public final class GameServer {
     }
 
     // avoid case like 'open key and goto' where exist game action and commands
-    public boolean includeBasicCommand(String command) {
+    public boolean includeBasicCommand() {
         for (String basicCommand: basicCommands){
-            if (command.contains(basicCommand)){
+            if (inputCommand.contains(basicCommand)){
                 return true;
             }
         }
@@ -411,10 +420,10 @@ public final class GameServer {
     }
 
     // based on the command, find all actions by trigger names
-    private Set<GameAction> getPossibleGameAction(String command, Set<String> triggers){
+    private Set<GameAction> getPossibleGameAction(Set<String> triggers){
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
         for (String actionName: actions.keySet()){
-            if (command.contains(actionName)){
+            if (inputCommand.contains(actionName)){
                 triggers.add(actionName);
                 possibleGameActions.addAll(actions.get(actionName));
             }
