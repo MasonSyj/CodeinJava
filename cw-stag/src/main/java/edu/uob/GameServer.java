@@ -491,7 +491,7 @@ public final class GameServer {
                     } else if (basicCommand.equals("goto")){
                         return executeGoto(tokens[indexCommand + 1]);
                     } else {
-                        return executeDrop(tokens[indexCommand(tokens) + 1]);
+                        return executeDrop(tokens[indexCommand + 1]);
                     }
                 }
             }

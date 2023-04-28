@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.nio.file.Paths;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.time.Duration;
 
 class ExampleSTAGTests {
@@ -224,6 +225,49 @@ class ExampleSTAGTests {
         response = sendCommandToServer("look");
         System.out.println(response);
         response = sendCommandToServer("inv");
+        System.out.println(response);
+        sendCommandToServer("goto cellar");
+        response = sendCommandToServer("look");
+        System.out.println(response);
+    }
+
+    @Test
+    void testGameAction19(){
+      String response = sendCommandToServer("goto");
+        System.out.println(response);
+    }
+
+    @Test
+    void testDrop(){
+      String response;
+      sendCommandToServer("get potion");
+      response = sendCommandToServer("look");
+        System.out.println(response);
+        sendCommandToServer("goto forest");
+        sendCommandToServer("drop potion");
+        response = sendCommandToServer("look");
+        System.out.println(response);
+        response = sendCommandToServer("drop potion");
+        System.out.println(response);
+    }
+
+    @Test
+    void eatIcecream(){
+      String response;
+      response = sendCommandToServer("eat icecream");
+        System.out.println(response);
+    }
+
+    @Test
+    void getWrongName(){
+      String response;
+      response = sendCommandToServer("get ice-cream");
+        System.out.println(response);
+    }
+
+    @Test
+    void gotoWrongLocation(){
+      String response = sendCommandToServer("goto library");
         System.out.println(response);
     }
 }
