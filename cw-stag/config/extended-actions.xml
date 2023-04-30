@@ -91,7 +91,7 @@
             <keyphrase>bridge</keyphrase>
         </triggers>
         <subjects>
-            <entity>log</entity>
+        <!--   <entity>log</entity> -->
             <entity>river</entity>
         </subjects>
         <consumed>

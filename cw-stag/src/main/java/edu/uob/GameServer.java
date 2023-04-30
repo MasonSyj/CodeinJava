@@ -37,6 +37,8 @@ public final class GameServer {
 
     private Set<String> entities;
 
+    private Set<String> triggers;
+
     public static void main(String[] args) throws IOException {
         File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
         File actionsFile = Paths.get("config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
@@ -183,15 +185,19 @@ public final class GameServer {
 
         // load locations
         locationHashMap = loadLocations(sections.get(0).getSubgraphs());
-        
-        // set up a set containing all entities
-        entities = buildEntities();
 
         //load Paths
         loadPaths(sections.get(1).getEdges());
 
         //load actions
         actions = loadActions(actionsFile);
+
+        // set up a set containing all entities
+        entities = buildEntities();
+
+        // set up a set containing all triggers
+        triggers = actions.keySet();
+
     }
 
     public Set<String> buildEntities() {
@@ -200,6 +206,8 @@ public final class GameServer {
             answer.addAll(location.getArtefacts().keySet());
             answer.addAll(location.getCharacters().keySet());
             answer.addAll(location.getFurnitures().keySet());
+            answer.addAll(location.getExits().keySet());
+            answer.add(location.getName());
         }
         return answer;
     }
@@ -348,7 +356,7 @@ public final class GameServer {
     }
 
 
-    // a valid performable action must have at least one subject mentioned in client's command
+    // a valid action must have at least one subject mentioned in client's command
     public boolean checkPartial(Set<GameAction> possibleGameActions) {
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
@@ -387,18 +395,52 @@ public final class GameServer {
     }
 
     // even though there might be vague cases, some might be not performable
+    // e.g. a key must be in the current location or in the current player's inv.
+    // all productions can be anywhere except in other players' location.
     public boolean checkPerformable(Set<GameAction> possibleGameActions, Set<String> availableEntities){
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
             for (String requiredSubject : action.getSubjects()) {
+                // if required subject is not available
                 if (!availableEntities.contains(requiredSubject)) {
                     iterator.remove();
                     break;
                 }
             }
+
+            if (!checkProductionConsumptionAvailable(action)){
+                iterator.remove();
+                break;
+            }
         }
         return possibleGameActions.size() == 0;
+    }
+
+    // both production and consumption mustn't be in another player's inv
+    public boolean checkProductionConsumptionAvailable(GameAction action){
+        Set<String> availableMaterials = new HashSet<>(entities);
+        for (Player player: playerHashMap.values()){
+            if (player != currentPlayer){
+                for (String artefact: player.getInventory().keySet()){
+                    availableMaterials.remove(artefact);
+                }
+            }
+        }
+
+        for (String production: action.getProductions()){
+            if (!availableMaterials.contains(production)){
+                return false;
+            }
+        }
+
+        for (String consumption: action.getConsumables()){
+            if (!availableMaterials.contains(consumption)){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // make sure client doesn't type inappropriate entities
@@ -425,6 +467,8 @@ public final class GameServer {
         return possibleGameActions.size() == 0;
     }
 
+    // return: excludeEntities, which one command must not contain any of it.
+    // e.g. In set, it's (all entities) - (available entities)
     public Set<String> getExcludedEntities(Set<String> availableEntities, GameAction action){
         Set<String> excludeEntities = new HashSet<String>();
         excludeEntities.addAll(availableEntities);
@@ -515,9 +559,6 @@ public final class GameServer {
                         Character character = location.getCharacters().remove(production);
                         currentLocation.addCharacter(character);
                         result.append("\nnew character: ").append(character.getName()).append("\n");
-                    } else {
-                        currentLocation.addFurniture(new Furniture(production, ""));
-                        result.append("\nnew furniture: ").append(production).append("\n");
                     }
                 }
             }
