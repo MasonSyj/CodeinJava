@@ -64,7 +64,6 @@
             <entity>cellar</entity>
         </consumed>
         <produced>
-            <entity></entity>
         </produced>
         <narration>You close the trapdoor, no path to cellar anymore</narration>
     </action>

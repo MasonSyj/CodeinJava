@@ -148,14 +148,11 @@ public final class GameServer {
             listOfItems.add(elementSpecificName);
         }
         for (String listOfItem : listOfItems) {
-            if (elementName.equals("triggers")) {
-                gameAction.addTrigger(listOfItem);
-            } else if (elementName.equals("subjects")) {
-                gameAction.addSubject(listOfItem);
-            } else if (elementName.equals("consumed")) {
-                gameAction.addConsumable(listOfItem);
-            } else if (elementName.equals("produced")) {
-                gameAction.addProduction(listOfItem);
+            switch (elementName) {
+                case "triggers" -> gameAction.addTrigger(listOfItem);
+                case "subjects" -> gameAction.addSubject(listOfItem);
+                case "consumed" -> gameAction.addConsumable(listOfItem);
+                case "produced" -> gameAction.addProduction(listOfItem);
             }
         }
     }
@@ -223,30 +220,60 @@ public final class GameServer {
         return numOfBasicCommands > 1;
     }
 
-    public int indexCommand(String[] tokens){
-        for (int i = 0; i < tokens.length; i++) {
-            if (basicCommands.contains(tokens[i])){
+    public int numOfEntites(String[] tokens){
+        int answer = 0;
+        for (String token : tokens) {
+            if (entities.contains(token)) {
+                answer++;
+            }
+        }
+        return answer;
+    }
+
+    public int lastEntityIndex(String[] tokens){
+        for (int i = tokens.length - 1; i >= 0; i--){
+            if (entities.contains(tokens[i])){
                 return i;
             }
         }
         return -1;
     }
 
-    public String executeInv(){
+    public int indexCommand(String[] tokens){
+        int answer = -1;
+        for (int i = 0; i < tokens.length; i++) {
+            if (basicCommands.contains(tokens[i])){
+                answer = i;
+                break;
+            }
+        }
+        return answer;
+    }
+
+    public String executeInv(int numOfEntities){
+        if (numOfEntities > 0){
+            return "Inv command contains extraneous entity";
+        }
         return currentPlayer.displayInventory();
     }
 
-    public String executeLook(){
+    public String executeLook(int numOfEntites){
+        if (numOfEntites > 0){
+            return "look command contains extraneous entity";
+        }
         StringBuilder nearbyPlayers = new StringBuilder("Nearby Players: ");
         for (Player player: playerHashMap.values()){
            if (player != currentPlayer && player.getCurrentLocation() == currentLocation){
               nearbyPlayers.append(player.getName()).append(" ");
            }
         }
-        return currentPlayer.getCurrentLocation().showInformation() + nearbyPlayers.toString();
+        return currentPlayer.getCurrentLocation().showInformation() + nearbyPlayers;
     }
 
-    public String executeHealth() {
+    public String executeHealth(int numOfEntites) {
+        if (numOfEntites > 0){
+            return "Health command contains extraneous entity";
+        }
         return "health: " + currentPlayer.getHealth();
     }
 
@@ -255,7 +282,7 @@ public final class GameServer {
             currentPlayer.setCurrentLocation(currentLocation.getExits().get(newLocation));
             return "you are now at " + currentPlayer.getCurrentLocation().getName();
         } else {
-            return "You can't go to " + newLocation;
+            return "failed to execute goto, You can't go to " + newLocation;
         }
     }
     public String executeGet(String artefactName){
@@ -264,8 +291,8 @@ public final class GameServer {
                 currentPlayer.addArtefact(currentArtefact);
                 currentLocation.getArtefacts().remove(currentArtefact.getName());
                 return "get " + currentArtefact.getName();
-            } else{
-                return "failed to get, you may input the wrong name or it doesn't exist at all.";
+         } else {
+                return "failed to execute get, you may input the wrong name or it doesn't exist at all.";
          }
     }
 
@@ -275,11 +302,14 @@ public final class GameServer {
             currentLocation.addArtefact(artefact);
             return "drop " + artefact.getName();
         } else {
-            return "doesn't exist this artefact";
+            return "failed to drop, doesn't exist this artefact";
         }
     }
 
     public String handleCommand(String command) {
+        if (command.equals("")){
+            return "";
+        }
         String username = "";
         for (int i = 0; i < command.length(); i++){
             if (command.charAt(i) == ':'){
@@ -296,9 +326,6 @@ public final class GameServer {
         // does it hurt to use global variable here?
         currentPlayer = playerHashMap.get(username);
         currentLocation = currentPlayer.getCurrentLocation();
-        if (tokens.length == 0){
-            return "";
-        }
 
         Set<String> triggers = new HashSet<String>();
         Set<GameAction> possibleGameActions = getPossibleGameAction(triggers);
@@ -429,12 +456,18 @@ public final class GameServer {
         }
 
         for (String production: action.getProductions()){
+            if (production.equals("health")) {
+                continue;
+            }
             if (!availableMaterials.contains(production)){
                 return false;
             }
         }
 
         for (String consumption: action.getConsumables()){
+            if (consumption.equals("health")) {
+                continue;
+            }
             if (!availableMaterials.contains(consumption)){
                 return false;
             }
@@ -470,8 +503,7 @@ public final class GameServer {
     // return: excludeEntities, which one command must not contain any of it.
     // e.g. In set, it's (all entities) - (available entities)
     public Set<String> getExcludedEntities(Set<String> availableEntities, GameAction action){
-        Set<String> excludeEntities = new HashSet<String>();
-        excludeEntities.addAll(availableEntities);
+        Set<String> excludeEntities = new HashSet<String>(availableEntities);
 
         for (String subject: action.getSubjects()){
             excludeEntities.remove(subject);
@@ -536,29 +568,33 @@ public final class GameServer {
             } else if (currentLocation.getArtefacts().containsKey(consumable)) {
                 Artefact artefact = currentLocation.getArtefacts().remove(consumable);
                 locationHashMap.get("storeroom").addArtefact(artefact);
-            } else if (currentLocation.getExits().containsKey(consumable)) {
-                currentLocation.getExits().remove(consumable);
-            }
+            } else currentLocation.getExits().remove(consumable);
         }
 
         for (String production: gameAction.getProductions()){
+            if (production.equals("health")){
+                currentPlayer.increaseHealth();
+            }
             if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
-                result.append("\nnew exit: ").append(production).append("\n");
+                result.append("new exit: ").append(production).append("\n");
             } else {
                 for (Location location: locationHashMap.values()){
                     if (location.getArtefacts().containsKey(production)){
                         Artefact artefact = location.getArtefacts().remove(production);
                         currentLocation.addArtefact(artefact);
-                        result.append("\nnew artefact: ").append(artefact.getName()).append("\n");
+                        result.append("new artefact: ").append(artefact.getName()).append("\n");
+                        break;
                     } else if (location.getFurnitures().containsKey(production)) {
                         Furniture furniture = location.getFurnitures().remove(production);
                         currentLocation.addFurniture(furniture);
-                        result.append("\nnew furniture: ").append(furniture.getName()).append("\n");
+                        result.append("new furniture: ").append(furniture.getName()).append("\n");
+                        break;
                     } else if (location.getCharacters().containsKey(production)) {
                         Character character = location.getCharacters().remove(production);
                         currentLocation.addCharacter(character);
-                        result.append("\nnew character: ").append(character.getName()).append("\n");
+                        result.append("new character: ").append(character.getName()).append("\n");
+                        break;
                     }
                 }
             }
@@ -570,29 +606,41 @@ public final class GameServer {
         for (String basicCommand: basicCommands){
             for (String token: tokens){
                 if (token.equals(basicCommand)){
-                    if (checkDuplicateBasicCommands(tokens)){
-                        return "What the hell is wrong with you";
-                    }
-                    switch (basicCommand) {
-                        case "inv":
-                        case "inventory":
-                            return executeInv();
-                        case "look":
-                            return executeLook();
-                        case "health":
-                            return executeHealth();
-                    }
-                    int indexCommand = indexCommand(tokens);
-                    if (indexCommand + 1 >= tokens.length){
-                        return basicCommand + " requires further object";
-                    }
-                    if (basicCommand.equals("get")){
-                        return executeGet(tokens[indexCommand + 1]);
-                    } else if (basicCommand.equals("goto")){
-                        return executeGoto(tokens[indexCommand + 1]);
-                    } else {
-                        return executeDrop(tokens[indexCommand + 1]);
-                    }
+                   if (checkDuplicateBasicCommands(tokens)){
+                       return "What the hell is wrong with you";
+                   }
+
+                   int indexCommand = indexCommand(tokens);
+                   int numOfEntites = numOfEntites(tokens);
+                   int lastEntityIndex = lastEntityIndex(tokens);
+
+                   switch (basicCommand) {
+                       case "inv":
+                       case "inventory":
+                           return executeInv(numOfEntites);
+                       case "look":
+                           return executeLook(numOfEntites);
+                       case "health":
+                           return executeHealth(numOfEntites);
+                   }
+
+                   if (numOfEntites > 1){
+                       return basicCommand + " have more than two entites";
+                   } else if (numOfEntites == 0){
+                       return basicCommand + " requires one entity to execute";
+                   }
+
+                   if (indexCommand > lastEntityIndex){
+                       return basicCommand + " is wrong in logic order";
+                   }
+
+                   if (basicCommand.equals("get")){
+                       return executeGet(tokens[lastEntityIndex]);
+                   } else if (basicCommand.equals("goto")){
+                       return executeGoto(tokens[lastEntityIndex]);
+                   } else {
+                       return executeDrop(tokens[lastEntityIndex]);
+                   }
                 }
             }
 

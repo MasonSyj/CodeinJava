@@ -29,44 +29,50 @@ class ExtendedTest {
                 "Server took too long to respond (probably stuck in an infinite loop)");
     }
 
-    // A lot of tests will probably check the game state using 'look' - so we better make sure 'look' works well !
     @Test
-    void testLook() {
-        String response = sendCommandToServer("simon: look");
-        response = response.toLowerCase();
-        System.out.println(response);
-        assertTrue(response.contains("cabin"), "Did not see the name of the current room in response to look");
-        assertTrue(response.contains("log cabin"), "Did not see a description of the room in response to look");
-        assertTrue(response.contains("magic potion"), "Did not see a description of artifacts in response to look");
-        assertTrue(response.contains("wooden trapdoor"), "Did not see description of furniture in response to look");
-        assertTrue(response.contains("forest"), "Did not see available paths in response to look");
+    void removeCharacterAndProduceHealth() {
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: get key");
+        sendCommandToServer("simon: goto cabin");
+        sendCommandToServer("simon: open key");
+        sendCommandToServer("simon: goto cellar");
+        response = sendCommandToServer("simon: look");
+        sendCommandToServer("simon: hit elf");
+        response = sendCommandToServer("simon: health");
+        assertTrue(response.contains("2"));
+        response = sendCommandToServer("simon: hit spider");
+        response = sendCommandToServer("simon: health");
+        assertTrue(response.contains("3"));
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("spider"));
     }
 
-    // Test that we can pick something up and that it appears in our inventory
     @Test
-    void testGet() {
+    void openCellarWhenKeyOnGround() {
         String response;
-        sendCommandToServer("simon: get potion");
-        response = sendCommandToServer("simon: inv");
-        response = response.toLowerCase();
-        assertTrue(response.contains("potion"), "Did not see the potion in the inventory after an attempt was made to get it");
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: get key");
+        sendCommandToServer("simon: goto cabin");
+        sendCommandToServer("simon: drop key");
+        sendCommandToServer("simon: open key");
         response = sendCommandToServer("simon: look");
-        response = response.toLowerCase();
-        assertFalse(response.contains("potion"), "Potion is still present in the room after an attempt was made to get it");
+        assertTrue(response.contains("cellar"));
+    }
+    @Test
+    void basicCommandWrongOrder() {
+        String response;
+        response = sendCommandToServer("simon: forest goto");
+        assertTrue(response.contains("wrong"));
+        assertTrue(response.contains("logic order"));
     }
 
-    // Test that we can goto a different location (we won't get very far if we can't move around the game !)
     @Test
-    void testGoto() {
+    void basicCommandManyEntites(){
         String response;
-        response = sendCommandToServer("simon: goto forest");
+        response = sendCommandToServer("simon: goto forest forest");
         System.out.println(response);
-        response = sendCommandToServer("simon: look");
-        response = response.toLowerCase();
-        System.out.println("--------------");
-        System.out.println(response);
-        System.out.println("--------------");
-        assertTrue(response.contains("key"), "Failed attempt to use 'goto' command to move to the forest - there is no key in the current location");
+        assertTrue(response.contains("have more than two"));
     }
 
     @Test
@@ -91,8 +97,11 @@ class ExtendedTest {
         assertTrue(response.contains("lumberjack"));
     }
 
+    // log is no longer a subject, just a consumption
+    // so that is doesn't need be in the current location
+    // if in other player's inv, the action will fail
     @Test
-    void testProductioninOtherPlayerInv(){
+    void testConsumptioninOtherPlayerInv(){
         String response;
         sendCommandToServer("simon: get axe");
         sendCommandToServer("simon: goto forest");
@@ -108,8 +117,9 @@ class ExtendedTest {
         assertFalse(response.contains("clearing"));
     }
 
+    // if in other location, the action will succeed
     @Test
-    void testProductionInOtherLocation() {
+    void testConsumptionInOtherLocation() {
         String response;
         sendCommandToServer("simon: get axe");
         sendCommandToServer("simon: goto forest");
@@ -123,5 +133,82 @@ class ExtendedTest {
         response = sendCommandToServer("sam: bridge river");
         response = sendCommandToServer("sam: look");
         assertTrue(response.contains("clearing"));
+    }
+
+    @Test
+    void testProductionIsFurniture() {
+        String response;
+        sendCommandToServer("simon: get axe");
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: cut down tree");
+        sendCommandToServer("sam: get coin");
+        sendCommandToServer("sam: goto forest");
+        sendCommandToServer("sam: get key");
+        sendCommandToServer("sam: goto cabin");
+        sendCommandToServer("sam: open key");
+        sendCommandToServer("sam: goto cellar");
+        response = sendCommandToServer("sam: pay elf");
+        System.out.println(response);
+        response = sendCommandToServer("sam: look");
+        System.out.println(response);
+        assertTrue(response.contains("shovel"));
+        sendCommandToServer("sam: get shovel");
+        response = sendCommandToServer("sam: inv");
+        String response2 = sendCommandToServer("sam: inventory");
+        assertTrue(response.equals(response2));
+        assertTrue(response.contains("shovel"));
+        sendCommandToServer("sam: goto cabin");
+        sendCommandToServer("sam: goto forest");
+        sendCommandToServer("sam: goto riverbank");
+        sendCommandToServer("sam: bridge river");
+        sendCommandToServer("sam: goto clearing");
+        response = sendCommandToServer("sam: dig ground");
+        System.out.println(response);
+        response = sendCommandToServer("sam: look");
+        assertTrue(response.contains("hole"));
+        assertTrue(response.contains("gold"));
+    }
+
+    // log as the production of the cut down tree, I put it to the cabin
+    @Test
+    void testProductionInOtherLocation() {
+        String response;
+        response = sendCommandToServer("simon: look");
+        System.out.println(response);
+        assertTrue(response.contains("log"));
+        sendCommandToServer("simon: get axe");
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: cut down tree");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("log"));
+        sendCommandToServer("simon: goto cabin");
+        response = sendCommandToServer("simon: look");
+        System.out.println(response);
+        assertFalse(response.contains("log"));
+    }
+
+    @Test
+    void testProductionInOtherPlayer() {
+        String response;
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("log"));
+        sendCommandToServer("sam: get log");
+        response = sendCommandToServer("sam: inv");
+        assertTrue(response.contains("log"));
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("log"));
+
+        sendCommandToServer("simon: get axe");
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: cut down tree");
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("log"));
+
+        sendCommandToServer("simon: goto cabin");
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("log"));
+
+        response = sendCommandToServer("sam: inv");
+        assertTrue(response.contains("log"));
     }
 }

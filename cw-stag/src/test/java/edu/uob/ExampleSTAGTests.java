@@ -72,6 +72,43 @@ class ExampleSTAGTests {
     }
 
     @Test
+    void invExtraneous(){
+        String response = sendCommandToServer("simon: inv forest");
+        assertTrue(response.equals("Inv command contains extraneous entity"));
+    }
+
+    @Test
+    void lookExtraneous(){
+        String response = sendCommandToServer("simon: look forest");
+        assertTrue(response.equals("look command contains extraneous entity"));
+    }
+
+    @Test
+    void healthExtraneous() {
+        String response = sendCommandToServer("simon: health elf");
+        assertTrue(response.contains("Health command contains extraneous entity"));
+    }
+
+    @Test
+    void failedToGoto(){
+        String response = sendCommandToServer("simon: goto cellar");
+        assertTrue(response.contains("failed to execute goto, You can't go to "));
+    }
+
+    @Test
+    void failedToGet(){
+        String response = sendCommandToServer("simon: get key");
+        assertTrue(response.contains("failed to execute get"));
+    }
+
+    @Test
+    void blankInput(){
+        String response = sendCommandToServer("");
+        System.out.println(response);
+        assertTrue(response.equals(""));
+    }
+
+    @Test
     void testdGameActionOnlyTrigger1() {
         String response;
         sendCommandToServer("simon: goto forest");
@@ -79,6 +116,7 @@ class ExampleSTAGTests {
         System.out.println(response);
         assertTrue(response.contains("subject"));
         response = sendCommandToServer("simon: look");
+        System.out.println(response);
         assertTrue(response.contains("tree"));
     }
 
@@ -167,7 +205,7 @@ class ExampleSTAGTests {
         sendCommandToServer("Simon: goto cabin");
         response = sendCommandToServer("Simon: open key");
         System.out.println(response);
-        response = sendCommandToServer("simon: look");
+        response = sendCommandToServer("Simon: look");
         System.out.println(response);
         assertFalse(response.contains("cellar"));
     }
@@ -226,13 +264,19 @@ class ExampleSTAGTests {
         String response;
         sendCommandToServer("simon: gotoforest");
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertFalse(response.contains("axe"));
         sendCommandToServer("simon: goto forest");
         sendCommandToServer("simon: getkey");
         response = sendCommandToServer("simon: inv");
-        System.out.println(response);
         assertFalse(response.contains("key"));
+        sendCommandToServer("simon: goto cabin");
+        sendCommandToServer("simon: goto forest cellar");
+        response = sendCommandToServer("simon: look");
+        System.out.println(response);
+        assertFalse(response.contains("tree"));
+        sendCommandToServer("simon: goto forest tree");
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("tree"));
     }
 
     @Test
@@ -277,8 +321,10 @@ class ExampleSTAGTests {
         System.out.println(response);
         sendCommandToServer("simon: open trapdoor");
         sendCommandToServer("simon: goto cellar");
+        System.out.println(sendCommandToServer("simon: look"));
         sendCommandToServer("simon: hit elf");
-        sendCommandToServer("simon: hit elf");
+        response = sendCommandToServer("simon: hit elf");
+        System.out.println(response);
         response = sendCommandToServer("simon: health");
         System.out.println(response);
         assertTrue(response.contains("1"));
@@ -333,14 +379,14 @@ class ExampleSTAGTests {
     void getWrongName() {
         String response;
         response = sendCommandToServer("simon: get ice-cream");
-        System.out.println("failed to get");
+        System.out.println("failed to execute");
     }
 
     @Test
     void gotoWrongLocation() {
         String response = sendCommandToServer("simon: goto library");
         System.out.println(response);
-        assertTrue(response.contains("You can't go to"));
+        assertTrue(response.contains("requires one entity"));
     }
 
     @Test
@@ -351,4 +397,5 @@ class ExampleSTAGTests {
         System.out.println(response);
         assertTrue(response.contains("simon"));
     }
+
 }

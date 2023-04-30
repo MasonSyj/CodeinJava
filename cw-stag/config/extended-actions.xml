@@ -71,6 +71,24 @@
 
     <action>
         <triggers>
+            <keyphrase>fight</keyphrase>
+            <keyphrase>hit</keyphrase>
+            <keyphrase>attack</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>spider</entity>
+        </subjects>
+        <consumed>
+            <entity>spider</entity>
+        </consumed>
+        <produced>
+            <entity>health</entity>
+        </produced>
+        <narration>You attack the spider, it's dead and you gain a unit health</narration>
+    </action>
+
+    <action>
+        <triggers>
             <keyphrase>pay</keyphrase>
         </triggers>
         <subjects>

@@ -52,6 +52,7 @@ digraph layout {
             subgraph artefacts {
                 node [shape = "diamond"];
                 log [description = "A heavy wooden log"];
+                ring [description = "A shiny ring"];
             }
             subgraph furniture {
                 node [shape = "hexagon"];
