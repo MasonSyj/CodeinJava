@@ -81,19 +81,19 @@ class ExampleSTAGTests {
     @Test
     void invExtraneous(){
         String response = sendCommandToServer("simon: inv forest");
-        assertTrue(response.equals("Inv command contains extraneous entity"));
+        assertTrue(response.contains("doesn't need entity"));
     }
 
     @Test
     void lookExtraneous(){
         String response = sendCommandToServer("simon: look forest");
-        assertTrue(response.equals("look command contains extraneous entity"));
+        assertTrue(response.contains("doesn't need entity"));
     }
 
     @Test
     void healthExtraneous() {
         String response = sendCommandToServer("simon: health elf");
-        assertTrue(response.contains("Health command contains extraneous entity"));
+        assertTrue(response.contains("doesn't need entity"));
     }
 
     @Test

@@ -613,7 +613,7 @@ public final class GameServer {
          }
 
          int lastEntityIndex = lastEntityIndex(tokens);
-         if (indexCommand < lastEntityIndex){
+         if (indexCommand > lastEntityIndex && !basicCommandWithoutEntity){
              return basicCommand + " is wrong in logic order";
          }
 
