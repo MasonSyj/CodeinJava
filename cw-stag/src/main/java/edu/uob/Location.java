@@ -35,6 +35,16 @@ public class Location extends GameEntity{
         this.characters = new HashMap<String, Character>();
     }
 
+    @Override
+    public void add(Location location) {
+        location.getExits().put(this.getName(), this);
+    }
+
+    @Override
+    public GameEntity remove(Location location) {
+        return location.getExits().remove(this.getName());
+    }
+
 
     public String showInformation() {
         StringBuilder stringBuilder = new StringBuilder();

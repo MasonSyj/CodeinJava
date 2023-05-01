@@ -526,26 +526,30 @@ public final class GameServer {
         return possibleGameActions;
     }
 
-    public String executeGameAction(GameAction gameAction) {
-        StringBuilder result = new StringBuilder("-----------------------------\n");
+    public boolean consumeHealth() {
+        currentPlayer.decreaseHealth();
+        if (currentPlayer.getHealth() == 0) {
+            for (Artefact artefact: currentPlayer.getInventory().values()){
+                currentLocation.addArtefact(artefact);
+            }
+            currentPlayer.removeAllArtefact();
+            currentPlayer.resetHealth();
+            currentPlayer.setCurrentLocation(startLocation);
+            currentLocation = startLocation;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String consumeGameAction(GameAction gameAction){
+        StringBuilder result = new StringBuilder();
 
         for (String consumable : gameAction.getConsumables()) {
             result.append("Consumed: ").append(consumable).append(" \n");
             if (consumable.equals("health")) {
-                currentPlayer.decreaseHealth();
-                if (currentPlayer.getHealth() == 0) {
-                    for (Artefact artefact: currentPlayer.getInventory().values()){
-                        currentLocation.addArtefact(artefact);
-                    }
-                    currentPlayer.removeAllArtefact();
-                    currentPlayer.resetHealth();
-                    currentPlayer.setCurrentLocation(startLocation);
-                    currentLocation = startLocation;
-
-                    result.append("You died, go back to the start Location. \n");
-                }
-            }
-            if (currentPlayer.getInventory().containsKey(consumable)) {
+                result.append(consumeHealth() ? "You died, go back to the start location": "You lost one health");
+            }else if (currentPlayer.getInventory().containsKey(consumable)) {
                 Artefact artefact = currentPlayer.getInventory().remove(consumable);
                 locationHashMap.get("storeroom").addArtefact(artefact);
             } else if (currentLocation.getCharacters().containsKey(consumable)) {
@@ -559,12 +563,24 @@ public final class GameServer {
                 locationHashMap.get("storeroom").addArtefact(artefact);
             } else currentLocation.getExits().remove(consumable);
         }
+        return result.toString();
+    }
 
+    public String executeGameAction(GameAction gameAction) {
+        StringBuilder result = new StringBuilder("-----------------------------\n");
+        result.append(consumeGameAction(gameAction));
+        result.append(produceGameAction(gameAction));
+        result.append(gameAction.getNarration()).append("\n-----------------------------\n");
+        return result.toString();
+    }
+
+    private String produceGameAction(GameAction gameAction) {
+        StringBuilder result = new StringBuilder();
         for (String production: gameAction.getProductions()){
             if (production.equals("health")){
                 currentPlayer.increaseHealth();
-            }
-            if (locationHashMap.containsKey(production)){
+                result.append("gain one unit of health");
+            } else if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
                 result.append("new exit: ").append(production).append("\n");
             } else {
@@ -588,50 +604,52 @@ public final class GameServer {
                 }
             }
         }
-        result.append(gameAction.getNarration()).append("\n-----------------------------\n");
         return result.toString();
     }
-     public String proceedBasicCommand(String[] tokens){
-         if (checkDuplicateBasicCommands(tokens)){
-             return "What the hell is wrong with you";
-         }
 
-         int indexCommand = indexBasicCommand(tokens);
-         if (indexCommand == -1){
-             return "failed to execute game action or basic commands";
-         }
-         String basicCommand = tokens[indexCommand];
-         boolean basicCommandWithoutEntity = basicCommand.equals("inv") || basicCommand.equals("inventory")
-                 || basicCommand.equals("look") || basicCommand.equals("health");
-         int numOfEntities = numOfEntites(tokens);
-         if (numOfEntities > 1){
-             return basicCommand + " have more than two entites";
-         } else if (numOfEntities == 0 && !basicCommandWithoutEntity){
-             return basicCommand + " requires one entity to execute";
-         } else if (numOfEntities == 1 && basicCommandWithoutEntity){
-             return basicCommand + " doesn't need entity";
-         }
+    public String proceedBasicCommand(String[] tokens){
+        if (checkDuplicateBasicCommands(tokens)){ return "What the hell is wrong with you"; }
 
-         int lastEntityIndex = lastEntityIndex(tokens);
-         if (indexCommand > lastEntityIndex && !basicCommandWithoutEntity){
-             return basicCommand + " is wrong in logic order";
-         }
+        int indexCommand = indexBasicCommand(tokens);
+        if (indexCommand == -1){ return "failed to execute game action or basic commands"; }
 
-         switch (basicCommand) {
-             case "inv":
-             case "inventory":
-                 return executeInv();
-             case "look":
-                 return executeLook();
-             case "health":
-                 return executeHealth();
-             case "get":
-                 return executeGet(tokens[lastEntityIndex]);
-             case "goto":
-                 return executeGoto(tokens[lastEntityIndex]);
-             default:
-                 return executeDrop(tokens[lastEntityIndex]);
-         }
+        String basicCommand = tokens[indexCommand];
+        boolean basicCommandWithoutEntity = basicCommand.equals("inv") || basicCommand.equals("inventory")
+                || basicCommand.equals("look") || basicCommand.equals("health");
+        int numOfEntities = numOfEntites(tokens);
+
+        if (numOfEntities > 1){
+            return basicCommand + " have more than two entites";
+        } else if (numOfEntities == 0 && !basicCommandWithoutEntity){
+            return basicCommand + " requires one entity to execute";
+        } else if (numOfEntities == 1 && basicCommandWithoutEntity){
+            return basicCommand + " doesn't need entity";
+        }
+
+        int lastEntityIndex = lastEntityIndex(tokens);
+        if (indexCommand > lastEntityIndex && !basicCommandWithoutEntity){
+            return basicCommand + " is wrong in logic order";
+        }
+
+        return executeBasicCommand(basicCommand, tokens, lastEntityIndex);
+    }
+
+    public String executeBasicCommand(String basicCommand, String[] tokens, int lastEntityIndex){
+        switch (basicCommand) {
+            case "inv":
+            case "inventory":
+                return executeInv();
+            case "look":
+                return executeLook();
+            case "health":
+                return executeHealth();
+            case "get":
+                return executeGet(tokens[lastEntityIndex]);
+            case "goto":
+                return executeGoto(tokens[lastEntityIndex]);
+            default:
+                return executeDrop(tokens[lastEntityIndex]);
+        }
     }
 
     //  === Methods below are there to facilitate server related operations. ===

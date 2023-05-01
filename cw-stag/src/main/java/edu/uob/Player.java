@@ -17,6 +17,16 @@ public class Player extends GameEntity{
         health = 3;
     }
 
+    @Override
+    public void add(Location location) {
+
+    }
+
+    @Override
+    public GameEntity remove(Location location) {
+        return null;
+    }
+
     public Location getCurrentLocation(){
         return this.currentLocation;
     }

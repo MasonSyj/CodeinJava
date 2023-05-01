@@ -25,4 +25,8 @@ public abstract class GameEntity
     public String toString(){
         return "{name:" + getName() +  ", description: " + getDescription() + "}";
     }
+
+    public abstract void add(Location location);
+
+    public abstract GameEntity remove(Location location);
 }
