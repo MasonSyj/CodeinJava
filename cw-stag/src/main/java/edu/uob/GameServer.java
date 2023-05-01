@@ -429,7 +429,6 @@ public final class GameServer {
 
             if (!checkProductionConsumptionAvailable(action)){
                 iterator.remove();
-                continue;
             }
         }
         return possibleGameActions.size() == 0;
@@ -439,6 +438,7 @@ public final class GameServer {
     public boolean checkProductionConsumptionAvailable(GameAction action){
         Set<String> availableMaterials = new HashSet<>(entities);
         availableMaterials.add("health");
+        boolean result = true;
         for (Player player: playerHashMap.values()){
             if (!player.equals(currentPlayer)){
                 availableMaterials.removeAll(player.getInventory().keySet());
@@ -447,17 +447,17 @@ public final class GameServer {
 
         for (String production: action.getProductions()){
             if (!availableMaterials.contains(production)){
-                return false;
+                result = false;
             }
         }
 
         for (String consumption: action.getConsumables()){
             if (!availableMaterials.contains(consumption)){
-                return false;
+                result = false;
             }
         }
 
-        return true;
+        return result;
     }
 
     // make sure client doesn't type inappropriate entities
@@ -542,18 +542,16 @@ public final class GameServer {
             result.append("Consumed: ").append(consumable).append(" \n");
             if (consumable.equals("health")) {
                 result.append(consumeHealth() ? "You died, go back to the start location": "You lost one health");
-                continue;
             } else if (currentPlayer.getInventory().containsKey(consumable)) {
                 Artefact artefact = currentPlayer.getInventory().remove(consumable);
                 locationHashMap.get("storeroom").addArtefact(artefact);
-                continue;
-            }
-
-            for (Location location: locationHashMap.values()){
-                if (location.getGameEntity(consumable) != null){
-                    GameEntity consumption = location.getGameEntity(consumable);
-                    consumption.remove(location);
-                    consumption.add(locationHashMap.get("storeroom"));
+            } else {
+                for (Location location: locationHashMap.values()) {
+                    if (location.getGameEntity(consumable) != null) {
+                        GameEntity consumption = location.getGameEntity(consumable);
+                        consumption.remove(location);
+                        consumption.add(locationHashMap.get("storeroom"));
+                    }
                 }
             }
         }
@@ -573,18 +571,16 @@ public final class GameServer {
             if (production.equals("health")){
                 currentPlayer.increaseHealth();
                 result.append("gain one unit of health");
-                continue;
             } else if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
                 result.append("new exit: ").append(production).append(" \n");
-                continue;
-            }
-
-            for (Location location: locationHashMap.values()){
-                if (location.getGameEntity(production) != null) {
-                    GameEntity productionName = location.getGameEntity(production);
-                    productionName.remove(location);
-                    productionName.add(currentLocation);
+            } else {
+                for (Location location: locationHashMap.values()){
+                    if (location.getGameEntity(production) != null) {
+                        GameEntity productionName = location.getGameEntity(production);
+                        productionName.remove(location);
+                        productionName.add(currentLocation);
+                    }
                 }
             }
         }
