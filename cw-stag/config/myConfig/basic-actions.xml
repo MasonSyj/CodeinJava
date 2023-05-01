@@ -85,4 +85,20 @@
         <narration>You attack the elf, but he fights back and you lose some health</narration>
     </action>
 
+    <action>
+        <triggers>
+            <keyphrase>drink</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>potion</entity>
+        </subjects>
+        <consumed>
+            <entity>potion</entity>
+        </consumed>
+        <produced>
+            <entity>health</entity>
+        </produced>
+        <narration>You drink the potion and your health improves</narration>
+    </action>
+
 </actions>

@@ -95,19 +95,19 @@ class OriginTest {
     void testGotoFailed() {
         sendCommandToServer("simon: goto");
         String response = sendCommandToServer("simon: look");
-        assertFalse(response.contains("axe"));
+        assertFalse(response.contains("key"));
+        assertTrue(response.contains("axe"));
         assertTrue(response.contains("trapdoor"));
 
         sendCommandToServer("simon: goto cellar");
         response = sendCommandToServer("simon: look");
-        assertFalse(response.contains("axe"));
+        assertTrue(response.contains("axe"));
         assertTrue(response.contains("trapdoor"));
 
         sendCommandToServer("simon: goto library");
         response = sendCommandToServer("simon: look");
-        assertFalse(response.contains("axe"));
+        assertTrue(response.contains("axe"));
         assertTrue(response.contains("trapdoor"));
-
     }
 
     @Test
@@ -194,5 +194,42 @@ class OriginTest {
         String response = sendCommandToServer("");
         System.out.println(response);
         assertTrue(response.equals(""));
+    }
+
+    @Test
+    void testBasicCommandWithWrongEntityNumber() {
+        String response;
+        sendCommandToServer("simon: gotoforest");
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("key"));
+        assertFalse(response.contains("tree"));
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: getkey");
+        response = sendCommandToServer("simon: inv");
+        assertFalse(response.contains("key"));
+        sendCommandToServer("simon: goto cabin");
+        sendCommandToServer("simon: goto forest cellar");
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("tree"));
+        sendCommandToServer("simon: goto forest tree");
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("tree"));
+    }
+
+    @Test
+    void testGameActionDuplicateBasicCommands() {
+        String response;
+        sendCommandToServer("Simon: look look");
+        sendCommandToServer("Simon: goto forest goto forest");
+        response = sendCommandToServer("Simon: look");
+        assertFalse(response.contains("key"));
+        assertFalse(response.contains("tree"));
+    }
+    @Test
+    void eatIcecream() {
+        String response;
+        response = sendCommandToServer("simon: eat ice-cream");
+        System.out.println(response);
+        assertTrue(response.contains("failed to execute"));
     }
 }
