@@ -98,6 +98,21 @@ public class Location extends GameEntity{
     public Map<String, Location> getExits() {
         return this.exits;
     }
+
+    public GameEntity getGameEntity (String name){
+        GameEntity answer;
+        if (getCharacters().get(name) != null) {
+            return getCharacters().get(name);
+        } else if (getExits().get(name) != null) {
+            return getExits().get(name);
+        } else if (getFurnitures().get(name) != null) {
+            return getFurnitures().get(name);
+        } else if (getArtefacts().get(name) != null) {
+            return getArtefacts().get(name);
+        } else {
+            return null;
+        }
+    }
 /*
     public void setExits(Set<Location> exits){
        this.exits = exits;

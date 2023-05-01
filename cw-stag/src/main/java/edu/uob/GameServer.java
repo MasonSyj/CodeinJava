@@ -271,7 +271,7 @@ public final class GameServer {
     public String executeGoto(String newLocation) {
         if (currentLocation.getExits().containsKey(newLocation)) {
             currentPlayer.setCurrentLocation(currentLocation.getExits().get(newLocation));
-            return "you are now at " + currentPlayer.getCurrentLocation().getName();
+            return executeLook();
         } else {
             return "failed to execute goto, You can't go to " + newLocation;
         }
@@ -549,19 +549,20 @@ public final class GameServer {
             result.append("Consumed: ").append(consumable).append(" \n");
             if (consumable.equals("health")) {
                 result.append(consumeHealth() ? "You died, go back to the start location": "You lost one health");
-            }else if (currentPlayer.getInventory().containsKey(consumable)) {
+                continue;
+            } else if (currentPlayer.getInventory().containsKey(consumable)) {
                 Artefact artefact = currentPlayer.getInventory().remove(consumable);
                 locationHashMap.get("storeroom").addArtefact(artefact);
-            } else if (currentLocation.getCharacters().containsKey(consumable)) {
-                Character character = currentLocation.getCharacters().remove(consumable);
-                locationHashMap.get("storeroom").addCharacter(character);
-            } else if (currentLocation.getFurnitures().containsKey(consumable)) {
-                Furniture furniture = currentLocation.getFurnitures().remove(consumable);
-                locationHashMap.get("storeroom").addFurniture(furniture);
-            } else if (currentLocation.getArtefacts().containsKey(consumable)) {
-                Artefact artefact = currentLocation.getArtefacts().remove(consumable);
-                locationHashMap.get("storeroom").addArtefact(artefact);
-            } else currentLocation.getExits().remove(consumable);
+                continue;
+            }
+
+            for (Location location: locationHashMap.values()){
+                if (location.getGameEntity(consumable) != null){
+                    GameEntity consumption = location.getGameEntity(consumable);
+                    consumption.remove(location);
+                    consumption.add(locationHashMap.get("storeroom"));
+                }
+            }
         }
         return result.toString();
     }
@@ -580,27 +581,18 @@ public final class GameServer {
             if (production.equals("health")){
                 currentPlayer.increaseHealth();
                 result.append("gain one unit of health");
+                continue;
             } else if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
                 result.append("new exit: ").append(production).append("\n");
-            } else {
-                for (Location location: locationHashMap.values()){
-                    if (location.getArtefacts().containsKey(production)){
-                        Artefact artefact = location.getArtefacts().remove(production);
-                        currentLocation.addArtefact(artefact);
-                        result.append("new artefact: ").append(artefact.getName()).append("\n");
-                        break;
-                    } else if (location.getFurnitures().containsKey(production)) {
-                        Furniture furniture = location.getFurnitures().remove(production);
-                        currentLocation.addFurniture(furniture);
-                        result.append("new furniture: ").append(furniture.getName()).append("\n");
-                        break;
-                    } else if (location.getCharacters().containsKey(production)) {
-                        Character character = location.getCharacters().remove(production);
-                        currentLocation.addCharacter(character);
-                        result.append("new character: ").append(character.getName()).append("\n");
-                        break;
-                    }
+                continue;
+            }
+
+            for (Location location: locationHashMap.values()){
+                if (location.getGameEntity(production) != null) {
+                    GameEntity productionName = location.getGameEntity(production);
+                    productionName.remove(location);
+                    productionName.add(currentLocation);
                 }
             }
         }
