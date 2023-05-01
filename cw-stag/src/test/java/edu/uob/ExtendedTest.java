@@ -224,8 +224,10 @@ class ExtendedTest {
         assertTrue(response.contains("log"));
         sendCommandToServer("sam: get log");
         response = sendCommandToServer("sam: inv");
+        System.out.println(response);
         assertTrue(response.contains("log"));
         response = sendCommandToServer("simon: look");
+        System.out.println(response);
         assertFalse(response.contains("log"));
 
         sendCommandToServer("simon: get axe");

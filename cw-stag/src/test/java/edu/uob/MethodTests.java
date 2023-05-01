@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.io.IOException;
 import java.sql.SQLOutput;
 import java.time.Duration;
+import java.util.Set;
 
 class MethodTests {
 
@@ -66,9 +67,21 @@ class MethodTests {
     @Test
     void indexCommand() {
         // return the first one, in practice string[] only has one basic command.
-        assertTrue(server.indexBasicCommand(new String[]{"goto goto"}) == 0);
-        assertTrue(server.indexBasicCommand(new String[]{"sam goto"}) == 1);
-        assertTrue(server.indexBasicCommand(new String[]{"goto library"}) == 0);
+        assertTrue(server.indexBasicCommand(new String[]{"goto", "goto"}) == 0);
+        assertTrue(server.indexBasicCommand(new String[]{"sam", "goto"}) == 1);
+        assertTrue(server.indexBasicCommand(new String[]{"goto" ,"library"}) == 0);
+    }
+
+    @Test
+    void findTriggersInCommand(){
+        server.handleCommand("simon: ccut down tree hit elf, cut log");
+        Set<String> answer = server.getTriggersInCommand();
+        assertTrue(answer.contains("cut down"));
+        // contain a cut, meaning a string equals to
+        assertFalse(answer.contains("cut"));
+        assertTrue(answer.contains("hit"));
+        assertFalse(answer.contains("elf"));
+        assertFalse(answer.contains("apple"));
     }
 }
 
