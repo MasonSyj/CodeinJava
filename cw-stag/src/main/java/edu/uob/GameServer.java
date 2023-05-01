@@ -350,7 +350,7 @@ public final class GameServer {
             return "this game action miss necessary subject to execute";
         }
 
-        if (checkExtraneous(possibleGameActions, availableEntities)){
+        if (checkExtraneous(possibleGameActions)){
             return "Your command contains extraneous entities";
         }
 
@@ -467,17 +467,12 @@ public final class GameServer {
     }
 
     // make sure client doesn't type inappropriate entities
-    public boolean checkExtraneous(Set<GameAction> possibleGameActions, Set<String> availableEntities){
-        for (String entity: entities){
-            if (!availableEntities.contains(entity) && inputCommand.contains(entity)){
-                return true;
-            }
-        }
+    public boolean checkExtraneous(Set<GameAction> possibleGameActions){
 
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
-            Set<String> excludeEntities = getExcludedEntities(availableEntities, action);
+            Set<String> excludeEntities = getExcludedEntities(action);
 
             for (String exclusion: excludeEntities){
                 if (inputCommand.contains(exclusion)){
@@ -492,8 +487,8 @@ public final class GameServer {
 
     // return: excludeEntities, which one command must not contain any of it.
     // e.g. In set, it's (all entities) - (available entities)
-    public Set<String> getExcludedEntities(Set<String> availableEntities, GameAction action){
-        Set<String> excludeEntities = new HashSet<String>(availableEntities);
+    public Set<String> getExcludedEntities(GameAction action){
+        Set<String> excludeEntities = new HashSet<String>(entities);
 
         for (String subject: action.getSubjects()){
             excludeEntities.remove(subject);
@@ -501,6 +496,10 @@ public final class GameServer {
 
         for (String consumable: action.getConsumables()) {
             excludeEntities.remove(consumable);
+        }
+
+        for (String production: action.getProductions()) {
+            excludeEntities.remove(production);
         }
         return excludeEntities;
     }

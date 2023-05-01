@@ -21,7 +21,6 @@
     <action>
         <triggers>
             <keyphrase>chop</keyphrase>
-            <keyphrase>cut</keyphrase>
             <keyphrase>cut down</keyphrase>
         </triggers>
         <subjects>
@@ -72,6 +71,24 @@
 
     <action>
         <triggers>
+            <keyphrase>fight</keyphrase>
+            <keyphrase>hit</keyphrase>
+            <keyphrase>attack</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>spider</entity>
+        </subjects>
+        <consumed>
+            <entity>spider</entity>
+        </consumed>
+        <produced>
+            <entity>health</entity>
+        </produced>
+        <narration>You attack the spider, it's dead and you gain a unit health</narration>
+    </action>
+
+    <action>
+        <triggers>
             <keyphrase>pay</keyphrase>
         </triggers>
         <subjects>
@@ -92,7 +109,7 @@
             <keyphrase>bridge</keyphrase>
         </triggers>
         <subjects>
-            <entity>log</entity>
+        <!--   <entity>log</entity> -->
             <entity>river</entity>
         </subjects>
         <consumed>
