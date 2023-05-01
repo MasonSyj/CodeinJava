@@ -239,7 +239,7 @@ public final class GameServer {
         return -1;
     }
 
-    public int indexCommand(String[] tokens){
+    public int indexBasicCommand(String[] tokens){
         int answer = -1;
         for (int i = 0; i < tokens.length; i++) {
             if (basicCommands.contains(tokens[i])){
@@ -610,7 +610,7 @@ public final class GameServer {
                        return "What the hell is wrong with you";
                    }
 
-                   int indexCommand = indexCommand(tokens);
+                   int indexCommand = indexBasicCommand(tokens);
                    int numOfEntites = numOfEntites(tokens);
                    int lastEntityIndex = lastEntityIndex(tokens);
 

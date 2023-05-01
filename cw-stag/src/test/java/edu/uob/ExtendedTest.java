@@ -28,6 +28,36 @@ class ExtendedTest {
                 },
                 "Server took too long to respond (probably stuck in an infinite loop)");
     }
+    @Test
+    void partialCommandInCompleteVersion(){
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: get key");
+        sendCommandToServer("simon: goto cabin");
+        sendCommandToServer("simon: unlock trapdoor with key");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("cellar"));
+    }
+    @Test
+    void partialCommandCase1(){
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: get key");
+        sendCommandToServer("simon: goto cabin");
+        sendCommandToServer("simon: unlock trapdoor");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("cellar"));
+    }
+    @Test
+    void partialCommandCase2(){
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: get key");
+        sendCommandToServer("simon: goto cabin");
+        sendCommandToServer("simon: unlock trapdoor");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("cellar"));
+    }
 
     @Test
     void removeCharacterAndProduceHealth() {

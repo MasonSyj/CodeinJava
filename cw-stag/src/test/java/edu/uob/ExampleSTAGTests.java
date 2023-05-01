@@ -72,6 +72,13 @@ class ExampleSTAGTests {
     }
 
     @Test
+    void usernameIsBuiltin(){
+        String response;
+        response = sendCommandToServer("inv: look");
+        System.out.println(response);
+    }
+
+    @Test
     void invExtraneous(){
         String response = sendCommandToServer("simon: inv forest");
         assertTrue(response.equals("Inv command contains extraneous entity"));
