@@ -70,7 +70,7 @@ public final class GameServer {
         HashMap<String, Location> answer = new HashMap<String, Location>();
         for (Graph location: locations){
             Node locationDetails = location.getNodes(false).get(0);
-            String locationName = locationDetails.getId().getId().toLowerCase();
+            String locationName = locationDetails.getId().getId();
             currentLocation = new Location(locationName, locationDetails.getAttribute("description"));
 
             // set the start location
@@ -89,8 +89,8 @@ public final class GameServer {
 
     public void loadPaths(ArrayList<Edge> paths){
         for (Edge edge: paths){
-            String fromLocationName = edge.getSource().getNode().getId().getId().toLowerCase();
-            String toLocationName = edge.getTarget().getNode().getId().getId().toLowerCase();
+            String fromLocationName = edge.getSource().getNode().getId().getId();
+            String toLocationName = edge.getTarget().getNode().getId().getId();
             if (locationHashMap.containsKey(fromLocationName)
                     && locationHashMap.containsKey(toLocationName)){
                 locationHashMap.get(fromLocationName).addExit(locationHashMap.get(toLocationName));
@@ -114,7 +114,7 @@ public final class GameServer {
                 loadActionItem(currentGameAction, currentActionElement, "subjects");
                 loadActionItem(currentGameAction, currentActionElement, "consumed");
                 loadActionItem(currentGameAction, currentActionElement, "produced");
-                currentGameAction.setNarration(currentActionElement.getElementsByTagName("narration").item(0).getTextContent().toLowerCase());
+                currentGameAction.setNarration(currentActionElement.getElementsByTagName("narration").item(0).getTextContent());
                 for (String trigger: currentGameAction.getTriggers()){
                     if (!answer.containsKey(trigger)){
                         answer.put(trigger, new HashSet<GameAction>());
@@ -146,7 +146,7 @@ public final class GameServer {
         }
 
         for (int i = 0; i < nodeList.getLength(); i++){
-            String elementSpecificName = nodeList.item(i).getTextContent().toLowerCase();
+            String elementSpecificName = nodeList.item(i).getTextContent();
             listOfItems.add(elementSpecificName);
         }
         for (String listOfItem : listOfItems) {
@@ -159,19 +159,21 @@ public final class GameServer {
         }
     }
 
-    public void loadGameEntity(Location location, ArrayList<Graph> graph, String name){
+    public void loadGameEntity(Location location, ArrayList<Graph> graph, String name) {
         List<Graph> graphs = graph.stream().filter(currentGraph -> currentGraph.getId().getId().equals(name)).toList();
-        for (Node item: graphs.get(0).getNodes(false)){
-            String itemName = item.getId().getId().toLowerCase();
-            switch (name) {
-                case "artefacts" ->
-                        location.addArtefact(new Artefact(itemName, item.getAttribute("description")));
-                case "furniture" ->
-                        location.addFurniture(new Furniture(itemName, item.getAttribute("description")));
-                case "characters" ->
-                        location.addCharacter(new Character(itemName, item.getAttribute("description")));
+        if (graphs.size() == 1) {
+            for (Node item : graphs.get(0).getNodes(false)) {
+                String itemName = item.getId().getId();
+                switch (name) {
+                    case "artefacts" -> location.addArtefact(new Artefact(itemName, item.getAttribute("description")));
+                    case "furniture" ->
+                            location.addFurniture(new Furniture(itemName, item.getAttribute("description")));
+                    case "characters" ->
+                            location.addCharacter(new Character(itemName, item.getAttribute("description")));
+                }
             }
-        }    }
+        }
+    }
 
     // @param entitiesFile The game configuration file containing all game entities to use in your game
     // @param actionsFile The game configuration file containing all game actions to use in your game
@@ -303,7 +305,7 @@ public final class GameServer {
         String username = "";
         int colonIndex = command.indexOf(':');
         username = command.substring(0, colonIndex);
-        this.inputCommand = command.substring(colonIndex + 1).toLowerCase();
+        this.inputCommand = command.substring(colonIndex + 1);
 
         String[] tokens = inputCommand.trim().replaceAll("\\s+", " ").split(" ");
         if (!playerHashMap.containsKey(username)){
@@ -488,13 +490,6 @@ public final class GameServer {
             excludeEntities.remove(subject);
         }
 
-        for (String consumable: action.getConsumables()) {
-            excludeEntities.remove(consumable);
-        }
-
-        for (String production: action.getProductions()) {
-            excludeEntities.remove(production);
-        }
         return excludeEntities;
     }
 
@@ -575,6 +570,7 @@ public final class GameServer {
                 currentLocation.addExit(locationHashMap.get(production));
                 result.append("new exit: ").append(production).append(" \n");
             } else {
+                result.append(production).append(" \n");
                 for (Location location: locationHashMap.values()){
                     if (location.getGameEntity(production) != null) {
                         GameEntity productionName = location.getGameEntity(production);
