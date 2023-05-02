@@ -9,12 +9,13 @@ digraph layout {
 
         subgraph cluster001 {
             node [shape = "none"];
-            cabin [description = "A log cabin in the woods"];
+            cabin [description = "A old cabin in the woods"];
             subgraph artefacts {
                 node [shape = "diamond"];
                 potion [description = "A bottle of magic potion"];
                 axe [description = "A razor sharp axe"];
                 coin [description = "A silver coin"];
+                log [description = "A heavy wooden log"];
             }
             subgraph furniture {
                 node [shape = "hexagon"];
@@ -41,6 +42,7 @@ digraph layout {
             subgraph characters {
                 node [shape = "ellipse"];
                 elf [description = "An angry looking Elf"];
+                spider [description = "A small Spider"];
             }
         }
 
@@ -75,7 +77,6 @@ digraph layout {
             }
             subgraph artefacts {
                 node [shape = "diamond"];
-                log [description = "A heavy wooden log"];
                 shovel [description = "A sturdy shovel"];
                 gold [description = "A big pot of gold"];
             }

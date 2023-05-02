@@ -70,7 +70,7 @@ public final class GameServer {
         HashMap<String, Location> answer = new HashMap<String, Location>();
         for (Graph location: locations){
             Node locationDetails = location.getNodes(false).get(0);
-            String locationName = locationDetails.getId().getId();
+            String locationName = locationDetails.getId().getId().toLowerCase();
             currentLocation = new Location(locationName, locationDetails.getAttribute("description"));
 
             // set the start location
@@ -89,8 +89,8 @@ public final class GameServer {
 
     public void loadPaths(ArrayList<Edge> paths){
         for (Edge edge: paths){
-            String fromLocationName = edge.getSource().getNode().getId().getId();
-            String toLocationName = edge.getTarget().getNode().getId().getId();
+            String fromLocationName = edge.getSource().getNode().getId().getId().toLowerCase();
+            String toLocationName = edge.getTarget().getNode().getId().getId().toLowerCase();
             if (locationHashMap.containsKey(fromLocationName)
                     && locationHashMap.containsKey(toLocationName)){
                 locationHashMap.get(fromLocationName).addExit(locationHashMap.get(toLocationName));
@@ -114,7 +114,7 @@ public final class GameServer {
                 loadActionItem(currentGameAction, currentActionElement, "subjects");
                 loadActionItem(currentGameAction, currentActionElement, "consumed");
                 loadActionItem(currentGameAction, currentActionElement, "produced");
-                currentGameAction.setNarration(currentActionElement.getElementsByTagName("narration").item(0).getTextContent());
+                currentGameAction.setNarration(currentActionElement.getElementsByTagName("narration").item(0).getTextContent().toLowerCase());
                 for (String trigger: currentGameAction.getTriggers()){
                     if (!answer.containsKey(trigger)){
                         answer.put(trigger, new HashSet<GameAction>());
@@ -132,6 +132,8 @@ public final class GameServer {
 
         return answer;
     }
+
+    // load different part of one action
     public void loadActionItem(GameAction gameAction, Element gameActionElement, String elementName){
         Element certainType = (Element) gameActionElement.getElementsByTagName(elementName).item(0);
         List<String> listOfItems = new ArrayList<String>();
@@ -144,7 +146,7 @@ public final class GameServer {
         }
 
         for (int i = 0; i < nodeList.getLength(); i++){
-            String elementSpecificName = nodeList.item(i).getTextContent();
+            String elementSpecificName = nodeList.item(i).getTextContent().toLowerCase();
             listOfItems.add(elementSpecificName);
         }
         for (String listOfItem : listOfItems) {
@@ -159,19 +161,17 @@ public final class GameServer {
 
     public void loadGameEntity(Location location, ArrayList<Graph> graph, String name){
         List<Graph> graphs = graph.stream().filter(currentGraph -> currentGraph.getId().getId().equals(name)).toList();
-        if (graphs.size() == 1){
-            for (Node item: graphs.get(0).getNodes(false)){
-                switch (name) {
-                    case "artefacts" ->
-                            location.addArtefact(new Artefact(item.getId().getId(), item.getAttribute("description")));
-                    case "furniture" ->
-                            location.addFurniture(new Furniture(item.getId().getId(), item.getAttribute("description")));
-                    case "characters" ->
-                            location.addCharacter(new Character(item.getId().getId(), item.getAttribute("description")));
-                }
+        for (Node item: graphs.get(0).getNodes(false)){
+            String itemName = item.getId().getId().toLowerCase();
+            switch (name) {
+                case "artefacts" ->
+                        location.addArtefact(new Artefact(itemName, item.getAttribute("description")));
+                case "furniture" ->
+                        location.addFurniture(new Furniture(itemName, item.getAttribute("description")));
+                case "characters" ->
+                        location.addCharacter(new Character(itemName, item.getAttribute("description")));
             }
-        }
-    }
+        }    }
 
     // @param entitiesFile The game configuration file containing all game entities to use in your game
     // @param actionsFile The game configuration file containing all game actions to use in your game
@@ -194,11 +194,10 @@ public final class GameServer {
 
         // set up a set containing all triggers
         triggers = actions.keySet();
-
     }
 
     public Set<String> buildEntities() {
-        Set<String> answer = new HashSet<String>();
+        Set<String> answer = new HashSet<>();
         for (Location location: locationHashMap.values()){
             answer.addAll(location.getArtefacts().keySet());
             answer.addAll(location.getCharacters().keySet());
@@ -258,7 +257,7 @@ public final class GameServer {
         StringBuilder nearbyPlayers = new StringBuilder("Nearby Players: ");
         for (Player player: playerHashMap.values()){
            if (player != currentPlayer && player.getCurrentLocation() == currentLocation){
-              nearbyPlayers.append(player.getName()).append(" ");
+              nearbyPlayers.append(player.getName()).append(", ");
            }
         }
         return currentPlayer.getCurrentLocation().showInformation() + nearbyPlayers;
@@ -304,7 +303,7 @@ public final class GameServer {
         String username = "";
         int colonIndex = command.indexOf(':');
         username = command.substring(0, colonIndex);
-        this.inputCommand = command.substring(colonIndex + 1);
+        this.inputCommand = command.substring(colonIndex + 1).toLowerCase();
 
         String[] tokens = inputCommand.trim().replaceAll("\\s+", " ").split(" ");
         if (!playerHashMap.containsKey(username)){
@@ -350,7 +349,7 @@ public final class GameServer {
             return "this game action miss necessary subject to execute";
         }
 
-        if (checkExtraneous(possibleGameActions, availableEntities)){
+        if (checkExtraneous(possibleGameActions)){
             return "Your command contains extraneous entities";
         }
 
@@ -425,12 +424,11 @@ public final class GameServer {
             GameAction action = iterator.next();
             if (!availableEntities.containsAll(action.getSubjects())){
                iterator.remove();
-               break;
+               continue;
             }
 
             if (!checkProductionConsumptionAvailable(action)){
                 iterator.remove();
-                break;
             }
         }
         return possibleGameActions.size() == 0;
@@ -439,45 +437,36 @@ public final class GameServer {
     // both production and consumption mustn't be in another player's inv
     public boolean checkProductionConsumptionAvailable(GameAction action){
         Set<String> availableMaterials = new HashSet<>(entities);
+        availableMaterials.add("health");
+        boolean result = true;
         for (Player player: playerHashMap.values()){
-            if (player != currentPlayer){
+            if (!player.equals(currentPlayer)){
                 availableMaterials.removeAll(player.getInventory().keySet());
             }
         }
 
         for (String production: action.getProductions()){
-            if (production.equals("health")) {
-                continue;
-            }
             if (!availableMaterials.contains(production)){
-                return false;
+                result = false;
             }
         }
 
         for (String consumption: action.getConsumables()){
-            if (consumption.equals("health")) {
-                continue;
-            }
             if (!availableMaterials.contains(consumption)){
-                return false;
+                result = false;
             }
         }
 
-        return true;
+        return result;
     }
 
     // make sure client doesn't type inappropriate entities
-    public boolean checkExtraneous(Set<GameAction> possibleGameActions, Set<String> availableEntities){
-        for (String entity: entities){
-            if (!availableEntities.contains(entity) && inputCommand.contains(entity)){
-                return true;
-            }
-        }
+    public boolean checkExtraneous(Set<GameAction> possibleGameActions){
 
         Iterator<GameAction> iterator = possibleGameActions.iterator();
         while (iterator.hasNext()) {
             GameAction action = iterator.next();
-            Set<String> excludeEntities = getExcludedEntities(availableEntities, action);
+            Set<String> excludeEntities = getExcludedEntities(action);
 
             for (String exclusion: excludeEntities){
                 if (inputCommand.contains(exclusion)){
@@ -492,8 +481,8 @@ public final class GameServer {
 
     // return: excludeEntities, which one command must not contain any of it.
     // e.g. In set, it's (all entities) - (available entities)
-    public Set<String> getExcludedEntities(Set<String> availableEntities, GameAction action){
-        Set<String> excludeEntities = new HashSet<String>(availableEntities);
+    public Set<String> getExcludedEntities(GameAction action){
+        Set<String> excludeEntities = new HashSet<String>(entities);
 
         for (String subject: action.getSubjects()){
             excludeEntities.remove(subject);
@@ -501,6 +490,10 @@ public final class GameServer {
 
         for (String consumable: action.getConsumables()) {
             excludeEntities.remove(consumable);
+        }
+
+        for (String production: action.getProductions()) {
+            excludeEntities.remove(production);
         }
         return excludeEntities;
     }
@@ -549,18 +542,16 @@ public final class GameServer {
             result.append("Consumed: ").append(consumable).append(" \n");
             if (consumable.equals("health")) {
                 result.append(consumeHealth() ? "You died, go back to the start location": "You lost one health");
-                continue;
             } else if (currentPlayer.getInventory().containsKey(consumable)) {
                 Artefact artefact = currentPlayer.getInventory().remove(consumable);
                 locationHashMap.get("storeroom").addArtefact(artefact);
-                continue;
-            }
-
-            for (Location location: locationHashMap.values()){
-                if (location.getGameEntity(consumable) != null){
-                    GameEntity consumption = location.getGameEntity(consumable);
-                    consumption.remove(location);
-                    consumption.add(locationHashMap.get("storeroom"));
+            } else {
+                for (Location location: locationHashMap.values()) {
+                    if (location.getGameEntity(consumable) != null) {
+                        GameEntity consumption = location.getGameEntity(consumable);
+                        consumption.remove(location);
+                        consumption.add(locationHashMap.get("storeroom"));
+                    }
                 }
             }
         }
@@ -569,9 +560,8 @@ public final class GameServer {
 
     public String executeGameAction(GameAction gameAction) {
         StringBuilder result = new StringBuilder("-----------------------------\n");
-        result.append(consumeGameAction(gameAction));
-        result.append(produceGameAction(gameAction));
-        result.append(gameAction.getNarration()).append("\n-----------------------------\n");
+        result.append(consumeGameAction(gameAction)).append(produceGameAction(gameAction))
+                .append(gameAction.getNarration()).append("\n-----------------------------\n");
         return result.toString();
     }
 
@@ -581,18 +571,16 @@ public final class GameServer {
             if (production.equals("health")){
                 currentPlayer.increaseHealth();
                 result.append("gain one unit of health");
-                continue;
             } else if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
-                result.append("new exit: ").append(production).append("\n");
-                continue;
-            }
-
-            for (Location location: locationHashMap.values()){
-                if (location.getGameEntity(production) != null) {
-                    GameEntity productionName = location.getGameEntity(production);
-                    productionName.remove(location);
-                    productionName.add(currentLocation);
+                result.append("new exit: ").append(production).append(" \n");
+            } else {
+                for (Location location: locationHashMap.values()){
+                    if (location.getGameEntity(production) != null) {
+                        GameEntity productionName = location.getGameEntity(production);
+                        productionName.remove(location);
+                        productionName.add(currentLocation);
+                    }
                 }
             }
         }
