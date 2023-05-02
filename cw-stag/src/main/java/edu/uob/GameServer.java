@@ -71,7 +71,7 @@ public final class GameServer {
         for (Graph location: locations){
             Node locationDetails = location.getNodes(false).get(0);
             String locationName = locationDetails.getId().getId();
-            currentLocation = new Location(locationName, locationDetails.getAttribute("description"));
+            currentLocation = new Location(locationName.toLowerCase(), locationDetails.getAttribute("description"));
 
             // set the start location
             if (startLocation == null) {
@@ -89,8 +89,8 @@ public final class GameServer {
 
     public void loadPaths(ArrayList<Edge> paths){
         for (Edge edge: paths){
-            String fromLocationName = edge.getSource().getNode().getId().getId();
-            String toLocationName = edge.getTarget().getNode().getId().getId();
+            String fromLocationName = edge.getSource().getNode().getId().getId().toLowerCase();
+            String toLocationName = edge.getTarget().getNode().getId().getId().toLowerCase();
             if (locationHashMap.containsKey(fromLocationName)
                     && locationHashMap.containsKey(toLocationName)){
                 locationHashMap.get(fromLocationName).addExit(locationHashMap.get(toLocationName));
@@ -146,7 +146,7 @@ public final class GameServer {
         }
 
         for (int i = 0; i < nodeList.getLength(); i++){
-            String elementSpecificName = nodeList.item(i).getTextContent();
+            String elementSpecificName = nodeList.item(i).getTextContent().toLowerCase();
             listOfItems.add(elementSpecificName);
         }
         for (String listOfItem : listOfItems) {
@@ -163,7 +163,7 @@ public final class GameServer {
         List<Graph> graphs = graph.stream().filter(currentGraph -> currentGraph.getId().getId().equals(name)).toList();
         if (graphs.size() == 1) {
             for (Node item : graphs.get(0).getNodes(false)) {
-                String itemName = item.getId().getId();
+                String itemName = item.getId().getId().toLowerCase();
                 switch (name) {
                     case "artefacts" -> location.addArtefact(new Artefact(itemName, item.getAttribute("description")));
                     case "furniture" ->
@@ -258,7 +258,7 @@ public final class GameServer {
     public String executeLook(){
         StringBuilder nearbyPlayers = new StringBuilder("Nearby Players: ");
         for (Player player: playerHashMap.values()){
-           if (player != currentPlayer && player.getCurrentLocation().equals(currentLocation)){
+           if (!player.equals(currentPlayer) && player.getCurrentLocation().equals(currentLocation)){
               nearbyPlayers.append(player.getName()).append(", ");
            }
         }
@@ -271,7 +271,8 @@ public final class GameServer {
 
     public String executeGoto(String newLocation) {
         if (currentLocation.getExits().containsKey(newLocation)) {
-            currentPlayer.setCurrentLocation(currentLocation.getExits().get(newLocation));
+            currentLocation = currentLocation.getExits().get(newLocation);
+            currentPlayer.setCurrentLocation(currentLocation);
             return executeLook();
         } else {
             return "[error] " + "failed to execute goto, You can't go to " + newLocation;
@@ -304,8 +305,8 @@ public final class GameServer {
         }
         String username = "";
         int colonIndex = command.indexOf(':');
-        username = command.substring(0, colonIndex);
-        this.inputCommand = command.substring(colonIndex + 1);
+        username = command.substring(0, colonIndex).toLowerCase();
+        this.inputCommand = command.substring(colonIndex + 1).toLowerCase();
 
         String[] tokens = inputCommand.trim().replaceAll("\\s+", " ").split(" ");
         if (!playerHashMap.containsKey(username)){
@@ -507,22 +508,17 @@ public final class GameServer {
     private Set<GameAction> getPossibleGameAction(String[] tokens){
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
         for (String actionName: actions.keySet()){
-            if (inputCommand.contains(actionName) && indexOfCommand(tokens, actionName) != -1){
+            if (inputCommand.contains(actionName) && validTrigger(actionName)){
                 possibleGameActions.addAll(actions.get(actionName));
             }
         }
         return possibleGameActions;
     }
 
-    public int indexOfCommand(String[] tokens, String command) {
-        int answer = -1;
-        for (int i = 0; i < tokens.length; i++) {
-            if (command.equals(tokens[i])) {
-                answer = i;
-                break;
-            }
-        }
-        return answer;
+    public boolean validTrigger(String trigger){
+        int index = inputCommand.indexOf(trigger);
+        int len = trigger.length();
+        return (index - 1 == -1 || inputCommand.charAt(index - 1) == ' ') && (index + len == inputCommand.length() || inputCommand.charAt(index + len) == ' ');
     }
 
     public boolean consumeHealth() {
@@ -547,7 +543,7 @@ public final class GameServer {
         for (String consumable : gameAction.getConsumables()) {
             result.append("Consumed: ").append(consumable).append(" \n");
             if (consumable.equals("health")) {
-                result.append(consumeHealth() ? "You died, go back to the start location": "You lost one health");
+                result.append(consumeHealth() ? "You died, go back to the start location \n": "You lost one health\n");
             } else if (currentPlayer.getInventory().containsKey(consumable)) {
                 Artefact artefact = currentPlayer.getInventory().remove(consumable);
                 locationHashMap.get("storeroom").addArtefact(artefact);
@@ -576,7 +572,7 @@ public final class GameServer {
         for (String production: gameAction.getProductions()){
             if (production.equals("health")){
                 currentPlayer.increaseHealth();
-                result.append("gain one unit of health");
+                result.append("You gain one unit of health \n");
             } else if (locationHashMap.containsKey(production)){
                 currentLocation.addExit(locationHashMap.get(production));
                 result.append("new exit: ").append(production).append(" \n");

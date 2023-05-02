@@ -137,4 +137,19 @@
         <narration>You blow the horn and as if by magic, a lumberjack appears !</narration>
     </action>
 
+    <action>
+        <triggers>
+            <keyphrase>remove</keyphrase>
+            <keyphrase>destroy</keyphrase>
+        </triggers>
+        <subjects>
+            <entity>axe</entity>
+        </subjects>
+        <consumed>
+            <entity>clearing</entity>
+        </consumed>
+        <produced>
+        </produced>
+        <narration>You removed the bridge to clearing !</narration> </action>
+
 </actions>

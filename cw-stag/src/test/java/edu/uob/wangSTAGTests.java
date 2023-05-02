@@ -69,6 +69,7 @@ class wangSTAGTests {
   @Test
   void testExtended() {
     String response = sendCommandToServer("simon: Look");
+    System.out.println(response);
     assertTrue(response.contains("potion"), "Did not see a description of the current room in response to look");
     assertTrue(response.contains("forest"), "Did not see available paths in response to look");
     response = sendCommandToServer("simon: GET axe");

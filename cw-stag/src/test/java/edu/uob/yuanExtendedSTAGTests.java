@@ -65,6 +65,7 @@ class yuanExtendedSTAGTests {
       response = sendCommandToServer("simon: inventory");
       assertTrue(response.contains("magic potion"));
       response = sendCommandToServer("simon: drink potion");
+      System.out.println(response);
       assertTrue(response.contains("You drink the potion and your health improves"));
       response = sendCommandToServer("simon: inv");
       assertFalse(response.contains("potion"));

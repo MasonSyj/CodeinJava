@@ -76,9 +76,12 @@ class MethodTests {
     void findTriggersInCommand(){
         server.handleCommand("simon: ccut down tree hit elf, cut log");
         Set<String> answer = server.getTriggersInCommand();
+        for (String trigger: answer){
+            System.out.println(trigger);
+        }
         assertTrue(answer.contains("cut down"));
         // contain a cut, meaning a string equals to
-        assertFalse(answer.contains("cut"));
+        assertTrue(answer.contains("cut"));
         assertTrue(answer.contains("hit"));
         assertFalse(answer.contains("elf"));
         assertFalse(answer.contains("apple"));

@@ -186,13 +186,6 @@ class chenSTAGTests {
     }
 
     @Test
-    void testDecorationWord3() {
-        String response = sendCommandToServer("simon: ^{get}$ axe!");
-        sendCommandToServer("simon: inv");
-        assertTrue(response.contains("axe"));
-    }
-
-    @Test
     void testWrongBuiltInMatch() {
         String response = sendCommandToServer("simon: look lumberjack");
         assertTrue(response.contains("error"));

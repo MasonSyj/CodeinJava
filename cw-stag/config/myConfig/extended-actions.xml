@@ -22,6 +22,7 @@
         <triggers>
             <keyphrase>chop</keyphrase>
             <keyphrase>cut down</keyphrase>
+            <keyphrase>cut</keyphrase>
         </triggers>
         <subjects>
             <entity>tree</entity>

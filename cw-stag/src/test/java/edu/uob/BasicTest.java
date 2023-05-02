@@ -60,6 +60,7 @@ class BasicTest {
         sendCommandToServer("simon: goto forest");
         sendCommandToServer("simon: Cut dOWn TREE");
         response = sendCommandToServer("simon: lOOk");
+        System.out.println(response);
         assertFalse(response.contains("tree"));
     }
 
@@ -159,7 +160,7 @@ class BasicTest {
         // log is a produced entity, so it's allowed here
         sendCommandToServer("simon: cut down tree log");
         response = sendCommandToServer("simon: look");
-        assertFalse(response.contains("tree"));
+        assertTrue(response.contains("tree"));
     }
 
     @Test

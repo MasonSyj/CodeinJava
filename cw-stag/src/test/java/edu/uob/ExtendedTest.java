@@ -17,7 +17,7 @@ class ExtendedTest {
     @BeforeEach
     void setup() {
         File entitiesFile = Paths.get("config" + File.separator + "myConfig" + File.separator + "extended-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("config" + File.separator + "myConfig" + File.separator +  "extended-actions.xml").toAbsolutePath().toFile();
+        File actionsFile = Paths.get("config" + File.separator + "myConfig" + File.separator + "extended-actions.xml").toAbsolutePath().toFile();
         server = new GameServer(entitiesFile, actionsFile);
     }
 
@@ -98,6 +98,15 @@ class ExtendedTest {
     }
 
     @Test
+    void testGameActionOrder() {
+        String response;
+        sendCommandToServer("simon: get axe");
+        sendCommandToServer("simon: goto forest");
+        response = sendCommandToServer("simon: cut tree down");
+        System.out.println(response);
+    }
+
+    @Test
     void basicCommandManyEntites(){
         String response;
         response = sendCommandToServer("simon: goto forest forest");
@@ -136,6 +145,8 @@ class ExtendedTest {
         sendCommandToServer("simon: get axe");
         sendCommandToServer("simon: goto forest");
         sendCommandToServer("simon: cut down tree");
+        response = sendCommandToServer("simon: look");
+        System.out.println(response);
         sendCommandToServer("simon: get log");
         sendCommandToServer("sam: goto forest");
         sendCommandToServer("sam: look");
@@ -144,6 +155,7 @@ class ExtendedTest {
         assertFalse(response.contains("clearing"));
         response = sendCommandToServer("sam: bridge river");
         response = sendCommandToServer("sam: look");
+        System.out.println(response);
         assertFalse(response.contains("clearing"));
     }
 
@@ -153,9 +165,13 @@ class ExtendedTest {
         String response;
         sendCommandToServer("simon: get axe");
         sendCommandToServer("simon: goto forest");
-        sendCommandToServer("simon: cut down tree");
+        response = sendCommandToServer("simon: cut down tree");
+        System.out.println(response);
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("log"));
         sendCommandToServer("sam: goto forest");
         response = sendCommandToServer("sam: look");
+        System.out.println(response);
         assertTrue(response.contains("log"));
         sendCommandToServer("sam: goto riverbank");
         response = sendCommandToServer("sam: look");
