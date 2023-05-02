@@ -53,7 +53,7 @@ public class Location extends GameEntity{
         if (exits.size() != 0){
             stringBuilder.append(" | exits: ");
             for (Location exist: exits.values()){
-                stringBuilder.append(exist.toString());
+                stringBuilder.append(exist.getName()).append("  ");
             }
             stringBuilder.append(" | \n");
         }

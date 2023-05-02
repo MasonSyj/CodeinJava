@@ -258,7 +258,7 @@ public final class GameServer {
     public String executeLook(){
         StringBuilder nearbyPlayers = new StringBuilder("Nearby Players: ");
         for (Player player: playerHashMap.values()){
-           if (player != currentPlayer && player.getCurrentLocation() == currentLocation){
+           if (player != currentPlayer && player.getCurrentLocation().equals(currentLocation)){
               nearbyPlayers.append(player.getName()).append(", ");
            }
         }
@@ -274,7 +274,7 @@ public final class GameServer {
             currentPlayer.setCurrentLocation(currentLocation.getExits().get(newLocation));
             return executeLook();
         } else {
-            return "failed to execute goto, You can't go to " + newLocation;
+            return "[error] " + "failed to execute goto, You can't go to " + newLocation;
         }
     }
     public String executeGet(String artefactName){
@@ -284,7 +284,7 @@ public final class GameServer {
                 currentLocation.getArtefacts().remove(currentArtefact.getName());
                 return "get " + currentArtefact.getName();
          } else {
-                return "failed to execute get, you may input the wrong name or it doesn't exist at all.";
+                return "[error] " + "failed to execute get, you may input the wrong name or it doesn't exist at all.";
          }
     }
 
@@ -294,7 +294,7 @@ public final class GameServer {
             currentLocation.addArtefact(artefact);
             return "drop " + artefact.getName();
         } else {
-            return "failed to drop, doesn't exist this artefact";
+            return "[error] " + "failed to drop, doesn't exist this artefact";
         }
     }
 
@@ -315,7 +315,7 @@ public final class GameServer {
         currentPlayer = playerHashMap.get(username);
         currentLocation = currentPlayer.getCurrentLocation();
 
-        Set<GameAction> possibleGameActions = getPossibleGameAction();
+        Set<GameAction> possibleGameActions = getPossibleGameAction(tokens);
         if (possibleGameActions.size() != 0){
             return proceedGameAction(possibleGameActions);
         }
@@ -334,31 +334,31 @@ public final class GameServer {
 
     public String proceedGameAction(Set<GameAction> possibleGameActions){
         if (includeBasicCommand()){
-            return "what the heck is wrong with you";
+            return "[error] what the heck is wrong with you";
         }
 
         if (checkComposite(possibleGameActions)){
-            return "You might use composite commands, you can only execute one at a time";
+            return "[error] You might use composite commands, you can only execute one at a time";
         }
 
         if (checkPartial(possibleGameActions)){
-            return "your command needs at least one subject";
+            return "[error] your command needs at least one subject";
         }
 
         Set<String> availableEntities = getAvailableEntities();
 
         if (checkPerformable(possibleGameActions, availableEntities)){
-            return "this game action miss necessary subject to execute";
+            return "[error] this game action miss necessary subject to execute";
         }
 
         if (checkExtraneous(possibleGameActions)){
-            return "Your command contains extraneous entities";
+            return "[error] Your command contains extraneous entities";
         }
 
         if (possibleGameActions.size() > 1){
-            return "Your command is ambiguous";
+            return "[error] Your command is ambiguous";
         } else if (possibleGameActions.size() == 0){
-            return "No game action is matched";
+            return "[error] No game action is matched";
         }
 
         GameAction action = possibleGameActions.stream().toList().get(0);
@@ -409,7 +409,7 @@ public final class GameServer {
             while (iterator.hasNext()) {
                 GameAction action = iterator.next();
                 Set<String> triggersInAction = action.getTriggers();
-                if (!triggersInCommand.containsAll(triggersInAction)){
+                if (!triggersInAction.containsAll(triggersInCommand)){
                     iterator.remove();
                 }
             }
@@ -504,14 +504,25 @@ public final class GameServer {
     }
 
     // based on the command, find all actions by trigger names
-    private Set<GameAction> getPossibleGameAction(){
+    private Set<GameAction> getPossibleGameAction(String[] tokens){
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
         for (String actionName: actions.keySet()){
-            if (inputCommand.contains(actionName)){
+            if (inputCommand.contains(actionName) && indexOfCommand(tokens, actionName) != -1){
                 possibleGameActions.addAll(actions.get(actionName));
             }
         }
         return possibleGameActions;
+    }
+
+    public int indexOfCommand(String[] tokens, String command) {
+        int answer = -1;
+        for (int i = 0; i < tokens.length; i++) {
+            if (command.equals(tokens[i])) {
+                answer = i;
+                break;
+            }
+        }
+        return answer;
     }
 
     public boolean consumeHealth() {
@@ -584,10 +595,10 @@ public final class GameServer {
     }
 
     public String proceedBasicCommand(String[] tokens){
-        if (checkDuplicateBasicCommands(tokens)){ return "What the hell is wrong with you"; }
+        if (checkDuplicateBasicCommands(tokens)){ return "[error] What the hell is wrong with you"; }
 
         int indexCommand = indexBasicCommand(tokens);
-        if (indexCommand == -1){ return "failed to execute game action or basic commands"; }
+        if (indexCommand == -1){ return "[error] failed to execute game action or basic commands"; }
 
         String basicCommand = tokens[indexCommand];
         boolean basicCommandWithoutEntity = basicCommand.equals("inv") || basicCommand.equals("inventory")
@@ -595,16 +606,16 @@ public final class GameServer {
         int numOfEntities = numOfEntites(tokens);
 
         if (numOfEntities > 1){
-            return basicCommand + " have more than two entites";
+            return "[error] " + basicCommand + " have more than two entites";
         } else if (numOfEntities == 0 && !basicCommandWithoutEntity){
-            return basicCommand + " requires one entity to execute";
+            return "[error] " + basicCommand + " requires one entity to execute";
         } else if (numOfEntities == 1 && basicCommandWithoutEntity){
-            return basicCommand + " doesn't need entity";
+            return "[error] " + basicCommand + " doesn't need entity";
         }
 
         int lastEntityIndex = lastEntityIndex(tokens);
         if (indexCommand > lastEntityIndex && !basicCommandWithoutEntity){
-            return basicCommand + " is wrong in logic order";
+            return "[error] " + basicCommand + " is wrong in logic order";
         }
 
         return executeBasicCommand(basicCommand, tokens, lastEntityIndex);

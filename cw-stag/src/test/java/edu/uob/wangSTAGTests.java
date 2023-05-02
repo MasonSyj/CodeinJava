@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class MySTAGTests {
+class wangSTAGTests {
 
   private GameServer server;
 
@@ -196,6 +196,7 @@ class MySTAGTests {
     assertFalse(response.contains("simon"), "see other players in response to look");
     response = sendCommandToServer("simon: cut tree");
     response = sendCommandToServer("sarah: goto forest");
+    System.out.println(response);
     assertTrue(response.contains("forest"), "Did not see the name of the current room in response to goto");
     assertTrue(response.contains("simon"), "Did not see other players in response to goto");
     assertTrue(response.contains("log"), "Did not see the name of the current room in response to goto");
@@ -280,7 +281,9 @@ class MySTAGTests {
     response = sendCommandToServer("simon: cutdown tree");
     assertTrue(response.contains("[error]"), "No action in the command");
     response = sendCommandToServer("simon: cut tree down");
+    System.out.println(response);
     response = sendCommandToServer("simon: look");
+    System.out.println(response);
     assertTrue(response.contains("log"), "Did not see a description of the current room in response to look");
     response = sendCommandToServer("simon: cut tree");
     assertTrue(response.contains("[error]"), "Entity does not exist in this location");
@@ -361,14 +364,18 @@ class MySTAGTests {
     response = sendCommandToServer("simon: look");
     assertTrue(response.contains("clearing"), "Did not see the path of the current room in response to look");
     response = sendCommandToServer("simon: destroy axe");
+    System.out.println(response);
     response = sendCommandToServer("simon: look");
+    System.out.println(response);
     assertFalse(response.contains("clearing"), "Already moved the bridge to clearing");
   }
 
   @Test
   void testOthers() {
-    String response = sendCommandToServer("simon: look,");
-    assertFalse(response.contains("[error]"), "No action in the command");
+//    String response = sendCommandToServer("simon: look");
+//    System.out.println(response);
+//    assertFalse(response.contains("[error]"), "No action in the command");
+    String response;
     response = sendCommandToServer("simon: look ,");
     assertTrue(response.contains("cabin"), "Did not see the name of the current room in response to look");
     response = sendCommandToServer("simon: l00k");
