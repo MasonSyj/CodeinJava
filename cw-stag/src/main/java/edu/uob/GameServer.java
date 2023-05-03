@@ -219,7 +219,6 @@ public final class GameServer {
                 numOfBasicCommands++;
             }
         }
-
         return numOfBasicCommands > 1;
     }
 
@@ -615,7 +614,6 @@ public final class GameServer {
                 currentPlayer.increaseHealth();
                 result.append("You gain one unit of health \n");
             } else if (locationHashMap.containsKey(production)){
-//                currentLocation.addExit(locationHashMap.get(production));
                 locationHashMap.get(production).add(currentLocation);
                 result.append("new exit: ").append(production).append(" \n");
             } else {

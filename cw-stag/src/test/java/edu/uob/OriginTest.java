@@ -52,8 +52,10 @@ class OriginTest {
         String response;
         sendCommandToServer("simon: look");
         response = sendCommandToServer("andy: look");
-        System.out.println(response);
         assertTrue(response.contains("simon"));
+        response = sendCommandToServer("mason: look");
+        assertTrue(response.contains("simon"));
+        assertTrue(response.contains("andy"));
     }
 
     // Test that we can pick something up and that it appears in our inventory

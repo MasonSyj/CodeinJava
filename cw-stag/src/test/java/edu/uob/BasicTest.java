@@ -121,14 +121,48 @@ class BasicTest {
     @Test
     void testGameActionPartialFailedTrigger() {
         String response;
-        response = sendCommandToServer("simon: goto forest");
-        response = sendCommandToServer("simon: cut tree down");
-        System.out.println(response);
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: cut tree down");
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertTrue(response.contains("tree"));
     }
 
+    @Test
+    void testGameActionPartialFailedTrigger2() {
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: ccut down tree down");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("tree"));
+    }
+
+    @Test
+    void testGameActionPartialFailedTrigger3() {
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: cut  down tree");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("tree"));
+    }
+
+    @Test
+    void testGameActionPartialFailedTrigger4() {
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: cutdown tree");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("tree"));
+    }
+
+
+    @Test
+    void testGameActionPartialSuccessfulTrigger() {
+        String response;
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: cut down tree");
+        response = sendCommandToServer("simon: look");
+        assertFalse(response.contains("tree"));
+    }
     // only allow entity that only included in the action
     @Test
     void testGameActionExtraneousCase() {

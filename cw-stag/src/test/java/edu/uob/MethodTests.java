@@ -86,5 +86,32 @@ class MethodTests {
         assertFalse(answer.contains("elf"));
         assertFalse(answer.contains("apple"));
     }
+
+    @Test
+    void testValidTrigger() {
+        server.handleCommand("simon: ccut down");
+        boolean isvalid = server.isValidTrigger("cut down");
+        assertFalse(isvalid);
+        isvalid = server.isValidTrigger("cut");
+        assertFalse(isvalid);
+
+        server.handleCommand("simon: cut down");
+        isvalid = server.isValidTrigger("cut down");
+        assertTrue(isvalid);
+    }
+
+    @Test
+    void isDead() {
+        server.handleCommand("simon: look");
+        boolean isDead = server.isDead();
+        assertFalse(isDead);
+        isDead = server.isDead();
+        assertFalse(isDead);
+        isDead = server.isDead();
+        assertTrue(isDead);
+
+        isDead = server.isDead();
+        assertFalse(isDead);
+    }
 }
 

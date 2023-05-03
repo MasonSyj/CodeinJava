@@ -110,8 +110,7 @@ class ExtendedTest {
     void basicCommandManyEntites(){
         String response;
         response = sendCommandToServer("simon: goto forest forest");
-        System.out.println(response);
-        assertTrue(response.contains("have more than two"));
+        assertTrue(response.contains("error"));
     }
 
     @Test
@@ -146,17 +145,21 @@ class ExtendedTest {
         sendCommandToServer("simon: goto forest");
         sendCommandToServer("simon: cut down tree");
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         sendCommandToServer("simon: get log");
         sendCommandToServer("sam: goto forest");
         sendCommandToServer("sam: look");
         sendCommandToServer("sam: goto riverbank");
         response = sendCommandToServer("sam: look");
         assertFalse(response.contains("clearing"));
-        response = sendCommandToServer("sam: bridge river");
+        sendCommandToServer("sam: bridge river");
         response = sendCommandToServer("sam: look");
-        System.out.println(response);
         assertFalse(response.contains("clearing"));
+
+        sendCommandToServer("simon: drop log"); // this action consume log, but I make log not subject
+
+        sendCommandToServer("sam: bridge river");
+        response = sendCommandToServer("sam: look");
+        assertTrue(response.contains("clearing"));
     }
 
     // if in other location, the action will succeed
@@ -194,9 +197,7 @@ class ExtendedTest {
         sendCommandToServer("sam: open key");
         sendCommandToServer("sam: goto cellar");
         response = sendCommandToServer("sam: pay elf");
-        System.out.println(response);
         response = sendCommandToServer("sam: look");
-        System.out.println(response);
         assertTrue(response.contains("shovel"));
         sendCommandToServer("sam: get shovel");
         response = sendCommandToServer("sam: inv");
@@ -209,10 +210,19 @@ class ExtendedTest {
         sendCommandToServer("sam: bridge river");
         sendCommandToServer("sam: goto clearing");
         response = sendCommandToServer("sam: dig ground");
-        System.out.println(response);
         response = sendCommandToServer("sam: look");
         assertTrue(response.contains("hole"));
         assertTrue(response.contains("gold"));
+
+        sendCommandToServer("sam: get gold");
+        response = sendCommandToServer("sam: inv");
+        assertTrue(response.contains("gold"));
+
+        // you cannot get a furniture
+        response = sendCommandToServer("sam: get hole");
+        assertTrue(response.contains("error"));
+        response = sendCommandToServer("sam: inv");
+        assertFalse(response.contains("hole"));
     }
 
     // log as the production of the cut down tree, I put it to the cabin
@@ -220,7 +230,6 @@ class ExtendedTest {
     void testProductionInOtherLocation() {
         String response;
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertTrue(response.contains("log"));
         sendCommandToServer("simon: get axe");
         sendCommandToServer("simon: goto forest");
@@ -229,7 +238,6 @@ class ExtendedTest {
         assertTrue(response.contains("log"));
         sendCommandToServer("simon: goto cabin");
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertFalse(response.contains("log"));
     }
 
@@ -239,12 +247,9 @@ class ExtendedTest {
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("log"));
         response = sendCommandToServer("sam: get log");
-        System.out.println(response);
         response = sendCommandToServer("sam: inv");
-        System.out.println(response);
         assertTrue(response.contains("log"));
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertFalse(response.contains("log"));
 
         sendCommandToServer("simon: get axe");
