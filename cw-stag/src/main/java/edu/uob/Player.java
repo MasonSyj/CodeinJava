@@ -4,27 +4,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Player extends GameEntity{
+public class Player extends Character{
 
     private Location currentLocation;
 
     private Map<String, Artefact> inventory;
 
-    int health;
-    public Player(String name, String description) {
+    private int health;
+
+    public Player(String name, String description, Location currentLocation) {
         super(name, description);
         inventory = new HashMap<String, Artefact>();
         health = 3;
-    }
-
-    @Override
-    public void add(Location location) {
-
-    }
-
-    @Override
-    public GameEntity remove(Location location) {
-        return null;
+        this.currentLocation = currentLocation;
     }
 
     public Location getCurrentLocation(){

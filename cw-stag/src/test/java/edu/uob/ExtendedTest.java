@@ -260,4 +260,14 @@ class ExtendedTest {
         response = sendCommandToServer("sam: inv");
         assertTrue(response.contains("log"));
     }
+    @Test
+    void testGameActionPerformable() {
+        String response;
+        sendCommandToServer("simon: get axe");
+        sendCommandToServer("simon: goto forest");
+        sendCommandToServer("simon: ccut down tree cut tree");
+        response = sendCommandToServer("simon: look");
+        assertTrue(response.contains("log"));
+        assertFalse(response.contains("tree"));
+    }
 }

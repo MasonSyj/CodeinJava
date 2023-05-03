@@ -225,6 +225,7 @@ class OriginTest {
         assertFalse(response.contains("key"));
         assertFalse(response.contains("tree"));
     }
+
     @Test
     void eatIcecream() {
         String response;

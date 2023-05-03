@@ -79,7 +79,7 @@ class MethodTests {
         for (String trigger: answer){
             System.out.println(trigger);
         }
-        assertTrue(answer.contains("cut down"));
+        assertFalse(answer.contains("cut down"));
         // contain a cut, meaning a string equals to
         assertTrue(answer.contains("cut"));
         assertTrue(answer.contains("hit"));
