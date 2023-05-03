@@ -194,7 +194,6 @@ class OriginTest {
     @Test
     void blankInput(){
         String response = sendCommandToServer("");
-        System.out.println(response);
         assertTrue(response.equals(""));
     }
 
@@ -232,7 +231,6 @@ class OriginTest {
     void eatIcecream() {
         String response;
         response = sendCommandToServer("simon: eat ice-cream");
-        System.out.println(response);
         assertTrue(response.contains("failed to execute"));
     }
 }

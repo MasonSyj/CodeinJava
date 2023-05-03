@@ -36,7 +36,6 @@ class MethodTests {
     void numOfEntitiesTest(){
         String[] tokens = {"tree", "axe", "key", "hole", "apple"};
         int num1 = server.numOfEntites(tokens);
-        System.out.println(num1);
         assertTrue(num1 == 4);
 
         tokens = new String[]{"hello", "bristol"};
@@ -76,9 +75,7 @@ class MethodTests {
     void findTriggersInCommand(){
         server.handleCommand("simon: ccut down tree hit elf, cut log");
         Set<String> answer = server.getTriggersInCommand();
-        for (String trigger: answer){
-            System.out.println(trigger);
-        }
+
         assertFalse(answer.contains("cut down"));
         // contain a cut, meaning a string equals to
         assertTrue(answer.contains("cut"));

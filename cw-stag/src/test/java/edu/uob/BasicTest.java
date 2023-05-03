@@ -39,9 +39,7 @@ class BasicTest {
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("cellar"));
         response = sendCommandToServer("simon: close trapdoor");
-        System.out.println(response);
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertTrue(!response.contains("cellar"));
     }
 
@@ -60,7 +58,6 @@ class BasicTest {
         sendCommandToServer("simon: goto forest");
         sendCommandToServer("simon: Cut dOWn TREE");
         response = sendCommandToServer("simon: lOOk");
-        System.out.println(response);
         assertFalse(response.contains("tree"));
     }
 
@@ -264,10 +261,8 @@ class BasicTest {
     void testGameActionNotPerformable() {
         String response;
         // current location is cabin and the player doesn't have key(it's in the forest)
-        response = sendCommandToServer("simon: open key");
-        System.out.println(response);
+        sendCommandToServer("simon: open key");
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertFalse(response.contains("cellar"));
     }
 
@@ -275,10 +270,8 @@ class BasicTest {
     void testPlayerNameAsEntity(){
         String response;
         response = sendCommandToServer("simon: andy look");
-        System.out.println(response);
         response = sendCommandToServer("andy: look");
         response = sendCommandToServer("simon: andy look");
-        System.out.println(response);
     }
 
 
