@@ -67,11 +67,11 @@ class ExtendedTest {
         sendCommandToServer("simon: goto cabin");
         sendCommandToServer("simon: open key");
         sendCommandToServer("simon: goto cellar");
-        response = sendCommandToServer("simon: look");
+        sendCommandToServer("simon: look");
         sendCommandToServer("simon: hit elf");
         response = sendCommandToServer("simon: health");
         assertTrue(response.contains("2"));
-        response = sendCommandToServer("simon: hit spider");
+        sendCommandToServer("simon: hit spider");
         response = sendCommandToServer("simon: health");
         assertTrue(response.contains("3"));
         response = sendCommandToServer("simon: look");
@@ -102,7 +102,7 @@ class ExtendedTest {
         String response;
         sendCommandToServer("simon: get axe");
         sendCommandToServer("simon: goto forest");
-        response = sendCommandToServer("simon: cut tree down");
+        sendCommandToServer("simon: cut tree down");
     }
 
     @Test
@@ -119,7 +119,7 @@ class ExtendedTest {
         sendCommandToServer("simon: goto riverbank");
         response = sendCommandToServer("simon: look");
         assertFalse(response.contains("lumberjack"));
-        response = sendCommandToServer("simon: blow horn");
+        sendCommandToServer("simon: blow horn");
         sendCommandToServer("simon: get horn");
 
         sendCommandToServer("simon: goto forest");
@@ -127,7 +127,7 @@ class ExtendedTest {
         response = sendCommandToServer("simon: look");
         assertFalse(response.contains("lumberjack"));
 
-        response = sendCommandToServer("simon: blow horn");
+        sendCommandToServer("simon: blow horn");
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("lumberjack"));
     }
@@ -141,7 +141,7 @@ class ExtendedTest {
         sendCommandToServer("simon: get axe");
         sendCommandToServer("simon: goto forest");
         sendCommandToServer("simon: cut down tree");
-        response = sendCommandToServer("simon: look");
+        sendCommandToServer("simon: look");
         sendCommandToServer("simon: get log");
         sendCommandToServer("sam: goto forest");
         sendCommandToServer("sam: look");
@@ -191,20 +191,20 @@ class ExtendedTest {
         sendCommandToServer("sam: goto cabin");
         sendCommandToServer("sam: open key");
         sendCommandToServer("sam: goto cellar");
-        response = sendCommandToServer("sam: pay elf");
+        sendCommandToServer("sam: pay elf");
         response = sendCommandToServer("sam: look");
         assertTrue(response.contains("shovel"));
         sendCommandToServer("sam: get shovel");
         response = sendCommandToServer("sam: inv");
         String response2 = sendCommandToServer("sam: inventory");
-        assertTrue(response.equals(response2));
+        assertEquals(response, response2);
         assertTrue(response.contains("shovel"));
         sendCommandToServer("sam: goto cabin");
         sendCommandToServer("sam: goto forest");
         sendCommandToServer("sam: goto riverbank");
         sendCommandToServer("sam: bridge river");
         sendCommandToServer("sam: goto clearing");
-        response = sendCommandToServer("sam: dig ground");
+        sendCommandToServer("sam: dig ground");
         response = sendCommandToServer("sam: look");
         assertTrue(response.contains("hole"));
         assertTrue(response.contains("gold"));
@@ -241,7 +241,7 @@ class ExtendedTest {
         String response;
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("log"));
-        response = sendCommandToServer("sam: get log");
+        sendCommandToServer("sam: get log");
         response = sendCommandToServer("sam: inv");
         assertTrue(response.contains("log"));
         response = sendCommandToServer("simon: look");

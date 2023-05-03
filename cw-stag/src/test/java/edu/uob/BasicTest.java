@@ -39,8 +39,10 @@ class BasicTest {
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("cellar"));
         response = sendCommandToServer("simon: close trapdoor");
+        System.out.println(response);
         response = sendCommandToServer("simon: look");
-        assertTrue(!response.contains("cellar"));
+        System.out.println(response);
+        assertFalse(response.contains("cellar"));
     }
 
     @Test
@@ -270,8 +272,10 @@ class BasicTest {
     void testPlayerNameAsEntity(){
         String response;
         response = sendCommandToServer("simon: andy look");
-        response = sendCommandToServer("andy: look");
+        assertTrue(response.contains("cabin"));
+        sendCommandToServer("andy: look");
         response = sendCommandToServer("simon: andy look");
+        assertTrue(response.contains("error"));
     }
 
 

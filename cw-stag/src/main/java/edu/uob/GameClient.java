@@ -33,7 +33,7 @@ public final class GameClient {
                 for (int i = 0; i < command.length(); i++){
                     if (command.charAt(i) == ':'){
                         String newUsername = command.substring(0, i);
-                        writeCommand = newUsername + ": " + command.substring(i + 1, command.length()) + "\n";
+                        writeCommand = newUsername + ": " + command.substring(i + 1) + "\n";
                     }
                 }
             } else {

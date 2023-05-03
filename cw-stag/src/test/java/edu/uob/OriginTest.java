@@ -126,7 +126,6 @@ class OriginTest {
         assertFalse(response.contains("potion"));
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("potion"));
-        response = sendCommandToServer("simon: drop potion");
     }
 
     @Test
@@ -168,12 +167,6 @@ class OriginTest {
         sendCommandToServer("simon: get key");
         sendCommandToServer("simon: goto cabin");
         sendCommandToServer("simon: open key");
-        /*
-        response = sendCommandToServer("simon: look");
-        System.out.println(response);
-        assertFalse(response.contains("cellar"));
-        sendCommandToServer("simon: open trapdoor");
-         */
         sendCommandToServer("simon: goto cellar");
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("elf"));

@@ -53,32 +53,6 @@ public class GameAction{
         return narration;
     }
 
-    /*
-    @Override
-    public String toString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("trigger: \n");
-        for (String str: this.triggers){
-            stringBuilder.append(str).append(" ");
-        }
-
-        stringBuilder.append("\nsubjects: \n");
-        for (String str: this.subjects){
-            stringBuilder.append(str).append(" ");
-        }
-
-        stringBuilder.append("\nconsumables: \n");
-        for (String str: this.consumables){
-            stringBuilder.append(str).append(" ");
-        }
-
-        stringBuilder.append("\nproductions: \n");
-        for (String str: this.productions){
-            stringBuilder.append(str).append(" ");
-        }
-        return stringBuilder.toString();
-    }
-    */
     public void setNarration(String narration) {
         this.narration = narration;
     }

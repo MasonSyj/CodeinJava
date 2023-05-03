@@ -314,9 +314,8 @@ public final class GameServer {
     public String handleCommand(String command) {
         if (command.equals("")){ return ""; }
 
-        String username = "";
         int colonIndex = command.indexOf(':');
-        username = command.substring(0, colonIndex).toLowerCase();
+        String username = command.substring(0, colonIndex).toLowerCase();
         this.inputCommand = command.substring(colonIndex + 1).toLowerCase();
         String[] tokens = inputCommand.trim().replaceAll("\\s+", " ").split(" ");
 
@@ -328,7 +327,7 @@ public final class GameServer {
         currentPlayer = playerHashMap.get(username);
         currentLocation = currentPlayer.getCurrentLocation();
 
-        Set<GameAction> possibleGameActions = getPossibleGameAction(tokens);
+        Set<GameAction> possibleGameActions = getPossibleGameAction();
         if (possibleGameActions.size() > 0){
             return proceedGameAction(possibleGameActions);
         }
@@ -484,12 +483,14 @@ public final class GameServer {
         for (String production: action.getProductions()){
             if (!availableMaterials.contains(production)){
                 result = false;
+                break;
             }
         }
 
         for (String consumption: action.getConsumables()){
             if (!availableMaterials.contains(consumption)){
                 result = false;
+                break;
             }
         }
 
@@ -537,7 +538,7 @@ public final class GameServer {
     }
 
     // based on the command, find all actions by trigger names
-    private Set<GameAction> getPossibleGameAction(String[] tokens){
+    private Set<GameAction> getPossibleGameAction(){
         Set<GameAction> possibleGameActions = new HashSet<GameAction>();
         for (String trigger: actions.keySet()){
             if (inputCommand.contains(trigger) && isValidTrigger(trigger)){
@@ -599,11 +600,11 @@ public final class GameServer {
 
     // execute game action needs to consume entity and produce entity
     public String executeGameAction(GameAction gameAction) {
-        StringBuilder result = new StringBuilder("-----------------------------\n");
-        result.append(consumeEntity(gameAction))
-              .append(produceEntity(gameAction))
-              .append(gameAction.getNarration()).append("\n-----------------------------\n");
-        return result.toString();
+         return   "-------------------------------\n"
+                + consumeEntity(gameAction)
+                + produceEntity(gameAction)
+                + gameAction.getNarration()
+                + "\n-----------------------------\n";
     }
 
     // produce game entity, including gain health, put entity in the current location or have new exits
@@ -634,7 +635,7 @@ public final class GameServer {
         // if contain several basic commands
         if (checkDuplicateBasicCommands(tokens)){ return "[error] What the hell is wrong with you"; }
 
-        // if doesn't contain any basic command
+        // if it doesn't contain any basic command
         int indexCommand = indexBasicCommand(tokens);
         if (indexCommand == -1){ return "[error] failed to execute game action or basic commands"; }
 
@@ -660,21 +661,14 @@ public final class GameServer {
     }
 
     public String executeBasicCommand(String basicCommand, String[] tokens, int entityIndex){
-        switch (basicCommand) {
-            case "inv":
-            case "inventory":
-                return executeInv();
-            case "look":
-                return executeLook();
-            case "health":
-                return executeHealth();
-            case "get":
-                return executeGet(tokens[entityIndex]);
-            case "goto":
-                return executeGoto(tokens[entityIndex]);
-            default:
-                return executeDrop(tokens[entityIndex]);
-        }
+        return switch (basicCommand) {
+            case "inv", "inventory" -> executeInv();
+            case "look" -> executeLook();
+            case "health" -> executeHealth();
+            case "get" -> executeGet(tokens[entityIndex]);
+            case "goto" -> executeGoto(tokens[entityIndex]);
+            default -> executeDrop(tokens[entityIndex]);
+        };
     }
 
     //  === Methods below are there to facilitate server related operations. ===

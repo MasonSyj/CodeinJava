@@ -13,7 +13,7 @@ public class Character extends GameEntity{
 
     @Override
     public GameEntity remove(Location location) {
-        return location.getCharacters().remove(this.getName());
+        return location.removeCharacter(this.getName());
     }
 
 

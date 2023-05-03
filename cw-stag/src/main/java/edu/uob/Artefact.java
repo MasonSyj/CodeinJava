@@ -12,6 +12,6 @@ public class Artefact extends GameEntity{
 
     @Override
     public GameEntity remove(Location location) {
-        return location.getArtefacts().remove(this.getName());
+        return location.removeArtefact(this.getName());
     }
 }

@@ -16,17 +16,34 @@ public class Location extends GameEntity{
     public void addArtefact(Artefact artefact){
         artefacts.put(artefact.getName(), artefact);
     }
+
+    public Artefact removeArtefact(String artefactName) {
+        return this.artefacts.remove(artefactName);
+    }
+
     public void addFurniture(Furniture furniture) {
         furnitures.put(furniture.getName(), furniture);
     }
 
+    public Furniture removeFurniture(String furnitureName) {
+        return this.furnitures.remove(furnitureName);
+    }
     public void addCharacter(Character character) {
         characters.put(character.getName(), character);
+    }
+
+    public Character removeCharacter(String characterName) {
+        return this.characters.remove(characterName);
     }
 
     public void addExit(Location exit){
         exits.put(exit.getName(), exit);
     }
+
+    public Location removeExit(String exitName) {
+        return this.exits.remove(exitName);
+    }
+
     public Location(String name, String description) {
         super(name, description);
         this.exits = new HashMap<String, Location>();
@@ -42,9 +59,8 @@ public class Location extends GameEntity{
 
     @Override
     public GameEntity remove(Location location) {
-        return location.getExits().remove(this.getName());
+        return location.removeExit(this.getName());
     }
-
 
     public String showInformation() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -57,7 +73,6 @@ public class Location extends GameEntity{
             }
             stringBuilder.append(" | \n");
         }
-        // DRY here.
         if (furnitures.size() != 0){
             stringBuilder.append("| furnitures: ");
             for (Furniture furniture: furnitures.values()){
@@ -100,7 +115,6 @@ public class Location extends GameEntity{
     }
 
     public GameEntity getGameEntity (String name){
-        GameEntity answer;
         if (getCharacters().get(name) != null) {
             return getCharacters().get(name);
         } else if (getExits().get(name) != null) {
@@ -113,21 +127,4 @@ public class Location extends GameEntity{
             return null;
         }
     }
-/*
-    public void setExits(Set<Location> exits){
-       this.exits = exits;
-    }
-
-    public void setCharacters(Set<Character> characters){
-        this.characters = characters;
-    }
-
-    public void setArtefacts(Set<Artefact> artefacts){
-        this.artefacts = artefacts;
-    }
-
-    public void setFurnitures(Set<Furniture> furnitures){
-        this.furnitures = furnitures;
-    }
-**/
 }
