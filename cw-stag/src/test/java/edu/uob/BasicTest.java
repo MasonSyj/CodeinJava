@@ -237,5 +237,15 @@ class BasicTest {
         assertFalse(response.contains("cellar"));
     }
 
+    @Test
+    void testPlayerNameAsEntity(){
+        String response;
+        response = sendCommandToServer("simon: andy look");
+        System.out.println(response);
+        response = sendCommandToServer("andy: look");
+        response = sendCommandToServer("simon: andy look");
+        System.out.println(response);
+    }
+
 
 }

@@ -322,6 +322,7 @@ public final class GameServer {
         String[] tokens = inputCommand.trim().replaceAll("\\s+", " ").split(" ");
 
         if (!playerHashMap.containsKey(username)){
+            entities.add(username);
             playerHashMap.put(username, new Player(username, "", startLocation));
         }
 
