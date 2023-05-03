@@ -7,7 +7,7 @@ public class Artefact extends GameEntity{
 
     @Override
     public void add(Location location) {
-        location.getArtefacts().put(this.getName(), this);
+        location.addArtefact(this);
     }
 
     @Override

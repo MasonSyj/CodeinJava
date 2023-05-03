@@ -37,7 +37,7 @@ public class Location extends GameEntity{
 
     @Override
     public void add(Location location) {
-        location.getExits().put(this.getName(), this);
+        location.addExit(this);
     }
 
     @Override

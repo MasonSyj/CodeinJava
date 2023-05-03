@@ -8,7 +8,7 @@ public class Character extends GameEntity{
 
     @Override
     public void add(Location location) {
-       location.getCharacters().put(this.getName(), this);
+        location.addCharacter(this);
     }
 
     @Override

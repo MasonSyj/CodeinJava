@@ -58,10 +58,10 @@ class MethodTests {
 
     @Test
     void lastEntityIndexTest() {
-        assertTrue(server.lastEntityIndex(new String[]{"apple", "axe", "forest"}) == 2);
-        assertTrue(server.lastEntityIndex(new String[]{"axe", "forest", "apple"}) == 1);
-        assertTrue(server.lastEntityIndex(new String[]{"axe", "banana", "apple"}) == 0);
-        assertTrue(server.lastEntityIndex(new String[]{"pear", "banana", "apple"}) == -1);
+        assertTrue(server.entityIndex(new String[]{"apple", "axe", "forest"}) == 2);
+        assertTrue(server.entityIndex(new String[]{"axe", "forest", "apple"}) == 1);
+        assertTrue(server.entityIndex(new String[]{"axe", "banana", "apple"}) == 0);
+        assertTrue(server.entityIndex(new String[]{"pear", "banana", "apple"}) == -1);
     }
 
     @Test

@@ -7,7 +7,8 @@ public class Furniture extends GameEntity{
 
     @Override
     public void add(Location location) {
-        location.getFurnitures().put(this.getName(), this);
+//        location.getFurnitures().put(this.getName(), this);
+        location.addFurniture(this);
     }
 
     @Override
