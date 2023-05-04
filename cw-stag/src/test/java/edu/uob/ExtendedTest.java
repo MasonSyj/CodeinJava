@@ -98,14 +98,6 @@ class ExtendedTest {
     }
 
     @Test
-    void testGameActionOrder() {
-        String response;
-        sendCommandToServer("simon: get axe");
-        sendCommandToServer("simon: goto forest");
-        sendCommandToServer("simon: cut tree down");
-    }
-
-    @Test
     void basicCommandManyEntites(){
         String response;
         response = sendCommandToServer("simon: goto forest forest");
@@ -148,6 +140,7 @@ class ExtendedTest {
         sendCommandToServer("sam: goto riverbank");
         response = sendCommandToServer("sam: look");
         assertFalse(response.contains("clearing"));
+
         sendCommandToServer("sam: bridge river");
         response = sendCommandToServer("sam: look");
         assertFalse(response.contains("clearing"));

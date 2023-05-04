@@ -40,8 +40,8 @@ public final class GameServer {
     private Set<String> triggers;
 
     public static void main(String[] args) throws IOException {
-        File entitiesFile = Paths.get("config" + File.separator + "basic-entities.dot").toAbsolutePath().toFile();
-        File actionsFile = Paths.get("config" + File.separator + "basic-actions.xml").toAbsolutePath().toFile();
+        File entitiesFile = Paths.get("config" + File.separator + "extended-entities.dot").toAbsolutePath().toFile();
+        File actionsFile = Paths.get("config" + File.separator + "extended-actions.xml").toAbsolutePath().toFile();
         GameServer server = new GameServer(entitiesFile, actionsFile);
         server.blockingListenOn(8888);
     }
@@ -611,6 +611,7 @@ public final class GameServer {
     private String produceEntity(GameAction gameAction) {
         StringBuilder result = new StringBuilder();
         for (String production: gameAction.getProductions()){
+            result.append("produced:  \n");
             if (production.equals("health")){
                 currentPlayer.increaseHealth();
                 result.append("You gain one unit of health \n");

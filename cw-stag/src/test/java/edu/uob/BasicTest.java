@@ -39,9 +39,7 @@ class BasicTest {
         response = sendCommandToServer("simon: look");
         assertTrue(response.contains("cellar"));
         response = sendCommandToServer("simon: close trapdoor");
-        System.out.println(response);
         response = sendCommandToServer("simon: look");
-        System.out.println(response);
         assertFalse(response.contains("cellar"));
     }
 
