@@ -1,8 +1,9 @@
 package edu.uob;
 
-public class Character extends GameEntity{
+// avoid confusion with Java.lang.Character
+public class CharacterStag extends GameEntity{
 
-    public Character(String name, String description) {
+    public CharacterStag(String name, String description) {
         super(name, description);
     }
 

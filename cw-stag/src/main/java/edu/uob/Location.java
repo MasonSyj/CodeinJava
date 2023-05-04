@@ -2,13 +2,11 @@ package edu.uob;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Location extends GameEntity{
 
     private Map<String, Location> exits;
-    private Map<String, Character> characters;
+    private Map<String, CharacterStag> characters;
     private Map<String, Artefact> artefacts;
     private Map<String, Furniture> furnitures;
 
@@ -28,11 +26,11 @@ public class Location extends GameEntity{
     public Furniture removeFurniture(String furnitureName) {
         return this.furnitures.remove(furnitureName);
     }
-    public void addCharacter(Character character) {
-        characters.put(character.getName(), character);
+    public void addCharacter(CharacterStag characterStag) {
+        characters.put(characterStag.getName(), characterStag);
     }
 
-    public Character removeCharacter(String characterName) {
+    public CharacterStag removeCharacter(String characterName) {
         return this.characters.remove(characterName);
     }
 
@@ -49,7 +47,7 @@ public class Location extends GameEntity{
         this.exits = new HashMap<String, Location>();
         this.artefacts = new HashMap<String, Artefact>();
         this.furnitures = new HashMap<String, Furniture>();
-        this.characters = new HashMap<String, Character>();
+        this.characters = new HashMap<String, CharacterStag>();
     }
 
     @Override
@@ -90,15 +88,15 @@ public class Location extends GameEntity{
 
         if (characters.size() != 0){
             stringBuilder.append("| characters: ");
-            for (Character character: characters.values()){
-                stringBuilder.append(character.toString());
+            for (CharacterStag characterStag : characters.values()){
+                stringBuilder.append(characterStag.toString());
             }
             stringBuilder.append(" | \n");
         }
         return stringBuilder.toString();
     }
 
-    public Map<String, Character> getCharacters() {
+    public Map<String, CharacterStag> getCharacters() {
         return characters;
     }
 

@@ -168,7 +168,7 @@ public final class GameServer {
                 switch (name) {
                     case "artefacts" -> entity = new Artefact(itemName, item.getAttribute("description"));
                     case "furniture" -> entity = new Furniture(itemName, item.getAttribute("description"));
-                    default -> entity = new Character(itemName, item.getAttribute("description"));
+                    default -> entity = new CharacterStag(itemName, item.getAttribute("description"));
                 }
                 entity.add(location);
             }

@@ -2,9 +2,8 @@ package edu.uob;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-public class Player extends Character{
+public class Player extends CharacterStag {
 
     private Location currentLocation;
 
