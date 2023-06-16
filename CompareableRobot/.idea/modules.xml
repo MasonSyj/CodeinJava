@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/RobotImplemtComparator.iml" filepath="$PROJECT_DIR$/RobotImplemtComparator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CompareableRobot.iml" filepath="$PROJECT_DIR$/CompareableRobot.iml" />
     </modules>
   </component>
 </project>
