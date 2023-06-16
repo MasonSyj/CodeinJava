@@ -1,11 +1,32 @@
 import java.util.Comparator;
 
 public abstract class Robot implements Comparable<Robot>{
-    String name;
-    int price;
-    int weight;
-    int height;
-    int power;
+    private String name;
+    private int price;
+    private int weight;
+    private int height;
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    private int power;
 
     public Robot(String name, int price, int weight, int power) {
         this.name = name;

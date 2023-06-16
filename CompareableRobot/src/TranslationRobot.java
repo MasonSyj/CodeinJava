@@ -12,12 +12,12 @@ public class TranslationRobot extends Robot{
 
     @Override
     public void talk(TranslationRobot robot) {
-        System.out.println(this.name + " as a translation is talking to another translation robot called " + robot.name);
+        System.out.println(this.getName() + " as a translation is talking to another translation robot called " + robot.getName());
     }
 
     @Override
     public void talk(CarrierRobot robot) {
-        System.out.println(this.name + " as a translation is talking to a carrier robot called " + robot.name);
+        System.out.println(this.getName()+ " as a translation is talking to a carrier robot called " + robot.getName());
     }
 
 }
