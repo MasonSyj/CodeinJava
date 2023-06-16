@@ -1,8 +1,8 @@
 public class TranslationRobot extends Robot{
 
 
-    public TranslationRobot(String name) {
-        super(name);
+    public TranslationRobot(String name, int price, int weight, int power) {
+        super(name, price, weight, power);
     }
 
     @Override
@@ -19,4 +19,5 @@ public class TranslationRobot extends Robot{
     public void talk(CarrierRobot robot) {
         System.out.println(this.name + " as a translation is talking to a carrier robot called " + robot.name);
     }
+
 }
